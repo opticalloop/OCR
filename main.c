@@ -1,7 +1,7 @@
 #inclde <stdio.h>
 
 int main(){
-    printf("je suis une pute");
+    printf("Quentin est sacrément bonne");
     return 0;
 }
 
