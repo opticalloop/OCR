@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "solvable.h"
+#include "Sudoku_Solvable/solvable.h"
 #include "sudoku_solver.h"
-#include "sudoku_printer.h"
+#include "Sudoku_Printer/sudoku_printer.h"
 
 #define true 1
 #define false 0
