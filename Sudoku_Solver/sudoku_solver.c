@@ -3,17 +3,17 @@
 #define true 1
 #define false 0
 
-int canBePlaced(int grid[9][9], int x, int y, int val)
+unsigned int canBePlaced(unsigned int grid[9][9], unsigned int x, unsigned int y, unsigned int val)
 {
     // Check row
-    for (int i = 0; i < 9; i++){
+    for (unsigned int i = 0; i < 9; i++){
         if (grid[x][i] == val){
             return false;
         }
     }
 
     // Check column
-    for (int i = 0; i < 9; i++){
+    for (unsigned int i = 0; i < 9; i++){
         if (grid[i][y] == val){
             return false;
         }
@@ -23,8 +23,8 @@ int canBePlaced(int grid[9][9], int x, int y, int val)
     x -= x % 3;
     y -= y % 3;
 
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 3; j++){
+    for (unsigned int i = 0; i < 3; i++){
+        for (unsigned int j = 0; j < 3; j++){
             if (grid[x + i][y + j] == val){
                 return false;
             }
@@ -34,7 +34,7 @@ int canBePlaced(int grid[9][9], int x, int y, int val)
     return true;
 }
 
-int solveSuduko(int grid[9][9], int x, int y)
+unsigned int solveSuduko(unsigned int grid[9][9], unsigned int x, unsigned int y)
 {
     // End of recursion : No solution found
     if (x >= 8 && y > 8){
@@ -53,7 +53,7 @@ int solveSuduko(int grid[9][9], int x, int y)
     }
 
     // Test all 9 possibilities
-    for (int val = 1; val <= 9; val++){
+    for (unsigned int val = 1; val <= 9; val++){
 
         // If number can be placed at this case
         if (canBePlaced(grid, x, y, val) == true){

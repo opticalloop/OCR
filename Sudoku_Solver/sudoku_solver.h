@@ -1,8 +1,8 @@
 #ifndef SUDOKU_SOLVER_H
 #define SUDOKU_SOLVER_H
 
-int canBePlaced(int grid[9][9], int x, int y, int val);
+unsigned int canBePlaced(unsigned int grid[9][9], unsigned int x, unsigned int y, unsigned int val);
 
-int solveSuduko(int grid[9][9], int x, int y);
+unsigned int solveSuduko(unsigned int grid[9][9], unsigned int x, unsigned int y);
 
 #endif
