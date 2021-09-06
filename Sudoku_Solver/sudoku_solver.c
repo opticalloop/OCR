@@ -3,17 +3,19 @@
 #define true 1
 #define false 0
 
-unsigned int canBePlaced(unsigned int grid[9][9], unsigned int x, unsigned int y, unsigned int val)
+#define dim 9
+
+unsigned int canBePlaced(unsigned int grid[dim][dim], unsigned int x, unsigned int y, unsigned int val)
 {
     // Check row
-    for (unsigned int i = 0; i < 9; i++){
+    for (unsigned int i = 0; i < dim; i++){
         if (grid[x][i] == val){
             return false;
         }
     }
 
     // Check column
-    for (unsigned int i = 0; i < 9; i++){
+    for (unsigned int i = 0; i < dim; i++){
         if (grid[i][y] == val){
             return false;
         }
@@ -34,15 +36,15 @@ unsigned int canBePlaced(unsigned int grid[9][9], unsigned int x, unsigned int y
     return true;
 }
 
-unsigned int solveSuduko(unsigned int grid[9][9], unsigned int x, unsigned int y)
+unsigned int solveSuduko(unsigned int grid[dim][dim], unsigned int x, unsigned int y)
 {
-    // End of recursion : No solution found
+    // End of recursion
     if (x >= 8 && y > 8){
-        return false;
+        return true;
     }
 
     // End of line
-    if (y == 9){
+    if (y > 8){
         x++;
         y = 0;
     }
@@ -53,7 +55,7 @@ unsigned int solveSuduko(unsigned int grid[9][9], unsigned int x, unsigned int y
     }
 
     // Test all 9 possibilities
-    for (unsigned int val = 1; val <= 9; val++){
+    for (unsigned int val = 1; val <= dim; val++){
 
         // If number can be placed at this case
         if (canBePlaced(grid, x, y, val) == true){
