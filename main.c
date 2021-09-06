@@ -1,7 +1,7 @@
-#include <stdio.h>
+#inclde <stdio.h>
 
 int main(){
     printf("Quentin est sacrément bonne");
-    printf("je confirme");
     return 0;
 }
+
