@@ -11,7 +11,9 @@ Neuron newNeuron(unsigned int nbWeights)
         nbWeights,
         NULL,
         0, // Value
-        0 // Bias
+        0, // Bias
+        0, // Delta
+        0  // Output
     };
 
     // Allocate memory for weights 
@@ -39,7 +41,7 @@ void frontPropagationNeuron(Neuron *neuron, Layer *prevLayer)
         sum += prevLayer->neurons[i].value * neuron->weights[i];
     }
 
-    neuron->value = Activation(sum + neuron->bias);
+    neuron->output = activation(sum + neuron->bias);
 }
 
 // ------ /Neuron ------
@@ -68,7 +70,7 @@ Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 // ------ Network ------
 
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput)
-{
+{ 
     Network network = {
         nbHiddenLayers + 2, // Add input and output layer
         sizeInput,
@@ -104,9 +106,10 @@ void initNetwork(Network* network)
     unsigned int nbNeurons;
     
     for (unsigned int i = 0; i < nbLayers; i++){
-            
+        
         Layer* layer = &network->layers[i];
         nbNeurons = layer->nbNeurons;
+
         for (unsigned int j = 0; j < nbNeurons; j++){
             initNeuron(&layer->neurons[j]);
         }
@@ -123,28 +126,56 @@ void frontPropagationNetwork(Network *network)
         Layer* layer = &network->layers[i];
         nbNeurons = layer->nbNeurons;
         for (unsigned int j = 0; i < nbNeurons; j++){
-            frontPropagationNeuron(&layer->neurons[j], &prevLayer);
+            frontPropagationNeuron(&layer->neurons[j], prevLayer);
         }
     }
 }
 
 // ------ /Network ------
 
-void backPropagation(Network *network, unsigned int expected[])
+void backPropagation(Network *network, double expected[])
 {
     unsigned int nbLayers = network->nbLayers;
+    unsigned int errorsIndex = 0;
     for (unsigned int i = nbLayers; i > 0 ; i--)
     {
         Layer *layer = &network->layers[i];
-        unsigned int errors[10];
+        double errors[1];
+        unsigned int nbNeurons = layer->nbNeurons;
         if (i != nbLayers - 1){
             for (unsigned int j = 0; j < layer->nbNeurons; j++){
                 double error = 0.0;
-                unsigned int nbNeurons = &network->layers[i + 1].nbNeurons;
+                Layer *layer = &network->layers[i + 1];
                 for (unsigned int k = 0; k < nbNeurons; k++){
-                    
+                    error += layer->neurons[k].weights[j] * layer->neurons[k].delta;
                 }
+                errors[errorsIndex] = error;
+                errorsIndex++;
             }
+        }
+        else{
+            
+            for (unsigned int j = 0; j < nbNeurons; j++){
+                errors[errorsIndex] = expected[j] - layer->neurons[j].output;
+                errorsIndex++;
+            }
+        }
+        for (unsigned int j = 0; j < nbNeurons; j++){
+            layer->neurons[j].delta = errors[j] * backPropFunction(layer->neurons[j].output);
+        }
+    }
+}
+
+void updateWeights(Network *network, double inputs[], float learningRate)
+{
+    for (unsigned int i = 0; i < network->nbLayers; i++){
+        Layer *layer = &network->layers[i];
+        unsigned int nbNeurons = layer->nbNeurons;
+        for (unsigned int j = 0; j < nbNeurons; j++){
+            for (unsigned int k = 0; k < 2; k++){
+                layer->neurons[j].weights[k] += learningRate * layer->neurons[j].delta * inputs[k];
+            }
+            layer->neurons[j].weights[layer->neurons[j].nbWeights - 1] += learningRate * layer->neurons[j].delta;
         }
     }
 }
