@@ -4,17 +4,15 @@
 #include "pixel_operations/pixel_operations.h"
 #include "op/op.h"
 
-void blackandwhite(void)
+void blackandwhite(SDL_Surface *image_surface)
 {
-    SDL_Surface *image_surface;
     SDL_Surface *screen_surface;
 
     init_sdl();
 
-    image_surface = load_image("my_image.jpg");
     screen_surface = display_image(image_surface);
 
-    wait_for_keypressed();
+    //wait_for_keypressed();
 
     int width = image_surface->w;
     int height = image_surface->h;
@@ -45,13 +43,14 @@ void blackandwhite(void)
     }
 
     update_surface(screen_surface,image_surface);
-    wait_for_keypressed();
+    //wait_for_keypressed();
 
     SDL_FreeSurface(image_surface);
     SDL_FreeSurface(screen_surface);
 }
 
 int main(void){
-    blackandwhite();
+    SDL_Surface *image_surface = load_image("my_image.jpg");
+    blackandwhite(image_surface);
     return 0;
 }

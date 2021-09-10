@@ -18,9 +18,6 @@ blackandwhite: pixel_operations/pixel_operations.o blackandwhite.o op/op.o
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	${RM} *.o
-	${RM} *.d
-	${RM} display
-	${RM} grayscale
+	${RM} *.o *.d display grayscale blackandwhite
                     
 # END
