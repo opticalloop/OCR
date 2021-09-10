@@ -21,7 +21,7 @@ void display(void)
     SDL_FreeSurface(screen_surface);
 }
 
-int display(void){
+int main(void){
     display();
     return 0;
 }
