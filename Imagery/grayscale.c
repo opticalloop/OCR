@@ -1,21 +1,19 @@
 #include <err.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include "pixel_operations.h"
-#include "op.h"
+#include "pixel_operations/pixel_operations.h"
+#include "op/op.h"
 
-int main()
+void grayscale(void)
 {
     SDL_Surface *image_surface;
     SDL_Surface *screen_surface;
 
-    // TODO: Initialize the SDL
     init_sdl();
 
     image_surface = load_image("my_image.jpg");
     screen_surface = display_image(image_surface);
 
-    // TODO: Wait for a key to be pressed.
     wait_for_keypressed();
 
     int width = image_surface->w;
@@ -46,15 +44,14 @@ int main()
         }
     }
 
-    //TODO: Redraw the surface
     update_surface(screen_surface,image_surface);
-    printf("update done");
-    //TODO: Wait for a key to be pressed
     wait_for_keypressed();
 
-    //TODO: Free the surface
     SDL_FreeSurface(image_surface);
     SDL_FreeSurface(screen_surface);
+}
 
+int main(void){
+    grayscale();
     return 0;
 }
