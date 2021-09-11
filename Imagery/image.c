@@ -12,14 +12,24 @@ void newImage(char* path, Image* image)
 
     image->width = width;
     image->height = height;
-
-    printf("width : %u and height : %u\n", width, height);
         
-    image->pixels = (Pixel **) malloc(width * sizeof(Pixel *));
-
-    for (unsigned int x = 0; x < width; x++){
-        image->pixels[x] = (Pixel *) calloc(height, sizeof(Pixel));  
+    image->pixels = malloc((width + 1) * sizeof(Pixel *));
+    
+    if (image->pixels == NULL){
+        printf("Error while allocating pixels pointers for the image");
+        return;
     }
+
+    unsigned int x;
+    for (x = 0; x < width; x++){
+        image->pixels[x] = (Pixel *) malloc((height + 1) * sizeof(Pixel));  
+        if (image->pixels[x]== NULL){
+            printf("Error while allocating pixels pointers for the image");
+            return;
+        }
+    }
+    // Make sure we don't have the '\0'
+    image->pixels[x] = NULL;
 
     SDL_Color rgb;
     Uint32 pixel;
@@ -28,45 +38,46 @@ void newImage(char* path, Image* image)
     for (unsigned int x = 0; x < width; x++){
         for (unsigned int y = 0; y < height; y++){
 
-            if (x == 1920){
-                printf("y : %u\n", y);
-            }
-            
             pixel = get_pixel(surface, x, y);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
             
             image->pixels[x][y].r = rgb.r;
             image->pixels[x][y].g = rgb.g;
             image->pixels[x][y].b = rgb.b;
-            
-            averageColor += rgb.r + rgb.g + rgb.b;
+
+            averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
 
     }
     averageColor /= (width * height);
+    image->averageColor = averageColor;
 }
 
 void freeImage(Image* image)
 {
     unsigned int width = image->width;
-    unsigned int height = image->height;
 
     for (unsigned int x = 0; x < width; x++){
-        for (unsigned int y = 0; y < height; y++){
-            
-        }
+        free(image->pixels[x]);
     }
+
+    free(image->pixels);
 }
 
 int main(void)
 {
-    Image *image = {
-        0,0,0.0, NULL
-    };
-    
-    newImage("my_image.jpg", &image);
+    Image _image;
+    _image.width = 0;
+    _image.height = 0;
+    _image.averageColor = 0;
+    _image.pixels = NULL;
+    Image *image = &_image;
+
+    newImage("my_image.jpg", image);
 
     printf("Average Color : %f", image->averageColor);
     
+    freeImage(image);
+
     return 0;
 }
