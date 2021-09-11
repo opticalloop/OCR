@@ -17,10 +17,6 @@ typedef struct Image{
 
 void newImage(char* path, Image* image);
 
-Image SDL_to_IMG(SDL_Surface *image_surface);
-    
-SDL_Surface IMG_to_SDL(Image *image);
-
 void freeImage(Image* image);
 
 #endif

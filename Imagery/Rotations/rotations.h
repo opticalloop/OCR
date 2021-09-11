@@ -4,6 +4,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-void rotate(SDL_Surface *image, SDL_Surface *screen_surface, float angle);
+#include "../image.h"
+
+void rotate(Image *image, float angle);
 
 #endif
