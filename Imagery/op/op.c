@@ -1,6 +1,5 @@
 #include "op.h"
 
-//TODO: Insert all the above functions.
 void init_sdl()
 {
     // Init only the video part.

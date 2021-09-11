@@ -35,16 +35,19 @@ typedef struct Network Network;
 Neuron newNeuron(unsigned int nbWeights);
 void initNeuron(Neuron *neuron);
 void frontPropagationNeuron(Neuron *neuron, Layer *prevLayer);
+void freeNeuron(Neuron *neuron);
 // ------ /Neuron ------
 
 // ------ Layer ------
 Layer newLayer(unsigned int sizeLayer, unsigned int sizePreviousLayer);
+void freeLayer(Layer *layer);
 // ------ /Layer ------
 
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput);
 void initNetwork(Network* network);
 void frontPropagationNetwork(Network *network);
+void freeNetwork(Network *network);
 // ------ /Network ------
 
 void backPropagation(Network *network, double expected[]);
