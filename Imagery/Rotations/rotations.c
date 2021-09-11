@@ -33,3 +33,27 @@ void rotate(SDL_Surface *image, SDL_Surface *screen_surface, float angle)
     SDL_FreeSurface(image);
     SDL_FreeSurface(screen_surface);
 }
+
+#include "../display.h"
+
+int main(void)
+{
+    printf("Initing SDL_Surfaces");
+
+    SDL_Surface *image_surface = NULL;
+    SDL_Surface *screen_surface = NULL;
+
+    printf("Waiting for a key to be pressed");
+
+    wait_for_keypressed();
+
+    // Display
+    image_surface = load_image("my_image.jpg");
+    display(image_surface, screen_surface);
+
+    // Rotate
+    wait_for_keypressed();
+    rotate(image_surface, screen_surface, 45);
+
+    return 0;
+}
