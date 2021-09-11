@@ -4,7 +4,7 @@
 #include "pixel_operations/pixel_operations.h"
 #include "op/op.h"
 
-void grayscale(SDL_Surface *image_surface)
+void blackandwhite(SDL_Surface *image_surface)
 {
     SDL_Surface *screen_surface;
 
@@ -27,18 +27,18 @@ void grayscale(SDL_Surface *image_surface)
             Uint8 r, g, b;
             SDL_GetRGB(pixel, image_surface->format,&r,&g,&b);
             
-            //Compute the average of the pixel
-            Uint8 average = 0.3*r + 0.59*g + 0.11*b;
-
-            //Update the RGB value by using the average r = g = b = average
-            r = g = b = average;
-            //printf("average : %d, r = %d; g = %d; b = %d",average,r,g,b);
-
             //put the new pixel value on the surface
-            Uint32 pixelfinal = SDL_MapRGB(image_surface->format,r,g,b);
-            
-            //put the new pixel value on the surface
-            put_pixel(image_surface,x,y,pixelfinal);
+
+            if((r+g+b)/3 >= 127){
+                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,255,255,255);
+                //put the new pixel value on the surface
+                put_pixel(image_surface,x,y,pixelfinal);
+            }
+            else{
+                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,0,0,0);
+                //put the new pixel value on the surface
+                put_pixel(image_surface,x,y,pixelfinal);
+            }
         }
     }
 
@@ -51,6 +51,6 @@ void grayscale(SDL_Surface *image_surface)
 
 int main(void){
     SDL_Surface *image_surface = load_image("my_image.jpg");
-    grayscale(image_surface);
+    blackandwhite(image_surface);
     return 0;
 }
