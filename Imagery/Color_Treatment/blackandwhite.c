@@ -1,18 +1,12 @@
+#include "blackandwhite.h"
+
 #include <err.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include "pixel_operations/pixel_operations.h"
-#include "op/op.h"
+#include "../Utils/pixel_operations.h"
+#include "../Utils/op.h"
 
-void blackandwhite(SDL_Surface *image_surface)
+void blackandwhite(SDL_Surface *image_surface, SDL_Surface *screen_surface)
 {
-    SDL_Surface *screen_surface;
-
-    init_sdl();
-
     screen_surface = display_image(image_surface);
-
-    //wait_for_keypressed();
 
     int width = image_surface->w;
     int height = image_surface->h;
@@ -42,15 +36,6 @@ void blackandwhite(SDL_Surface *image_surface)
         }
     }
 
-    update_surface(screen_surface,image_surface);
-    //wait_for_keypressed();
-
     SDL_FreeSurface(image_surface);
     SDL_FreeSurface(screen_surface);
-}
-
-int main(void){
-    SDL_Surface *image_surface = load_image("my_image.jpg");
-    blackandwhite(image_surface);
-    return 0;
 }
