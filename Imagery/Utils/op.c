@@ -1,6 +1,5 @@
 #include "op.h"
 
-//TODO: Insert all the above functions.
 void init_sdl()
 {
     // Init only the video part.
@@ -42,7 +41,7 @@ SDL_Surface* display_image(SDL_Surface *img)
     // Update the screen
     SDL_UpdateRect(screen, 0, 0, img->w, img->h);
 
-                        // return the screen for further uses
+    // return the screen for further uses
     return screen;
 }
 
