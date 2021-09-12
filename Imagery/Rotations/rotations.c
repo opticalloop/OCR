@@ -6,7 +6,7 @@ void rotate(Image *image, double angle)
 {
     int width = image->width;
     int height = image->height;
- 
+
     Image _image;
     _image.width = image->width;
     _image.height = image->height;
@@ -21,7 +21,8 @@ void rotate(Image *image, double angle)
 
     unsigned int x;
     for (x = 0; x < _image.width; x++){
-        _image.pixels[x] = (Pixel *) malloc((_image.height + 1) * sizeof(Pixel));  
+        _image.pixels[x] = (Pixel *) malloc((_image.height + 1) 
+                * sizeof(Pixel));
         if (_image.pixels[x]== NULL){
             printf("Error while allocating pixels pointers for the image");
             return;
@@ -38,10 +39,12 @@ void rotate(Image *image, double angle)
     int newY;
     for (int x = 0; x < width; x++){
         for (int y = 0; y < height; y++){
-            
+
             // Calculate new position
-            newX = (int) ((double) (cos(angle) * ((double)x - middleX) - sin(angle) * ((double)y - middleY)) + middleX);
-            newY = (int) ((double) (cos(angle) * ((double)y - middleY) + sin(angle) * ((double)x - middleX)) + middleY);
+            newX = (int) ((double) (cos(angle) * ((double)x - middleX) 
+                        - sin(angle) * ((double)y - middleY)) + middleX);
+            newY = (int) ((double) (cos(angle) * ((double)y - middleY) 
+                        + sin(angle) * ((double)x - middleX)) + middleY);
 
             // Assign it into new image and make sure he is in the image
             if (newX > 0 && newX < width && newY > 0 && newY < height){

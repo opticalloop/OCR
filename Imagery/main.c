@@ -6,7 +6,7 @@
 #include "Rotations/rotations.h"
 
 int main(void)
-{   
+{
     Image _image;
     _image.width = 0;
     _image.height = 0;
@@ -16,7 +16,7 @@ int main(void)
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
-    
+
     //displayImage(image);
     rotate(image, 180);
 

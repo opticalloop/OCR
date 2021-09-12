@@ -16,11 +16,11 @@ void grayscale(SDL_Surface *image_surface, SDL_Surface *screen_surface)
         for(int y = 0; y < height;y++){
             //get the pixel value
             Uint32 pixel = get_pixel(image_surface,x,y);
-            
+
             //getting the RGB value of the pixel
             Uint8 r, g, b;
             SDL_GetRGB(pixel, image_surface->format,&r,&g,&b);
-            
+
             //Compute the average of the pixel
             Uint8 average = 0.3*r + 0.59*g + 0.11*b;
 
@@ -30,7 +30,7 @@ void grayscale(SDL_Surface *image_surface, SDL_Surface *screen_surface)
 
             //put the new pixel value on the surface
             Uint32 pixelfinal = SDL_MapRGB(image_surface->format,r,g,b);
-            
+
             //put the new pixel value on the surface
             put_pixel(image_surface,x,y,pixelfinal);
         }

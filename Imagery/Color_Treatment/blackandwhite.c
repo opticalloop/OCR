@@ -16,15 +16,16 @@ void blackandwhite(SDL_Surface *image_surface, SDL_Surface *screen_surface)
         for(int y = 0; y < height;y++){
             //get the pixel value
             Uint32 pixel = get_pixel(image_surface,x,y);
-            
+
             //getting the RGB value of the pixel
             Uint8 r, g, b;
             SDL_GetRGB(pixel, image_surface->format,&r,&g,&b);
-            
+
             //put the new pixel value on the surface
 
             if((r+g+b)/3 >= 127){
-                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,255,255,255);
+                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,
+                        255,255,255);
                 //put the new pixel value on the surface
                 put_pixel(image_surface,x,y,pixelfinal);
             }
