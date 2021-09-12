@@ -1,8 +1,8 @@
 #include "grayscale.h"
 
 #include <err.h>
-#include "../Pixel_operations/pixel_operations.h"
-#include "../op/op.h"
+#include "../Utils/pixel_operations.h"
+#include "../Utils/op.h"
 
 void grayscale(SDL_Surface *image_surface, SDL_Surface *screen_surface)
 {
