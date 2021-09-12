@@ -13,9 +13,12 @@ typedef struct Image{
     unsigned int height;
     double averageColor;
     Pixel **pixels;
+    char* path;
 } Image;
 
 void newImage(char* path, Image* image);
+
+void displayImage(Image *image);
 
 void freeImage(Image* image);
 
