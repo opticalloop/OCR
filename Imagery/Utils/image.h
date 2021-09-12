@@ -14,11 +14,16 @@ typedef struct Image{
     double averageColor;
     Pixel **pixels;
     char* path;
+    SDL_Surface *surface;
 } Image;
 
-void newImage(char* path, Image* image);
+void newImage(Image* image);
 
 void displayImage(Image *image);
+
+void updateSurface(Image *image);
+
+void saveImage(Image *image, char *path);
 
 void freeImage(Image* image);
 

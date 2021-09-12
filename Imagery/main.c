@@ -13,10 +13,16 @@ int main(void)
     _image.averageColor = 0;
     _image.pixels = NULL;
     _image.path = "my_image.jpg";
+    _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
     
-    displayImage(image);
+    //displayImage(image);
+    rotate(image, 180);
+
+    saveImage(image, "out.bmp");
+
+    freeImage(image);
 
     return 0;
 }

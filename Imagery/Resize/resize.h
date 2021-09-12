@@ -3,7 +3,8 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include "../Utils/image.h"
 
-void (SDL_Surface *image, SDL_Surface *screen_surface, unsigned int newWidth, unsigned int newHeight);
+void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight);
 
 #endif
