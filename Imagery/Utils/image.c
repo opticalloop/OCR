@@ -3,9 +3,9 @@
 #include "op.h"
 #include "pixel_operations.h"
 
-void newImage(char* path, Image* image)
+void newImage(Image* image)
 {
-    SDL_Surface *surface = load_image(path);
+    SDL_Surface *surface = load_image(image->path);
 
     unsigned int width = surface->w;
     unsigned int height = surface->h;
