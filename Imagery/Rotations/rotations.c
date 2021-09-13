@@ -1,5 +1,6 @@
 #include "rotations.h"
 
+#include <stdio.h>
 #include <math.h>
 
 void rotate(Image *image, double angle)
@@ -42,12 +43,12 @@ void rotate(Image *image, double angle)
 
             // Calculate new position
             newX = (int) ((double) (cos(angle) * ((double)x - middleX) 
-                        - sin(angle) * ((double)y - middleY)) + middleX);
+                        - sin(angle) * ((double)y - middleY)) + middleX + 1);
             newY = (int) ((double) (cos(angle) * ((double)y - middleY) 
-                        + sin(angle) * ((double)x - middleX)) + middleY);
+                        + sin(angle) * ((double)x - middleX)) + middleY + 1);
 
             // Assign it into new image and make sure he is in the image
-            if (newX > 0 && newX < width && newY > 0 && newY < height){
+            if (newX >= 0 && newX < width && newY >= 0 && newY < height){
 
                 // Get the pixel on the actual image
                 pixel = image->pixels[x][y];
@@ -61,4 +62,15 @@ void rotate(Image *image, double angle)
     }
     freeImage(image);
     image->pixels = _image.pixels;
+}
+
+
+float detectDiffAngle(Image *image, float precision)
+{
+
+}
+
+void autoRotate(Image *image, float precision)
+{
+
 }

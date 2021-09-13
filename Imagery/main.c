@@ -20,10 +20,10 @@ int main(void)
     newImage(image);
 
     //displayImage(image);
-    //rotate(image, 180);
+    rotate(image, 180);
 
     //grayscale(image);
-    blackandwhite(image);
+    //blackandwhite(image);
     saveImage(image, "out.bmp");
 
     freeImage(image);

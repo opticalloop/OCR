@@ -8,4 +8,8 @@
 
 void rotate(Image *image, double angle);
 
+float detectDiffAngle(Image *image, float precision);
+
+void autoRotate(Image *image, float precision);
+
 #endif
