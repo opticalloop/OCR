@@ -1,41 +1,28 @@
 #include "blackandwhite.h"
 
-#include <err.h>
-#include "../Utils/pixel_operations.h"
-#include "../Utils/op.h"
+#include "blackandwhite.h"
 
-void blackandwhite(SDL_Surface *image_surface, SDL_Surface *screen_surface)
+void blackandwhite(Image* image)
 {
-    screen_surface = display_image(image_surface);
-
-    int width = image_surface->w;
-    int height = image_surface->h;
+    int width = image->width;
+    int height = image->height;
 
     //For each pixel of the image
     for(int x = 0; x < width; x++){
         for(int y = 0; y < height;y++){
-            //get the pixel value
-            Uint32 pixel = get_pixel(image_surface,x,y);
-            
-            //getting the RGB value of the pixel
-            Uint8 r, g, b;
-            SDL_GetRGB(pixel, image_surface->format,&r,&g,&b);
-            
-            //put the new pixel value on the surface
 
-            if((r+g+b)/3 >= 127){
-                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,255,255,255);
-                //put the new pixel value on the surface
-                put_pixel(image_surface,x,y,pixelfinal);
+            Pixel pixel = image->pixels[x][y];
+
+            if((pixel.r+ pixel.b + pixel.g)/3 >= 127){
+                image->pixels[x][y].r = 255;
+                image->pixels[x][y].b = 255;
+                image->pixels[x][y].g = 255;
             }
             else{
-                Uint32 pixelfinal = SDL_MapRGB(image_surface->format,0,0,0);
-                //put the new pixel value on the surface
-                put_pixel(image_surface,x,y,pixelfinal);
+                 image->pixels[x][y].r = 0;
+                 image->pixels[x][y].b = 0;
+                 image->pixels[x][y].g = 0;
             }
         }
     }
-
-    SDL_FreeSurface(image_surface);
-    SDL_FreeSurface(screen_surface);
 }
