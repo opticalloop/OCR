@@ -44,8 +44,6 @@ void newImage(Image* image)
             // Get RGB values from pixel
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            // TODO : Grayscale and black and white all pixels 
-
             image->pixels[x][y].r = rgb.r;
             image->pixels[x][y].g = rgb.g;
             image->pixels[x][y].b = rgb.b;
@@ -81,17 +79,17 @@ void updateSurface(Image *image)
 
     unsigned int width = image->width;
     unsigned int height = image-> height;
-    
+
     // For each pixel in the source image
     for (unsigned int x = 0; x < width; x++){
         for (unsigned int y = 0; y < height; y++){
-            
+
             // Get pixel from image
             Pixel _pixel = image->pixels[x][y];
 
             // Get pixel value for SDL
             Uint32 pixel = SDL_MapRGB(pixel_format, _pixel.r, _pixel.g, _pixel.b);
-            
+
             // Put pixel in img
             put_pixel(image->surface, x, y, pixel);
         }
@@ -103,7 +101,7 @@ void saveImage(Image *image, char *path)
     // Init SDL (malloc inside so need to free at the end)
     if(SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(1,"Could not initialize SDL: %s.\n", SDL_GetError());
-    
+
     // Update SDL_Surface inside Image struct
     updateSurface(image);
 

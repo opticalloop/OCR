@@ -4,6 +4,8 @@
 
 #include "Utils/image.h"
 #include "Rotations/rotations.h"
+#include "Color_Treatment/grayscale.h"
+#include "Color_Treatment/blackandwhite.h"
 
 int main(void)
 {
@@ -18,8 +20,10 @@ int main(void)
     newImage(image);
 
     //displayImage(image);
-    rotate(image, 180);
+    //rotate(image, 180);
 
+    //grayscale(image);
+    blackandwhite(image);
     saveImage(image, "out.bmp");
 
     freeImage(image);

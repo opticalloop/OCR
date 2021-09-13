@@ -14,5 +14,4 @@ main: main.o Utils/image.o Utils/op.o Utils/pixel_operations.o Rotations/Rotatio
 
 clean:
 	${RM} *.o *.d main test out.bmp
-
 # END
