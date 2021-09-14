@@ -44,11 +44,8 @@ void initNeuron(Neuron *neuron)
 
 void freeNeuron(Neuron *neuron)
 {
-    for (unsigned int i = 0; i < neuron->nbWeights; i++){
-        double *weight = &(neuron->weights[i]); 
-        free(weight);
-    }
-    free(neuron);
+    free(neuron->weights);
+    free(neuron->dw);
 }
 
 // ------ /Neuron ------
@@ -57,21 +54,18 @@ void freeNeuron(Neuron *neuron)
 
 Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 {
-    Layer layer = {
+    Layer layer = { 
         size,
         NULL
     };
 
     // Allocate memory for neurons, calloc already put the + 1 for the \0
     layer.neurons = malloc((size + 1) * sizeof(struct Neuron));
-    
-    unsigned int i = 0;
 
     // Create all the neurons depending on the size of the previous layer
-    for (i = 0; i < size; i++){
+    for (unsigned int i = 0; i < size; i++){
         layer.neurons[i] = newNeuron(sizePreviousLayer);
     }
-
 
     return layer;
 }
@@ -82,7 +76,7 @@ void freeLayer(Layer *layer)
         Neuron *neuron = &(layer->neurons[i]);
         freeNeuron(neuron);
     }
-    free(layer);
+    free(layer->neurons);
 }
 
 // ------ /Layer ------
@@ -187,7 +181,7 @@ void freeNetwork(Network *network)
         Layer *layer = &(network->layers[i]);
         freeLayer(layer);
     }
-    free(network);
+    free(network->layers);
 }
 
 // ------ /Network ------
