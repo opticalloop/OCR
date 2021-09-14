@@ -1,40 +1,36 @@
 #ifndef NEURAL_NETWORK_XOR
 #define NEURAL_NETWORK_XOR
 
-struct Neuron
+typedef struct Neuron
 {
     unsigned int nbWeights;
     double* weights;
+    double* dw;
     double value;
     double bias;
 
     double delta;
-    double output;
-};
+    double errorRate;
+} Neuron;
 
-typedef struct Neuron Neuron;
-
-struct Layer
+typedef struct Layer
 {
     unsigned int nbNeurons;
     Neuron* neurons;
-};
-typedef struct Layer Layer;
+}Layer;
 
-struct Network
+typedef struct Network
 {
     unsigned int nbLayers;
     unsigned int sizeInput;
     unsigned int sizeHidden;
     unsigned int sizeOutput;
     Layer* layers;
-};
-typedef struct Network Network;
+}Network;
 
 // ------ Neuron ------
 Neuron newNeuron(unsigned int nbWeights);
 void initNeuron(Neuron *neuron);
-void frontPropagationNeuron(Neuron *neuron, Layer *prevLayer);
 void freeNeuron(Neuron *neuron);
 // ------ /Neuron ------
 
@@ -46,13 +42,15 @@ void freeLayer(Layer *layer);
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput);
 void initNetwork(Network* network);
-void frontPropagationNetwork(Network *network);
+void frontPropagationNetwork(Network *network, double input[], double expected[]);
 void freeNetwork(Network *network);
 // ------ /Network ------
 
-void backPropagation(Network *network, double expected[]);
+void backPropagation(Network *network);
 
 void updateWeights(Network *network, double inputs[], float learningRate);
+
+double sigmoid(double x);
 
 double activation(double x);
 
