@@ -7,7 +7,7 @@ LDFLAGS=
 LDLIBS= -lSDL -lpthread -lSDL_image
 
 all: main
-main: main.o Utils/image.o Utils/op.o Utils/pixel_operations.o Rotations/Rotations.o Color_Treatment/blackandwhite.o Color_Treatment/grayscale.o Resize/resize.o
+main: main.o Utils/image.o Utils/op.o Utils/pixel_operations.o Preprocessing/noise_reduction.o Color_Treatment/blackandwhite.o Color_Treatment/grayscale.o
 	$(CC) $^ -o $@ $(LDLIBS)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
