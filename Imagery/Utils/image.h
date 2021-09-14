@@ -27,4 +27,6 @@ void saveImage(Image *image, char *path);
 
 void freeImage(Image* image);
 
+void updatePixelToSameValue(Pixel *pixel, unsigned int value);
+
 #endif

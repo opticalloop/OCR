@@ -5,13 +5,20 @@
 #ifndef OCR_NOISE_REDUCTION_H
 #define OCR_NOISE_REDUCTION_H
 
-void Preprocessing(SDL_Surface *p);
-Uint32 AverageFilter(SDL_Surface *img, int x, int y);
-Uint32 MedianFilter(SDL_Surface *p, int x, int y);
+void Preprocessing(Image *image);
 
-struct MinMaxXY {
-    Uint32 minX, maxX, minY, maxY;
-};
-typedef struct MinMaxXY Struct;
+typedef struct {
+    unsigned int minX, maxX, minY, maxY;
+} MinMaxXY;
+
+unsigned int AverageFilter(Image *image, int x, int y);
+
+unsigned int MedianFilter(Image *image, int x, int y);
+
+MinMaxXY GetMinMaxXY(int x, int y, int h, int w);
+
+
+
+
 
 #endif //OCR_NOISE_REDUCTION_H

@@ -4,6 +4,7 @@
 
 #include "Utils/image.h"
 #include "Rotations/rotations.h"
+#include "Preprocessing/noise_reduction.h"
 
 int main(void)
 {   
@@ -12,13 +13,14 @@ int main(void)
     _image.height = 0;
     _image.averageColor = 0;
     _image.pixels = NULL;
-    _image.path = "my_image.jpg";
+    _image.path = "image_02.jpeg";
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
     
     //displayImage(image);
-    rotate(image, 180);
+    Preprocessing(image);
+//    rotate(image, 180);
 
     saveImage(image, "out.bmp");
 

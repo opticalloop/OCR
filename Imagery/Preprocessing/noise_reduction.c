@@ -1,68 +1,73 @@
 #include <stdlib.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
+#include "../Utils/image.h"
 #include "../Utils/array_sort.h"
+#include "noise_reduction.h"
+#include <stdio.h>
 
 
-void Preprocessing(SDL_Surface *p) {
-    int w = img->w;
-    int h = img->h;
+void Preprocessing(Image *image) {
+    unsigned int w = image->width;
+    unsigned int h = image->height;
 
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < h; ++j) {
-            // TODO : finish the function
-            Uint32 pixel = AverageFilter(&p, i, j);
-        }
-    }
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < h; ++j) {
-            // TODO : finish the function
-            Uint32 pixel = MedianFilter(&p, i, j);
+
+    for (unsigned int i = 0; i < w; i++) {
+        for (unsigned int j = 0; j < h; j++) {
+            updatePixelToSameValue(&(image->pixels[i][j]), MedianFilter(image, i, j));
 
         }
     }
+//    for (int i = 0; i < w; i++) {
+//        for (int j = 0; j < h; j++) {
+//            updatePixelToSameValue(&(image->pixels[i][j]), AverageFilter(image, i, j));
+//        }
+//    }
+
 }
 
 
-Uint32 MedianFilter(SDL_Surface *p, int x, int y) {
-    int w = img->w - 1;
-    int h = img->h - 1;
+unsigned int MedianFilter(Image *image, int x, int y) {
+    unsigned int w = image->width;
+    unsigned int h = image->height;
 
-    Struct m = GetMinMaxXY(x, y, h, w);
+    MinMaxXY m = GetMinMaxXY(x, y, h, w);
 
-    Uint32 size = (m.maxX - m.minX + 1) * (m.maxY - m.minY + 1);
-    Uint32 *mask = malloc(sizeof(int) * size);
+    unsigned int *mask = malloc(sizeof(unsigned int) * (9 + 1));
 
-    int index = 0;
-    for (int i = m.minX; i <= m.maxX; ++i) {
-        for (int j = m.minY; j <= m.maxY; ++j) {
-            mask[index] = get_pixel(img, i, j);
+    unsigned int index = 0;
+    for (unsigned int i = m.minX; i < m.maxX; i++) {
+        for (unsigned int j = m.minY; j < m.maxY; j++) {
+            mask[index] = image->pixels[i][j].b;
             index++;
         }
     }
-    array_sort_Uint32(&mask, size);
+    for (; index < 9; index++) {
+        mask[index] = 0;
+    }
+    array_sort(mask, 9);
 
-    Uint32 result = mask[size / 2];
+    unsigned int result = mask[9 / 2];
     free(mask);
-
     return result;
 }
 
-Uint32 AverageFilter(SDL_Surface *img, int x, int y) {
-    Uint32 result;
-    Uint32 w = img->w - 1;
-    Uint32 h = img->h - 1;
+unsigned int AverageFilter(Image *image, int x, int y) {
+    unsigned int result = 0;
+    unsigned int w = image->width - 1;
+    unsigned int h = image->height - 1;
 
-    Struct m = GetMinMaxXY(x, y, h, w);
+    MinMaxXY m = GetMinMaxXY(x, y, h, w);
 
-    for (int i = minX; i <= maxX; ++i) {
-        for (int y = minY; j <= maxY; ++j) {
-            result += get_pixel(img, i, j);
+
+    for (unsigned int i = m.minX; i <= m.maxX; ++i) {
+        for (unsigned int j = m.minY; j <= m.maxY; ++j) {
+            result += image->pixels[x][y].b;
         }
     }
 
     return result;
 }
+
+
 /*///////////////////////////////////////////////*/
 /*///////////////////////////////////////////////*/
 
@@ -72,15 +77,13 @@ Uint32 AverageFilter(SDL_Surface *img, int x, int y) {
 /*///////////////////////////////////////////////*/
 
 
+MinMaxXY GetMinMaxXY(int x, int y, int h, int w) {
+    MinMaxXY m;
+    m.minX = (x == 0) ? 0 : x - 1;
+    m.minY = (y == 0) ? 0 : y - 1;
 
+    m.maxX = (x == w - 1) ? w - 1 : x + 1;
+    m.maxY = (y == h - 1) ? h - 1 : y + 1;
 
-
-Struct GetMinMaxXY(int x, int y, int h, int w) {
-    Struct m;
-    m.minX = (x > 0) ? x - 1 : 0;
-    m.minY = (y > 0) ? y - 1 : 0;
-
-    m.maxX = (x < h - 1) ? x + 1 : h;
-    m.maxY = (y < w - 1) ? y + 1 : w;
     return m;
 }
