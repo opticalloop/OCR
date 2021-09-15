@@ -1,3 +1,4 @@
+#include <err.h>
 #include <stdio.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -10,8 +11,8 @@
 int main(int argc, char *argv[])
 {
     if (argc != 3){
-        printf("Usage : ./main input_image output_image");
-        return 1;
+        errx(1, "Usage : ./main input_image output_image");
+
     }
     Image _image;
     _image.width = 0;
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
     //grotate(image, 180);
 
     //grayscale(image);
-    //blackandwhite(image);
+    blackandwhite(image);
     autoRotate(image, 0.01);
     saveImage(image, argv[2]);
 

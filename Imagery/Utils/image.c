@@ -3,12 +3,14 @@
 #include "op.h"
 #include "pixel_operations.h"
 
+#include <err.h>
+
 void newImage(Image* image)
 {
     SDL_Surface *surface = load_image(image->path);
 
-    unsigned int width = surface->w;
-    unsigned int height = surface->h;
+    const unsigned int width = surface->w;
+    const unsigned int height = surface->h;
 
     image->width = width;
     image->height = height;
@@ -16,16 +18,14 @@ void newImage(Image* image)
     image->pixels = malloc((width + 1) * sizeof(Pixel *));
 
     if (image->pixels == NULL){
-        printf("Error while allocating pixels pointers for the image");
-        return;
+        errx(1, "Error while allocating pixels pointers for the image");
     }
 
     unsigned int x;
     for (x = 0; x < width; x++){
-        image->pixels[x] = (Pixel *) malloc((height + 1) * sizeof(Pixel));  
+        image->pixels[x] = malloc((height + 1) * sizeof(Pixel));  
         if (image->pixels[x]== NULL){
-            printf("Error while allocating pixels pointers for the image");
-            return;
+            errx(1, "Error while allocating pixels pointers for the image");
         }
     }
     // Make sure we don't have the '\0'
@@ -77,8 +77,8 @@ void updateSurface(Image *image)
     // Get pixel format for the given image
     SDL_PixelFormat *pixel_format = image->surface->format;
 
-    unsigned int width = image->width;
-    unsigned int height = image-> height;
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
 
     // For each pixel in the source image
     for (unsigned int x = 0; x < width; x++){
@@ -96,47 +96,6 @@ void updateSurface(Image *image)
     }
 }
 
-Image copyImage(Image *image)
-{
-    unsigned int width = image->width;
-    unsigned int height = image->height;
-
-    // Copy image
-    Image _image;
-    _image.width = width;
-    _image.height = height;
-    _image.averageColor = image->averageColor;
-    _image.surface = load_image(image->path);
-    _image.path = image->path;
-
-    // Allocate memory
-    _image.pixels = malloc((width + 1) * sizeof(Pixel *));
-
-    if (_image.pixels == NULL){
-        errx(1, "Error while allocating pixels pointers for the image");
-    }
-    unsigned int x;
-    for (x = 0; x < width; x++){
-        _image.pixels[x] = malloc((height + 1) * sizeof(Pixel));
-        if (_image.pixels[x]== NULL){
-            errx(1, "Error while allocating pixels pointers for the image");
-        }
-    }
-    // Make sure we don't have the '\0'
-    _image.pixels[x] = NULL;
-
-    for (unsigned int x = 0; x < width; x++){
-        for (unsigned int y = 0; y < height; y++){
-            _image.pixels[x][y].r = image->pixels[x][y].r;
-            _image.pixels[x][y].g = image->pixels[x][y].g;
-            _image.pixels[x][y].b = image->pixels[x][y].b;
-        }
-    }
-    updateSurface(&_image);
-
-    return _image;
-}
-
 void saveImage(Image *image, char *path)
 {
     // Init SDL (malloc inside so need to free at the end)
@@ -146,7 +105,9 @@ void saveImage(Image *image, char *path)
     // Update SDL_Surface inside Image struct
     updateSurface(image);
 
-    SDL_SaveBMP(image->surface, path);
+    if (SDL_SaveBMP(image->surface, path) != 0){
+        errx(1, "Error while saving file");   
+    }
 
     // Free memory took by SDL
     SDL_Quit();
@@ -161,4 +122,5 @@ void freeImage(Image* image)
     }
 
     free(image->pixels);
+    SDL_FreeSurface(image->surface);
 }
