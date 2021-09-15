@@ -5,12 +5,10 @@ typedef struct Neuron
 {
     unsigned int nbWeights;
     double* weights;
-    double* dw;
+
     double value;
     double bias;
-
     double delta;
-    double errorRate;
 } Neuron;
 
 typedef struct Layer
@@ -42,19 +40,14 @@ void freeLayer(Layer *layer);
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput);
 void initNetwork(Network* network);
-void frontPropagationNetwork(Network *network, double input[], double expected[]);
+void frontPropagationNetwork(Network *network, double input[]);
 void freeNetwork(Network *network);
 // ------ /Network ------
 
-void backPropagation(Network *network);
-
-void updateWeights(Network *network, double inputs[], float learningRate);
+void backPropagation(Network *network, double expected[]);
 
 double sigmoid(double x);
 
-double activation(double x);
-
-double backPropFunction(double output);
-
+double sigmoidPrime(double x);
 
 #endif

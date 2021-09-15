@@ -13,12 +13,11 @@ int main(void)
     unsigned int nbInputs = 2;
     unsigned int nbOutputs = 1;
 
-    unsigned int learningRate = 0.5;
-    unsigned int epoch = 20;
+    unsigned int epoch = 10000;
 
     printf("Creating network\n");
 
-    Network n = newNetwork(nbInputs, nbInputs, 2, nbOutputs);
+    Network n = newNetwork(nbInputs, 3, 1, nbOutputs);
     Network* network = &n;
 
     printf("Initing network\n");
@@ -26,24 +25,22 @@ int main(void)
     initNetwork(network);
 
     for (unsigned int i = 0; i < epoch; i++){
-        printf("Epoch : %d\n", i);
+        printf("###### Epoch : %d ######\n", i);
         for (unsigned int j = 0; j < 8; j+=2){
             if (j != 8){
                 //printf("Front propagating\n");
                 double input[2] = {inputs[j], inputs[j + 1]};
                 double expected[1] = {expecteds[j / 2]};
-                frontPropagationNetwork(network, input, expected);
+                frontPropagationNetwork(network, input);
                 
                 //printf("Back propagating\n");
-                backPropagation(network);
+                backPropagation(network, expected);
 
                 //printf("Updating all weight after back propagating\n");
-                updateWeights(network, input, learningRate);
-                printf("Output : %f, expected : %f\n", network->layers[3].neurons[1].value, expected[0]);
+                printf("Input : %f %f\n", input[0], input[1]);
+                printf("Output : %f, expected : %f\n\n", network->layers[2].neurons[0].value, expected[0]);
             }
         }
-            
-        
     }
 
     freeNetwork(network);

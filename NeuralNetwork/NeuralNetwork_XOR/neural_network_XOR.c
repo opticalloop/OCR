@@ -11,21 +11,17 @@ Neuron newNeuron(unsigned int nbWeights)
     Neuron neuron = {
         nbWeights,
         NULL,
-        NULL,
         0, // Value
         0, // Bias
         0, // Delta
-        0, // Output
     };
 
     // Allocate memory for weights 
     if (nbWeights != 0){
         neuron.weights = malloc((nbWeights + 1) * sizeof(double));
-        neuron.dw = malloc((nbWeights + 1) * sizeof(double));
     }
     else{
         neuron.weights = malloc(0 * sizeof(double));
-        neuron.dw = malloc(0 * sizeof(double));
     }  
     return neuron;
 }
@@ -36,7 +32,7 @@ void initNeuron(Neuron *neuron)
     unsigned int nbWeights = neuron->nbWeights;
     for (unsigned int i = 0; i < nbWeights; i++){
         neuron->weights[i] = (double)rand()/RAND_MAX * 2.0 - 1.0;
-        neuron->dw[i] = 0.0; 
+        printf("Weight initialized : %f\n", neuron->weights[i]);
     }
 
     neuron->bias = (double)rand()/RAND_MAX * 2.0 - 1.0;
@@ -45,7 +41,6 @@ void initNeuron(Neuron *neuron)
 void freeNeuron(Neuron *neuron)
 {
     free(neuron->weights);
-    free(neuron->dw);
 }
 
 // ------ /Neuron ------
@@ -117,23 +112,21 @@ void initNetwork(Network* network)
 {
     srand (time(NULL));
     unsigned int nbLayers = network->nbLayers;
-    
-    // Initialize it here juste to don't have to create another one and kill memory :c
     unsigned int nbNeurons;
     
     for (unsigned int i = 0; i < nbLayers; i++){
         
         printf("Initing all neurons for layer %u\n", i);
 
-        Layer* layer = &network->layers[i];
+        Layer* layer = &(network->layers[i]);
         nbNeurons = layer->nbNeurons;
         for (unsigned int j = 0; j < nbNeurons; j++){
-            initNeuron(&layer->neurons[j]);
+            initNeuron(&(layer->neurons[j]));
         }
     }
 }
 
-void frontPropagationNetwork(Network *network, double input[], double expected[])
+void frontPropagationNetwork(Network *network, double input[])
 {
     // First layer
     Layer *layer = &(network->layers[0]);
@@ -155,23 +148,14 @@ void frontPropagationNetwork(Network *network, double input[], double expected[]
             Neuron* neuron = &(layer->neurons[j]);
             double sum = 0.0;
 
-            // Propage result from the previous layer
+            // Calcul new neuron value based on his weights and the value of previous layer
             for (unsigned int k = 0; k <= prevLayer.nbNeurons; k++){
-                if (k == 0){
-                    sum += neuron->weights[k];
-                }
-                else{
-                    sum += neuron->weights[k] * prevLayer.neurons[k - 1].value;
-                }
+                sum += neuron->weights[k] * prevLayer.neurons[k].value;
             }
+            //sum += neuron->bias;
             layer->neurons[j].value = sigmoid(sum);
+            //printf("Layer : %d, value of update : %f\n", i, layer->neurons[j].value);
         }
-    }
-
-    // Last layer delta
-    layer = &(network->layers[network->nbLayers - 1]); 
-    for (unsigned int i = 0; i < layer->nbNeurons; i++){
-        layer->neurons[i].delta = layer->neurons[i].value - expected[i];
     }
 }
 
@@ -186,76 +170,61 @@ void freeNetwork(Network *network)
 
 // ------ /Network ------
 
-void backPropagation(Network *network)
+void backPropagation(Network *network, double expected[])
 {
-    unsigned int nbLayers = network->nbLayers;
-    // Last hidden layer to start back propaging
-    Layer *lastLayer = &(network->layers[nbLayers - 1]);
-    
-    for (unsigned int i = 0; i < lastLayer->nbNeurons; i++){
-        //printf("i : %u, nbNeurons : %u\n", i, lastLayer->nbNeurons);
-        Neuron *neuron = &(lastLayer->neurons[i]);
-        neuron->delta = neuron->value * (1 - neuron->value);
-        
-        for (unsigned int j = 0; j < neuron->nbWeights; j++){
-            if (j == 0){
-                neuron->dw[j] = 1;
-            }
-            else{
-                neuron->dw[j] = network->layers[nbLayers - 2].neurons[j - 1].value;
-            }
-        }
-        
-    }
+    double error = 0.0;
+    double errorTemp = 0.0;
 
-    // Propage delta for other hidden layers
+    unsigned int nbLayers = network->nbLayers;
+
+    // Output layer
+    Layer *outputLayer = &(network->layers[nbLayers - 1]);
+
+    // NbNeurons of lastlayer and expected are equals
+    for (unsigned int i = 0; i < outputLayer->nbNeurons; i++){
+        Neuron *neuron = &(outputLayer->neurons[i]);
+        errorTemp = expected[i] - neuron->value;
+        neuron->delta = errorTemp * sigmoidPrime(neuron->value);
+        error += errorTemp * errorTemp;
+    }
+    printf("Error : %f\n", error);
+
+    // For all layer except the input
     for (unsigned int i = nbLayers - 2; i > 0; i--){
         Layer *layer = &(network->layers[i]);
-        Layer *previousLayer = &(network->layers[i - 1]);
-        Layer *nextLayer = &(network->layers[i + 1]);
-
+        Layer nextLayer = network->layers[i + 1];
+        // For each neurons
         for (unsigned int j = 0; j < layer->nbNeurons; j++){
+            errorTemp = 0.0;
             Neuron *neuron = &(layer->neurons[j]);
-            neuron->delta = neuron->value * (1 - neuron->value);
-            neuron->errorRate = 0;
-
-            // Find error rate
-            for (unsigned int k = 0; k < nextLayer->nbNeurons; k++){
-                Neuron neighbourNeuron = nextLayer->neurons[k];
-                neuron->errorRate += neighbourNeuron.errorRate 
-                                   * neighbourNeuron.delta 
-                                   * neighbourNeuron.weights[j + 1];
-            }
-
-            for (unsigned int k = 0; k < neuron->nbWeights; k++){
-                if (k == 0){
-                    neuron->dw[k] = 1;
-                }
-                else{
-                    neuron->dw[k] = previousLayer->neurons[k - 1].value;
+            // Calculate error rate based on all neuron in the next layer and all weights of the actual neuron
+            for (unsigned int k = 0; k < nextLayer.nbNeurons; k++){
+                
+                for (unsigned int l = 0; l < neuron->nbWeights; l++){
+                    errorTemp += nextLayer.neurons[k].delta * neuron->weights[l];
                 }
             }
+            neuron->delta = errorTemp * sigmoidPrime(neuron->value);
         }
     }
-}
 
-void updateWeights(Network *network, double inputs[], float learningRate)
-{
-    for (unsigned int i = 0; i < network->nbLayers; i++){
+    // Gradient descent
+    for (unsigned int i = network->nbLayers - 1; i > 1 ; i--){
         Layer *layer = &(network->layers[i]);
-        unsigned int nbNeurons = layer->nbNeurons;
-        for (unsigned int j = 0; j < nbNeurons; j++){
-            Neuron *neuron = &(layer->neurons[j]);
-            for (unsigned int k = 0; k < neuron->nbWeights; k++){
-                //printf("Layer : %u, neuron : %u, weight : %u, nbWeight : %u\n", i, j, k, neuron->nbWeights);
-                neuron->weights[k] += learningRate * neuron->delta * inputs[k];
-            }
-            
-                if (neuron->nbWeights != 0){
-                neuron->weights[neuron->nbWeights - 1] += learningRate *neuron->delta;
+        Layer *previousLayer = &(network->layers[i - 1]);
+        // For each neurons in the layer
+        for (unsigned int j = 0; j < layer->nbNeurons; j++){
+            // For each neurons on the layer
+            for (unsigned int k = 0; k < previousLayer->nbNeurons; k++){
+                Neuron *neuron = &(previousLayer->neurons[k]);
+                // For each weights on the neuron of the previous layer
+                for (unsigned int l = 0; l < neuron->nbWeights; l++){
+                    neuron->weights[l] += layer->neurons[j].delta * neuron->value;
+                }
             }
         }
     }
+    
 }
 
 double sigmoid(double x)
@@ -263,12 +232,7 @@ double sigmoid(double x)
     return 1 / (1 + exp(-x));
 }
 
-double activation(double x)
+double sigmoidPrime(double x)
 {
-    return log(1 + exp(x));
-}
-
-double backPropFunction(double output)
-{
-    return output * (1.0 - output);
+    return x * (1 - x);
 }

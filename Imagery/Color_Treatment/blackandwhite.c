@@ -1,7 +1,5 @@
 #include "blackandwhite.h"
 
-#include "blackandwhite.h"
-
 void blackandwhite(Image* image)
 {
     int width = image->width;
