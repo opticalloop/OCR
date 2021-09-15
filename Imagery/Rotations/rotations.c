@@ -10,6 +10,7 @@ void rotate(Image *image, double angleDegree)
 {
     const unsigned int width = image->width;
     const unsigned int height = image->height;
+
     const double middleX = ((double) width / (double) 2);
     const double middleY = ((double) height / (double) 2);
 
@@ -35,7 +36,9 @@ void rotate(Image *image, double angleDegree)
     // Copy of all pixel 
     for (unsigned int x = 0; x < width; x++){
         for (unsigned int y = 0; y < height; y++){
-            _pixels[x][y] = image->pixels[x][y];
+            _pixels[x][y].r = 255;
+            _pixels[x][y].g = 255;
+            _pixels[x][y].b = 255;
         }
     }
 
@@ -55,20 +58,21 @@ void rotate(Image *image, double angleDegree)
             if (newX > 0 && newX < width && newY > 0 && newY < height){
 
                 // Get the pixel on the copied image
-                pixel = _pixels[x][y];
+                pixel = image->pixels[x][y];
 
                 // Assign the pixel
-                image->pixels[newX][newY].r = pixel.r;
-                image->pixels[newX][newY].g = pixel.g;
-                image->pixels[newX][newY].b = pixel.b;
+                _pixels[newX][newY].r = pixel.r;
+                _pixels[newX][newY].g = pixel.g;
+                _pixels[newX][newY].b = pixel.b;
             }
         }
     }
 
     for (unsigned int i = 0; i < width; i++){
-        free(_pixels[i]);
+        free(image->pixels[i]);
     }
-    free(_pixels);
+    free(image->pixels);
+    image->pixels = _pixels;
 }
 
 
@@ -134,7 +138,8 @@ double detectDiffAngle(Image *image, float precision)
 void autoRotate(Image *image, float precision)
 {
     double angle = detectDiffAngle(image, precision);
+    angle = (180 / PI);
     printf("Max angle %f\n", angle);
 
-    rotate(image, angle * (180 / PI));
+    rotate(image, angle);
 }

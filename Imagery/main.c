@@ -4,6 +4,7 @@
 #include <SDL/SDL_image.h>
 
 #include "Utils/image.h"
+#include "Resize/resize.h"
 #include "Rotations/rotations.h"
 #include "Color_Treatment/grayscale.h"
 #include "Color_Treatment/blackandwhite.h"
@@ -25,11 +26,14 @@ int main(int argc, char *argv[])
     newImage(image);
 
     //displayImage(image);
-    //grotate(image, 180);
+    //rotate(image, 180);
 
     //grayscale(image);
-    blackandwhite(image);
     autoRotate(image, 0.01);
+    //blackandwhite(image);
+    
+    //resizeImage(image, 1280, 720);
+    
     saveImage(image, argv[2]);
 
     freeImage(image);

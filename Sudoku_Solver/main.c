@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
 
 #include "sudoku_solver.h"
 #include "Sudoku_Solvable/sudoku_solvable.h"
@@ -9,19 +10,19 @@
 #define true 1
 #define false 0
 
-void readGrid(unsigned int grid[9][9], char inputGrid[]){
+void readGrid(unsigned int **grid, char inputPath[]);
+
+void readGrid(unsigned int **grid, char inputPath[]){
     
     FILE *fp;
 
-    fp = fopen(inputGrid, "r");
+    fp = fopen(inputPath, "r");
     
     if (fp == NULL)
     {
         printf("File doesn't exist.\n");
         return;
     }
-
-    printf("%s\n", inputGrid);
 
     char ch;
     
@@ -35,7 +36,6 @@ void readGrid(unsigned int grid[9][9], char inputGrid[]){
             for (int j = 0; j < 11; j++){
                 ch = inputGrid[j + i]; 
                 
-                printf("%c", ch);
                 if (ch == '\n'){
                     break;
                 }
@@ -45,7 +45,7 @@ void readGrid(unsigned int grid[9][9], char inputGrid[]){
                 }
                 
                 if (ch != '.' && ch != ' '){
-                    grid[xIndex][yIndex] = ch - '0';
+                    grid[xIndex % 9][yIndex % dim] = ch - '0';
                 }
             }
             xIndex++;
@@ -54,38 +54,66 @@ void readGrid(unsigned int grid[9][9], char inputGrid[]){
     fclose(fp);
 }
 
-int main(int argc, char **argv)
+void saveGrid(unsigned int **grid, char outputPath[]);
+
+void saveGrid(unsigned int **grid, char outputPath[])
 {
-    if (argc != 2){
-        printf("Only one argument is required");
-        return 1;
+    FILE *f = fopen("file.txt", "w");
+    if (f == NULL)
+    {
+        errx(1, "Error opening file!\n");
     }
 
-    unsigned int grid[9][9] = {{ 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                                
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 },
-                               { 0, 0, 0,  0, 0, 0,  0, 0, 0 }};
+    /* print some text */
+    const char *text = "Write this to the file";
+    fprintf(f, "Some text: %s\n", text);
+
+    /* print integers and floats */
+    int i = 1;
+    float pi= 3.1415927;
+    fprintf(f, "Integer: %d, float: %f\n", i, pi);
+
+    /* printing single chatacters */
+    char c = 'A';
+    fprintf(f, "A character: %c\n", c);
+
+    fclose(f);
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3){
+        errx(1, "Usage : ./main input_path output_path");
+    }
+
+    unsigned int **grid = malloc(sizeof(unsigned int*) * (dim + 1));
+
+    unsigned int i = 0;
+    for (; i < dim; i++){
+        grid[i] = malloc(sizeof(unsigned int) * (dim + 1));
+    }
+    // '\0'
+    grid[i] = NULL;
 
     readGrid(grid, argv[1]);
 
-    return 0;
+    //return 0;
     
-    if (isSolvable(grid) == false){
-        printf("No solution exists\n");
-        return 1;
-    }
+    //if (isSolvable(grid) == false){
+    //    errx(1, "Grid can't be solved\n");
+   // }
 
-    printf("Start solving\n");
-    solveSuduko(grid, 0, 0);
-    print(grid);
-    
+    //printf("Start solving\n");
+    //solveSuduko(grid, 0, 0);
+    //print(grid);
+
+    saveGrid(argv[2]);
+
+    for (i = 0; i < dim; i++){
+        free(grid[i]);
+    }
+    free(grid);
+
     return 0;
 
 }

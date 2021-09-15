@@ -23,7 +23,7 @@ void newImage(Image* image)
 
     unsigned int x;
     for (x = 0; x < width; x++){
-        image->pixels[x] = malloc((height + 1) * sizeof(Pixel));  
+        image->pixels[x] = malloc((height + 1) * sizeof(Pixel));
         if (image->pixels[x]== NULL){
             errx(1, "Error while allocating pixels pointers for the image");
         }
