@@ -96,6 +96,47 @@ void updateSurface(Image *image)
     }
 }
 
+Image copyImage(Image *image)
+{
+    unsigned int width = image->width;
+    unsigned int height = image->height;
+
+    // Copy image
+    Image _image;
+    _image.width = width;
+    _image.height = height;
+    _image.averageColor = image->averageColor;
+    _image.surface = load_image(image->path);
+    _image.path = image->path;
+
+    // Allocate memory
+    _image.pixels = malloc((width + 1) * sizeof(Pixel *));
+
+    if (_image.pixels == NULL){
+        errx(1, "Error while allocating pixels pointers for the image");
+    }
+    unsigned int x;
+    for (x = 0; x < width; x++){
+        _image.pixels[x] = malloc((height + 1) * sizeof(Pixel));
+        if (_image.pixels[x]== NULL){
+            errx(1, "Error while allocating pixels pointers for the image");
+        }
+    }
+    // Make sure we don't have the '\0'
+    _image.pixels[x] = NULL;
+
+    for (unsigned int x = 0; x < width; x++){
+        for (unsigned int y = 0; y < height; y++){
+            _image.pixels[x][y].r = image->pixels[x][y].r;
+            _image.pixels[x][y].g = image->pixels[x][y].g;
+            _image.pixels[x][y].b = image->pixels[x][y].b;
+        }
+    }
+    updateSurface(&_image);
+
+    return _image;
+}
+
 void saveImage(Image *image, char *path)
 {
     // Init SDL (malloc inside so need to free at the end)

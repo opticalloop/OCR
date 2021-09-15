@@ -6,64 +6,44 @@
 
 #define PI 3.14159265
 
-void rotate(Image *image, double angle)
+void rotate(Image *image, double angleDegree)
 {
     unsigned int width = image->width;
     unsigned int height = image->height;
-
-    Image _image;
-    _image.width = image->width;
-    _image.height = image->height;
-    _image.averageColor = image->averageColor;
-    // Allocate memory
-    _image.pixels = malloc((_image.width + 1) * sizeof(Pixel *));
-
-    if (_image.pixels == NULL){
-        printf("Error while allocating pixels pointers for the image");
-        return;
-    }
-
-    unsigned int x;
-    for (x = 0; x < _image.width; x++){
-        _image.pixels[x] = malloc((_image.height + 1) * sizeof(Pixel));
-        if (_image.pixels[x]== NULL){
-            printf("Error while allocating pixels pointers for the image");
-            return;
-        }
-    }
-    // Make sure we don't have the '\0'
-    _image.pixels[x] = NULL;
-
+    double angle = angleDegree / 360.0;
+    angle *= 2 * PI;
     double middleX = ((double) width / (double) 2);
     double middleY = ((double) height / (double) 2);
+
+    // Create temporary image
+    Image _image = copyImage(image);
 
     Pixel pixel;
     unsigned int newX;
     unsigned int newY;
     for (unsigned int x = 0; x < width; x++){
-        for (unsigned int  y = 0; y < height; y++){
+        for (unsigned int y = 0; y < height; y++){
 
             // Calculate new position
             newX = (unsigned int) ((double) (cos(angle) * ((double)x - middleX) 
-                        - sin(angle) * ((double)y - middleY)) + middleX + 1);
+                        - sin(angle) * ((double)y - middleY)) + middleX);
             newY = (unsigned int) ((double) (cos(angle) * ((double)y - middleY) 
-                        + sin(angle) * ((double)x - middleX)) + middleY + 1);
+                        + sin(angle) * ((double)x - middleX)) + middleY);
 
             // Assign it into new image and make sure he is in the image
             if (newX >= 0 && newX < width && newY >= 0 && newY < height){
 
-                // Get the pixel on the actual image
-                pixel = image->pixels[x][y];
+                // Get the pixel on the copied image
+                pixel = _image.pixels[x][y];
 
                 // Assign the pixel
-                _image.pixels[newX][newY].r = pixel.r;
-                _image.pixels[newX][newY].g = pixel.g;
-                _image.pixels[newX][newY].b = pixel.b;
+                image->pixels[newX][newY].r = pixel.r;
+                image->pixels[newX][newY].g = pixel.g;
+                image->pixels[newX][newY].b = pixel.b;
             }
         }
     }
-    freeImage(image);
-    image->pixels = _image.pixels;
+    freeImage(&_image);
 }
 
 

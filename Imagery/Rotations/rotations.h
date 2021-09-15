@@ -6,7 +6,7 @@
 
 #include "../Utils/image.h"
 
-void rotate(Image *image, double angle);
+void rotate(Image *image, double angleDegree);
 
 double detectDiffAngle(Image *image, float precision);
 

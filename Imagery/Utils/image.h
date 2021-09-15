@@ -23,6 +23,8 @@ void displayImage(Image *image);
 
 void updateSurface(Image *image);
 
+Image copyImage(Image *image);
+
 void saveImage(Image *image, char *path);
 
 void freeImage(Image* image);

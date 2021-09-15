@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
     //displayImage(image);
     //grotate(image, 180);
 
-    grayscale(image);
-    blackandwhite(image);
-    autoRotate(image, 0.1);
+    //grayscale(image);
+    //blackandwhite(image);
+    autoRotate(image, 0.01);
     saveImage(image, argv[2]);
 
     freeImage(image);
