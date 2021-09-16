@@ -5,6 +5,8 @@
 #include "Utils/image.h"
 #include "Rotations/rotations.h"
 #include "Preprocessing/noise_reduction.h"
+#include "Color_Treatment/grayscale.h"
+#include "Color_Treatment/blackandwhite.h"
 
 int main(void)
 {   
@@ -17,12 +19,16 @@ int main(void)
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
-    
-    //displayImage(image);
+
+    grayscale(image);
+    blackandwhite(image);
+
+//    displayImage(image);
+    saveImage(image, "out.bmp");
     Preprocessing(image);
 //    rotate(image, 180);
 
-    saveImage(image, "out.bmp");
+    saveImage(image, "out2.bmp");
 
     freeImage(image);
 
