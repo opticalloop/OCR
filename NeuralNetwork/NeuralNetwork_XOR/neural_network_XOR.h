@@ -46,6 +46,8 @@ void freeNetwork(Network *network);
 
 void backPropagation(Network *network, double expected[]);
 
+void gradientDescent(Network *network);
+
 double sigmoid(double x);
 
 double sigmoidPrime(double x);

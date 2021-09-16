@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 {
     if (argc != 3){
         errx(1, "Usage : ./main input_image output_image");
-
     }
+
     Image _image;
     _image.width = 0;
     _image.height = 0;
@@ -29,11 +29,11 @@ int main(int argc, char *argv[])
     //rotate(image, 180);
 
     //grayscale(image);
+    // blackandwhite(image);
     autoRotate(image, 0.01);
-    //blackandwhite(image);
-    
+
     //resizeImage(image, 1280, 720);
-    
+
     saveImage(image, argv[2]);
 
     freeImage(image);

@@ -43,6 +43,7 @@ void rotate(Image *image, double angleDegree)
     }
 
     Pixel pixel;
+    
     unsigned int newX;
     unsigned int newY;
     for (unsigned int x = 0; x < width; x++){
@@ -138,7 +139,7 @@ double detectDiffAngle(Image *image, float precision)
 void autoRotate(Image *image, float precision)
 {
     double angle = detectDiffAngle(image, precision);
-    angle = (180 / PI);
+    angle *= (180 / PI);
     printf("Max angle %f\n", angle);
 
     rotate(image, angle);

@@ -10,9 +10,7 @@
 #define true 1
 #define false 0
 
-void readGrid(unsigned int **grid, char inputPath[]);
-
-void readGrid(unsigned int **grid, char inputPath[]){
+static void readGrid(unsigned int **grid, char inputPath[]){
     
     FILE *fp;
 
@@ -54,9 +52,7 @@ void readGrid(unsigned int **grid, char inputPath[]){
     fclose(fp);
 }
 
-void saveGrid(unsigned int **grid, char outputPath[]);
-
-void saveGrid(unsigned int **grid, char outputPath[])
+static void saveGrid(unsigned int **grid, char outputPath[])
 {
     FILE *f = fopen("file.txt", "w");
     if (f == NULL)
