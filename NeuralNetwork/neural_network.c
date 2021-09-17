@@ -2,7 +2,7 @@
 #include <time.h> // To call srand(time(NULL));
 #include <math.h>
 #include <stdio.h>
-#include "neural_network_XOR.h"
+#include "neural_network.h"
 
 // ------ Neuron ------
 

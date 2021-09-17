@@ -1,8 +1,5 @@
 #include "image.h"
 
-#include "op.h"
-#include "pixel_operations.h"
-
 #include <err.h>
 
 void newImage(Image* image)

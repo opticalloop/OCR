@@ -4,6 +4,9 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
+#include "op.h"
+#include "pixel_operations.h"
+
 typedef struct Pixel{
     unsigned int r, g, b;
 }Pixel;

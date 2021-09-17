@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "neural_network_XOR.h"
+#include "neural_network.h"
 
 static void printWeights(Network *network)
 {
@@ -29,9 +29,12 @@ int main(void)
 
     unsigned int epoch = 1000000;
 
+    unsigned int nbHiddenLayers = 2;
+    unsigned int nbNodesPerHidden = 5;
+
     printf("Creating network\n");
 
-    Network n = newNetwork(nbInputs, 5, 1, nbOutputs);
+    Network n = newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
     Network* network = &n;
 
     printf("Initing network\n");
@@ -39,7 +42,7 @@ int main(void)
     initNetwork(network);
 
     for (unsigned int i = 0; i <= epoch; i++){
-        if (i % 1000 == 0){  
+        if (i % 10000 == 0){  
             printf("###### Epoch : %d ######\n", i);
         }
         for (unsigned int j = 0; j < 8; j+=2){
@@ -53,9 +56,9 @@ int main(void)
                 backPropagation(network, expected);
                 gradientDescent(network);
 
-                if (i % 1000 == 0){ 
+                if (i % 10000 == 0){ 
                     printf("Input : %u %u\n", (unsigned int) input[0], (unsigned int) input[1]);
-                    printf("Output : %f, expected : %u\n\n", network->layers[2].neurons[0].value, (unsigned int) expected[0]);
+                    printf("Output : %f, expected : %u\n\n", network->layers[nbHiddenLayers + 1].neurons[0].value, (unsigned int) expected[0]);
                 }
             }
         }
