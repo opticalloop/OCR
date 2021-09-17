@@ -81,11 +81,11 @@ void freeLayer(Layer *layer)
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput)
 {
     Network network = {
-        nbHiddenLayers + 2, // Add input and output layer
-        sizeInput,
-        sizeHidden,
-        sizeOutput,
-        NULL
+        .nbLayers = nbHiddenLayers + 2, // Add input and output layer
+        .sizeInput = sizeInput,
+        .sizeHidden = sizeHidden,
+        .sizeOutput = sizeOutput,
+        .layers = NULL
     };
 
     // Allocate memory for all layers 

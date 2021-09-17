@@ -13,6 +13,7 @@
 
 #include "../Imagery/Utils/image.h"
 #include "neural_network.h"
+#include "save_load.h"
 
 static void printWeights(Network *network)
 {
@@ -84,63 +85,67 @@ static void createData(char* path, double inputs[28 * 28], double expected[9])
 
 int main(int argc, char **argv)
 {
-    if (argc != 2){
-        return 1;
-    }
-    unsigned int nbImages = 4;
+    // if (argc != 2){
+    //     return 1;
+    // }
+    // unsigned int nbImages = 4;
 
-    double input[nbImages][28 * 28];
-    double expected[nbImages][9];
+    // double input[nbImages][28 * 28];
+    // double expected[nbImages][9];
     
     unsigned int nbInputs = 28 * 28;
     unsigned int nbOutputs = 9;
-    unsigned int nbHiddenLayers = 1;
+    unsigned int nbHiddenLayers = 2;
     unsigned int nbNodesPerHidden = 5;
 
-    unsigned int epoch = 10;
+    // unsigned int epoch = 10;
 
-    char* inputs[nbImages];
-    char* directory = argv[1];
+    // char* inputs[nbImages];
+    // char* directory = argv[1];
 
-    // Read all images
-    DIR* FD;
-    struct dirent* in_file;
-    /* Scanning the in directory */
-    if ((FD = opendir(directory)) == NULL) {
-        errx(1, "Error : Failed to open input directory\n");
-    }
-    unsigned int index = 0;
-    while ((in_file = readdir(FD))) {
-        // Check that we don't have the parent directory
-        if (!strcmp(in_file->d_name, "."))
-            continue;
-        if (!strcmp(in_file->d_name, ".."))    
-            continue;
+    // // Read all images
+    // DIR* FD;
+    // struct dirent* in_file;
+    // /* Scanning the in directory */
+    // if ((FD = opendir(directory)) == NULL) {
+    //     errx(1, "Error : Failed to open input directory\n");
+    // }
+    // unsigned int index = 0;
+    // while ((in_file = readdir(FD))) {
+    //     // Check that we don't have the parent directory
+    //     if (!strcmp(in_file->d_name, "."))
+    //         continue;
+    //     if (!strcmp(in_file->d_name, ".."))    
+    //         continue;
 
-        char* filename = in_file->d_name;
-        printf("\nFile : %s\n", filename);
-        inputs[index] = filename;
-        index++;
-    }
-    closedir(FD);
+    //     char* filename = in_file->d_name;
+    //     printf("\nFile : %s\n", filename);
+    //     inputs[index] = filename;
+    //     index++;
+    // }
+    // closedir(FD);
 
-    for (unsigned int i = 0; i < nbImages; i++){
-        char directory[50];
-        strcpy(directory, "Images/");
-        strcat(directory, inputs[i]);
-        inputs[i] = directory;
-        printf("%s\n", directory);
-        createData(directory, input[i], expected[i]);
-    }
+    // for (unsigned int i = 0; i < nbImages; i++){
+    //     char directory[50];
+    //     strcpy(directory, "Images/");
+    //     strcat(directory, inputs[i]);
+    //     inputs[i] = directory;
+    //     printf("%s\n", directory);
+    //     createData(directory, input[i], expected[i]);
+    // }
 
-    // printf("Creating network\n");
+    printf("Creating network\n");
 
-    // Network n = newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
-    // Network* network = &n;
+    Network n = newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
+    Network* network = &n;
 
-    // printf("Initing network\n");
+    printf("Initing network\n");
 
-    // initNetwork(network);
+    initNetwork(network);
+
+    saveWeights(network, "Weights/test.txt");
+
+    launchWeights(network, "Weights/test.txt");
 
     // for (unsigned int i = 0; i <= epoch; i++){
     //     if (i % 1 == 0){  
@@ -171,7 +176,7 @@ int main(int argc, char **argv)
 
     // printWeights(network);
 
-    // freeNetwork(network);
+    freeNetwork(network);
     
     return 0;
 }
