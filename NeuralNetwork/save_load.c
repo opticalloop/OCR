@@ -63,6 +63,7 @@ void saveWeights(Network* network, char* path)
             for (unsigned int k = 0; k < network->layers[i].neurons[j].nbWeights; k++){
                 writeToFile(file, network->layers[i].neurons[j].weights[k], k == 0 ? "" : "|");
             }
+            fputs("|", file);
         }
     }
 
@@ -106,22 +107,8 @@ void launchWeights(Network* network, char* path)
                 weightIndex = 0;
             }
         }
-        else if (chr == ' '){
+        else if (chr == ' ' || chr == '\n'){
             continue;
-        }
-        else if (chr == '\n'){
-            // Save last weights of the line
-            // A double have a minimum lenght of 8 : '0.000000' 
-            if (strlen(tempStr) >= 8){
-                // Save weights
-                network->layers[layerIndex]
-                .neurons[neuronIndex].weights[weightIndex] = atof(tempStr);
-                
-                printf("Weight launched : %f\n", atof(tempStr));
-
-                // Reset string
-                memset(tempStr, 0, sizeof(tempStr));
-            }
         }
         else if(chr == '|'){ 
             // Save weights

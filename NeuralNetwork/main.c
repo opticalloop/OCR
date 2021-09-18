@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 
     printf("Initing network\n");
 
-    // initNetwork(network);
+    initNetwork(network);
 
     // saveWeights(network, "Weights/test.txt");
 
