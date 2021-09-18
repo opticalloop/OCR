@@ -106,17 +106,35 @@ void launchWeights(Network* network, char* path)
                 weightIndex = 0;
             }
         }
-        else if (chr == ' ' || chr == '\n'){
+        else if (chr == ' '){
             continue;
         }
-        else if(chr == '|'){ // Save weights
+        else if (chr == '\n'){
+            // Save last weights of the line
+            // A double have a minimum lenght of 8 : '0.000000' 
+            if (strlen(tempStr) >= 8){
+                // Save weights
+                network->layers[layerIndex]
+                .neurons[neuronIndex].weights[weightIndex] = atof(tempStr);
+                
+                printf("Weight launched : %f\n", atof(tempStr));
+
+                // Reset string
+                memset(tempStr, 0, sizeof(tempStr));
+            }
+        }
+        else if(chr == '|'){ 
+            // Save weights
             network->layers[layerIndex]
             .neurons[neuronIndex].weights[weightIndex] = atof(tempStr);
+            
             printf("Weight launched : %f\n", atof(tempStr));
+
+            // Reset string
             memset(tempStr, 0, sizeof(tempStr));
             weightIndex++;
         }
-        else{
+        else{ // Append digit or - and .
             strncat(tempStr, &chr, 1);
         }
     }
