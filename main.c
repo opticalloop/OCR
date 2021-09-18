@@ -4,10 +4,12 @@
 static void printHelp()
 {
     printf("Usage : ./main image_path [options] \n");
-    printf("Options :\n");
-    printf("-o output_path : specify an output path\n");
-    printf("-r angle : manually rotate the image by the angle\n");
-    printf("--help : print this help\n");
+    printf("Options :\n"
+           "gui : open graphical interface"
+           "-o <output_path> : specify an output path\n"
+           "-r <angle> : manually rotate the image by the anglec in degree\n"
+           "--help : print this help\n"
+           );
 }
 
 int main(int argc, char **argv)

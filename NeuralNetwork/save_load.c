@@ -5,8 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define _OPEN_SYS_ITOA_EXT
-
 #include "save_load.h"
 
 static void writeToFile(FILE* path, double number, char* extra)
@@ -63,7 +61,7 @@ void saveWeights(Network* network, char* path)
             writeToFile(file, (double) j, "# ");
         
             for (unsigned int k = 0; k < network->layers[i].neurons[j].nbWeights; k++){
-                writeToFile(file, network->layers[i].neurons[j].weights[k], k == 0 ? "" : " | ");
+                writeToFile(file, network->layers[i].neurons[j].weights[k], k == 0 ? "" : "|");
             }
         }
     }
@@ -78,12 +76,48 @@ void launchWeights(Network* network, char* path)
     FILE* file;
     file = fopen(path, "r");
 
+    int layerIndex = 0;
+    int neuronIndex = 0;
+    int weightIndex = 0;
+
     char chr;
+    char tempStr[50];
 
     // For each character
     while ((chr = getc(file)) != EOF){
-        if (chr == '\n'){
-            
+        printf("chr : %c\n", chr);
+        // New neuron or layer
+        if (chr == '#'){
+            chr = getc(file);
+            // New layer
+            if (chr == '#'){
+                chr = getc(file); // Should be a ' '
+                chr = getc(file); // Number of the layer
+                layerIndex = (int) ((int) chr - (int)'0');
+                printf("New layer index : %d\n", layerIndex);
+                weightIndex = 0;
+                neuronIndex = 0;
+            } 
+            // New neuron
+            else if (chr == ' '){
+                chr = getc(file); // Number of the neuron
+                neuronIndex = (int) ((int) chr - (int)'0');
+                printf("New neuron index : %d\n", neuronIndex);
+                weightIndex = 0;
+            }
+        }
+        else if (chr == ' ' || chr == '\n'){
+            continue;
+        }
+        else if(chr == '|'){ // Save weights
+            network->layers[layerIndex]
+            .neurons[neuronIndex].weights[weightIndex] = atof(tempStr);
+            printf("Weight launched : %f\n", atof(tempStr));
+            memset(tempStr, 0, sizeof(tempStr));
+            weightIndex++;
+        }
+        else{
+            strncat(tempStr, &chr, 1);
         }
     }
 

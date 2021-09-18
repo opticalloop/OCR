@@ -33,7 +33,8 @@ static void printWeights(Network *network)
 // Consider that the image is already in grayscale
 static void createData(char* path, double inputs[28 * 28], double expected[9])
 {   
-    char actualpath [PATH_MAX+1];
+    // Get absolute path
+    char actualpath [PATH_MAX + 1];
     char *ptr;
     
     ptr = realpath(path, actualpath);
@@ -79,6 +80,8 @@ static void createData(char* path, double inputs[28 * 28], double expected[9])
     for (unsigned int i = 0; i < 9; i++){
         expected[i] = i + 1 == num ? 1.0 : 0.0;
     }
+
+    printf("Expected : %lu\n", num);
     
     SDL_FreeSurface(surface);
 }
@@ -88,10 +91,10 @@ int main(int argc, char **argv)
     // if (argc != 2){
     //     return 1;
     // }
-    // unsigned int nbImages = 4;
+    unsigned int nbImages = 4;
 
-    // double input[nbImages][28 * 28];
-    // double expected[nbImages][9];
+    double input[nbImages][28 * 28];
+    double expected[nbImages][9];
     
     unsigned int nbInputs = 28 * 28;
     unsigned int nbOutputs = 9;
@@ -100,8 +103,8 @@ int main(int argc, char **argv)
 
     // unsigned int epoch = 10;
 
-    // char* inputs[nbImages];
-    // char* directory = argv[1];
+    char* inputs[nbImages];
+    char* directory = argv[1];
 
     // // Read all images
     // DIR* FD;
@@ -141,9 +144,9 @@ int main(int argc, char **argv)
 
     printf("Initing network\n");
 
-    initNetwork(network);
+    // initNetwork(network);
 
-    saveWeights(network, "Weights/test.txt");
+    // saveWeights(network, "Weights/test.txt");
 
     launchWeights(network, "Weights/test.txt");
 
@@ -174,7 +177,7 @@ int main(int argc, char **argv)
     //     }
     // }
 
-    // printWeights(network);
+    printWeights(network);
 
     freeNetwork(network);
     
