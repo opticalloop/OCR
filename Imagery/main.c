@@ -1,5 +1,3 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <err.h>
 #include <stdio.h>
 #include "Color_Treatment/blackandwhite.h"
