@@ -13,6 +13,8 @@
 #include "neural_network.h"
 #include "save_load.h"
 
+static const unsigned int nbImages = 4;
+
 static void printWeights(Network *network)
 {
     printf("\n######## ALL WEIGHTS ########\n");
@@ -50,11 +52,10 @@ static void printResult(double expected[], Neuron neuron[])
     }
 }
 
-static void printInput(double inputs[28 * 28])
+static void checkInputs(double inputs[28 * 28])
 {
     for (unsigned int i = 0; i < 28 * 28; i++)
     {
-        printf("Input : %f\n", inputs[i]);
         if (inputs[i] > 234124.0)
         {
             errx(1, "Too long");
@@ -104,8 +105,8 @@ static void createData(char *path, double intputs[28 * 28], double expected[9])
     SDL_FreeSurface(surface);
 }
 
-static void createAllData(char *directory, char *intputPaths[],
-    double input[][], double expected[][])
+static void createAllData(char* directory, char* intputPaths[],
+    double input[nbImages][28 * 28], double expected[nbImages][9])
 {
     // Get all images paths
     DIR *FD;
@@ -149,7 +150,6 @@ int main(int argc, char **argv)
     {
         return 1;
     }
-    unsigned int nbImages = 4;
 
     double input[nbImages][28 * 28];
     double expected[nbImages][9];
@@ -161,8 +161,8 @@ int main(int argc, char **argv)
 
     unsigned int epoch = 10000;
 
-    char *intputPaths[nbImages];
-    char *directory = argv[1];
+    char* intputPaths[nbImages];
+    char* directory = argv[1];
 
     createAllData(directory, intputPaths, input, expected);
 
@@ -187,7 +187,7 @@ int main(int argc, char **argv)
         for (unsigned int j = 0; j < 3; j++)
         {
 
-            // printInput(input[j]);
+            checkInputs(input[j]);
 
             frontPropagationNetwork(network, input[j]);
             backPropagation(network, expected[j]);

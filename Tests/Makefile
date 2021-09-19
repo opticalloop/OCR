@@ -1,3 +1,2 @@
 clean:
-	${RM} Unit/*.o
-	${RM} Unit/*.d
+	${RM} *.o *.d

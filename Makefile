@@ -1,11 +1,10 @@
 CC=gcc
 
 CPPFLAGS = `pkg-config --cflags sdl` -MMD
-CFLAGS = -Wall -Wextra -Werror -std=c99 -O1 -g -fsanitize=address 
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lcriterion -lm
 LDLIBS = -lSDL -lpthread -lSDL_image 
 OBJ = main.o
-TESTOBJ = Tests/Unit/dummy.o
 
 all: main
 
@@ -13,13 +12,16 @@ main: $(OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 nn:
-	make -C NeuralNetwork
+	make -C NeuralNetwork nn
+
+xor:
+	make -C NeuralNetwork xor
 
 utils:
 	make -C Imagery
 
-check: $(TESTOBJ)
-	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
+tests:
+	make -C Tests
 
 # Format all files
 format:
@@ -35,4 +37,4 @@ clean:
 	make -C NeuralNetwork clean
 	make -C Sudoku_Solver clean
 	make -C Tests clean
-	${RM} *.o *.d check main
+	${RM} *.o *.d main
