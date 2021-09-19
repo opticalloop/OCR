@@ -2,25 +2,40 @@
 #include <stdio.h>
 #include <string.h>
 
-static void printHelp()
+static void printHelpOCR()
 {
-    printf("Optical character recognition sudoku solver by opticalloop\n"
-           "Usage : ./main image_path [options] \n"
-           "Options :\n"
-           "gui : open graphical interface\n"
-           "-o <output_path> : specify an output path\n"
-           "-r <angle> : manually rotate the image by the angle in degree\n"
-           "--help : print this help\n");
+    prinftf(
+        "Options ocr :\n"
+        "    gui : open graphical interface\n"
+        "    -o <output_path> : specify an output path\n"
+        "    -r <angle> : manually rotate the image by the angle in degree\n"
+        "    --help : print this help\n");
 }
 
-int main(int argc, const char **argv)
+static void printHelpNN()
 {
-    if (argc == 1)
-    {
-        printHelp();
-        return 0;
-    }
+    printf("Options nn :\n"
+           "    -xor : train the neural network on the xor function\n"
+           "    -reset : reset weights of the neural network (need to train "
+           "the network after doing that)\n"
+           "    -train <nb_hidden_layer> <nb_node_per_hidden> : train the "
+           "network with the speficied number of hidden layer and node per "
+           "hidden layer\n");
+}
 
+static void printHelp()
+{
+    printf(
+        "###### Optical character recognition sudoku solver by opticalloop "
+        "######\n"
+        "Usage : ./main ocr <image_path> [options] or ./main nn [options] \n");
+
+    printHelpOCR();
+    printHelpNN();
+}
+
+static void analyzeOCR(int argc, const char **argv)
+{
     char *output_path = "auto_save.bmp";
     double rotateAngle = 0.0;
 
@@ -58,12 +73,38 @@ int main(int argc, const char **argv)
         }
         else if (!strcmp(argv[i], "--help"))
         {
-            printHelp();
+            printHelpOCR();
             return 0;
         }
     }
 
     printf("%s %f", output_path, rotateAngle);
+}
+
+static void analyzeNN(int argc, const char **argv)
+{
+}
+
+int main(int argc, const char **argv)
+{
+    if (argc == 1)
+    {
+        printHelp();
+        return 0;
+    }
+
+    if (!strcmp(argv[1], "ocr"))
+    {
+        analyzeOCR(argc, argv);
+    }
+    else if (!strcmp(argv[1], "nn"))
+    {
+        analyzeNN(argc, argv);
+    }
+    else
+    {
+        errx(1, "The first argument should be ocr or nn (Neural network)");
+    }
 
     return 0;
 }

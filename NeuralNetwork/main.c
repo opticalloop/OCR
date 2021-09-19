@@ -105,7 +105,7 @@ static void createData(char *path, double intputs[28 * 28], double expected[9])
     SDL_FreeSurface(surface);
 }
 
-static void createAllData(char* directory, char* intputPaths[],
+static void createAllData(char *directory, char *intputPaths[],
     double input[nbImages][28 * 28], double expected[nbImages][9])
 {
     // Get all images paths
@@ -160,8 +160,8 @@ int main(int argc, char **argv)
 
     unsigned int epoch = 10000;
 
-    char* intputPaths[nbImages];
-    char* directory = argv[1];
+    char *intputPaths[nbImages];
+    char *directory = argv[1];
 
     createAllData(directory, intputPaths, input, expected);
 
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
         for (unsigned int j = 0; j < nbImages; j++)
         {
 
-            checkInputs(input[j]);
+            // checkInputs(input[j]);
 
             frontPropagationNetwork(network, input[j]);
             backPropagation(network, expected[j]);
