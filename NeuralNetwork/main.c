@@ -13,7 +13,7 @@
 #include "neural_network.h"
 #include "save_load.h"
 
-static const unsigned int nbImages = 4;
+static const unsigned int nbImages = 1;
 
 static void printWeights(Network *network)
 {
@@ -138,7 +138,6 @@ static void createAllData(char* directory, char* intputPaths[],
         strcpy(directory, "Images/");
         strcat(directory, intputPaths[i]);
         intputPaths[i] = directory;
-        printf("%s\n", directory);
         createData(directory, input[i], expected[i]);
     }
 }
@@ -184,7 +183,7 @@ int main(int argc, char **argv)
         {
             printf("###### Epoch : %d ######\n", i);
         }
-        for (unsigned int j = 0; j < 3; j++)
+        for (unsigned int j = 0; j < nbImages; j++)
         {
 
             checkInputs(input[j]);
