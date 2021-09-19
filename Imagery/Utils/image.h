@@ -3,24 +3,25 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-
 #include "op.h"
 #include "pixel_operations.h"
 
-typedef struct Pixel{
+typedef struct Pixel
+{
     unsigned int r, g, b;
-}Pixel;
+} Pixel;
 
-typedef struct Image{
+typedef struct Image
+{
     unsigned int width;
     unsigned int height;
     double averageColor;
     Pixel **pixels;
-    char* path;
+    char *path;
     SDL_Surface *surface;
 } Image;
 
-void newImage(Image* image);
+void newImage(Image *image);
 
 void displayImage(Image *image);
 
@@ -28,6 +29,6 @@ void updateSurface(Image *image);
 
 void saveImage(Image *image, char *path);
 
-void freeImage(Image* image);
+void freeImage(Image *image);
 
 #endif

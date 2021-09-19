@@ -3,7 +3,6 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-
 #include "../Utils/image.h"
 
 void rotate(Image *image, double angleDegree);

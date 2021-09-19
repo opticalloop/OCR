@@ -1,6 +1,5 @@
-#include "resize.h" 
-
 #include <err.h>
+#include "resize.h"
 
 void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
 {
@@ -19,26 +18,31 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
     unsigned int averageColor = 0;
 
     Pixel **results = malloc(sizeof(Pixel *) * (newWidth + 1));
-    if (results == NULL){
+    if (results == NULL)
+    {
         errx(1, "Error while allocating memory");
     }
 
     unsigned int i = 0;
-    for (; i < newWidth; i++){
+    for (; i < newWidth; i++)
+    {
         results[i] = malloc(sizeof(Pixel) * (newHeight + 1));
-        if (results[i] == NULL){
+        if (results[i] == NULL)
+        {
             errx(1, "Error while allocating memory");
         }
     }
     results[i] = NULL;
 
-    for (unsigned int x = 0; x < newWidth; x++){
-        for (unsigned int y = 0; y < newHeight; y++){
+    for (unsigned int x = 0; x < newWidth; x++)
+    {
+        for (unsigned int y = 0; y < newHeight; y++)
+        {
             printf("x1 : %u, y1 : %u\n", x1, y1);
             color = image->pixels[x1][y1].g * (x2 - x1) * (y2 - y1);
             color += image->pixels[x1][y2].g * (x2 - x1) * (y1 - y2 + 1);
             color += image->pixels[x2][y1].g * (x1 - x2 + 1) * (y2 - y1);
-            color += image->pixels[x2][y2].g * (x1 - x2 + 1) * (y1 - y2 + 1); 
+            color += image->pixels[x2][y2].g * (x1 - x2 + 1) * (y1 - y2 + 1);
 
             results[x][y].r = color;
             results[x][y].g = color;
@@ -47,9 +51,11 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
             averageColor += color;
             x1 += diffX;
 
-            if (x1 > x2){
+            if (x1 > x2)
+            {
                 x2 = x1 + 1;
-                if (x2 >= width){
+                if (x2 >= width)
+                {
                     x2--;
                 }
             }
@@ -57,16 +63,19 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
         y1 += diffY;
         x1 = 0;
         x2 = 1;
-        if (y1 > y2){
+        if (y1 > y2)
+        {
             y2 = y1 + 1;
-            if (y2 >= height){
+            if (y2 >= height)
+            {
                 y2--;
             }
         }
     }
 
     // Free previosu pixels
-    for (unsigned int i = 0; i < width; i++){
+    for (unsigned int i = 0; i < width; i++)
+    {
         free(image->pixels[i]);
     }
     free(image->pixels);
@@ -75,6 +84,7 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
     image->height = newHeight;
     image->averageColor = averageColor / (newWidth * newHeight);
     SDL_FreeSurface(image->surface);
-    image->surface = SDL_CreateRGBSurface(0, newWidth, newHeight, 32, 0, 0, 0, 0);
+    image->surface
+        = SDL_CreateRGBSurface(0, newWidth, newHeight, 32, 0, 0, 0, 0);
     updateSurface(image);
 }

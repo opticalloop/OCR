@@ -4,7 +4,7 @@
 typedef struct Neuron
 {
     unsigned int nbWeights;
-    double* weights;
+    double *weights;
 
     double value;
     double bias;
@@ -14,8 +14,8 @@ typedef struct Neuron
 typedef struct Layer
 {
     unsigned int nbNeurons;
-    Neuron* neurons;
-}Layer;
+    Neuron *neurons;
+} Layer;
 
 typedef struct Network
 {
@@ -23,8 +23,8 @@ typedef struct Network
     unsigned int sizeInput;
     unsigned int sizeHidden;
     unsigned int sizeOutput;
-    Layer* layers;
-}Network;
+    Layer *layers;
+} Network;
 
 // ------ Neuron ------
 Neuron newNeuron(unsigned int nbWeights);
@@ -38,8 +38,9 @@ void freeLayer(Layer *layer);
 // ------ /Layer ------
 
 // ------ Network ------
-Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden, unsigned int nbHiddenLayers, unsigned int sizeOutput);
-void initNetwork(Network* network);
+Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
+    unsigned int nbHiddenLayers, unsigned int sizeOutput);
+void initNetwork(Network *network);
 void frontPropagationNetwork(Network *network, double input[]);
 void freeNetwork(Network *network);
 // ------ /Network ------

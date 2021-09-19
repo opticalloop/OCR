@@ -7,7 +7,8 @@ unsigned int isRowSolved(unsigned int grid[dim][dim], unsigned int y);
 
 unsigned int isColumnSolved(unsigned int grid[dim][dim], unsigned int x);
 
-unsigned int isSquareSolved(unsigned int grid[dim][dim], unsigned int x, unsigned int y);
+unsigned int isSquareSolved(
+    unsigned int grid[dim][dim], unsigned int x, unsigned int y);
 
 unsigned int isSolved(unsigned int grid[dim][dim]);
 
