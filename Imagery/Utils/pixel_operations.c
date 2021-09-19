@@ -64,7 +64,7 @@ void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel)
                 p[2] = (pixel >> 16) & 0xff;
             }
             break;
-    
+
         case 4:
             *(Uint32 *)p = pixel;
             break;

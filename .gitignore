@@ -54,6 +54,4 @@ dkms.conf
 .vscode/
 .idea/
 /cmake-build-debug/
-.clang-format
-
-out.bmp-
+out.bmp
