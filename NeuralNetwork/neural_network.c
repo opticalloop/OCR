@@ -32,7 +32,7 @@ void initNeuron(Neuron *neuron)
     unsigned int nbWeights = neuron->nbWeights;
     for (unsigned int i = 0; i < nbWeights; i++){
         neuron->weights[i] = (double)rand()/RAND_MAX * 2.0 - 1.0;
-        printf("Weight initialized : %f\n", neuron->weights[i]);
+        // printf("Weight initialized : %f\n", neuron->weights[i]);
     }
 
     neuron->bias = (double)rand()/RAND_MAX * 2.0 - 1.0;
@@ -116,7 +116,7 @@ void initNetwork(Network* network)
     
     for (unsigned int i = 0; i < nbLayers; i++){
         
-        printf("Initing all neurons for layer %u\n", i);
+        // printf("Initing all neurons for layer %u\n", i);
 
         Layer* layer = &(network->layers[i]);
         nbNeurons = layer->nbNeurons;
