@@ -1,18 +1,28 @@
-# Simple SDL mini Makefile
 CC=gcc
 
-CPPFLAGS= `pkg-config --cflags sdl` -MMD
-CFLAGS= -Wall -Wextra -Werror -std=c99 -O3 -g -fsanitize=address
-LDFLAGS=
-LDLIBS= -lSDL -lpthread -lSDL_image
+CPPFLAGS = `pkg-config --cflags sdl` -MMD
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
+LDLFLAGS = -lcriterion -lm
+LDLIBS = -lSDL -lpthread -lSDL_image 
 
-all: main
-main: main.o Utils/image.o Utils/op.o Utils/pixel_operations.o Rotations/Rotations.o Color_Treatment/blackandwhite.o Color_Treatment/grayscale.o Resize/resize.o
-	$(CC) $^ -o $@ $(LDLIBS)
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+IMAGE_OBJ = main.o Utils/image.o Utils/op.o Utils/pixel_operations.o Color_Treatment/blackandwhite.o Color_Treatment/grayscale.o Resize/resize.o Rotations/rotations.o
+
+all: imagery
+
+imagery: $(IMAGE_OBJ)
+	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 clean:
-	${RM} *.o *.d main test out.bmp
-                    
-# END
+	${RM} *.o *.d imagery out.bmp
+	
+	${RM} Color_Treatment/*.o
+	${RM} Color_Treatment/*.d
+
+	${RM} Resize/*.o
+	${RM} Resize/*.d
+	
+	${RM} Rotations/*.o
+	${RM} Rotations/*.d
+	
+	${RM} Utils/*.o
+	${RM} Utils/*.d
