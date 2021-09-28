@@ -1,5 +1,5 @@
-#ifndef NEURAL_NETWORK_XOR
-#define NEURAL_NETWORK_XOR
+#ifndef NEURAL_NETWORK_H
+#define NEURAL_NETWORK_H
 
 typedef struct Neuron
 {

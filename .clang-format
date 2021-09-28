@@ -1,4 +1,4 @@
-Language: C
+Language: Cpp
 
 # Use 80 columns. (2.1)
 ColumnLimit: 79

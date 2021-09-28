@@ -9,7 +9,7 @@
 #define true 1
 #define false 0
 
-static void readGrid(unsigned int **grid, char inputPath[])
+static void readGrid(unsigned int grid[dim][dim], char inputPath[])
 {
 
     FILE *fp;
@@ -88,15 +88,16 @@ int main(int argc, char **argv)
         errx(1, "Usage : ./main input_path output_path");
     }
 
-    // unsigned int **grid = malloc(sizeof(unsigned int *) * (dim + 1));
+    unsigned int grid[9][9] = {{0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0},
 
-    // unsigned int i = 0;
-    // for (; i < dim; i++)
-    // {
-    //     grid[i] = malloc(sizeof(unsigned int) * (dim + 1));
-    // }
-    // // '\0'
-    // grid[i] = NULL;
+        {0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+        {0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+    createSudokuImage(grid);
 
     // readGrid(grid, argv[1]);
 

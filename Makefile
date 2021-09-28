@@ -14,6 +14,9 @@ main: $(OBJ)
 nn:
 	make -C NeuralNetwork nn
 
+sudoku:
+	make -C Sudoku_Solver
+
 xor:
 	make -C NeuralNetwork xor
 

@@ -1,9 +1,12 @@
 #include <err.h>
+#include <string.h>
 #include "image.h"
 
 void newImage(Image *image)
 {
-    SDL_Surface *surface = load_image(image->path);
+    SDL_Surface *surface = !strcmp(image->path, "") ? SDL_CreateRGBSurface(
+                               0, 266, 266, 32, 0, 0, 0, 0)
+                                                    : load_image(image->path);
 
     const unsigned int width = surface->w;
     const unsigned int height = surface->h;
