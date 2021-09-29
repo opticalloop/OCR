@@ -10,17 +10,16 @@ void rotate(Image *image, double angleDegree)
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
-    const double middleX = ((double)width / (double)2);
-    const double middleY = ((double)height / (double)2);
+    const double middleX = ((double)width / 2.0);
+    const double middleY = ((double)height / 2.0);
 
-    double angle = angleDegree / 360.0;
-    angle *= 2 * PI;
+    const double angle = (angleDegree / 360.0) * 2.0 * PI;
 
     // Create two dimensional array of pixels
     Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
     if (_pixels == NULL)
     {
-        errx(1, "Error while allocating memory");
+        errx(EXIT_FAILURE, "Error while allocating memory");
     }
 
     unsigned int x = 0;
@@ -29,7 +28,7 @@ void rotate(Image *image, double angleDegree)
         _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
         if (_pixels[x] == NULL)
         {
-            errx(1, "Error while allocating memory");
+            errx(EXIT_FAILURE, "Error while allocating memory");
         }
     }
     // '\0'
@@ -48,27 +47,23 @@ void rotate(Image *image, double angleDegree)
 
     Pixel pixel;
 
-    unsigned int newX;
-    unsigned int newY;
+    int newX;
+    int newY;
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-
             // Calculate new position
-            newX
-                = (unsigned int)((double)(cos(angle) * ((double)x - middleX)
-                                          - sin(angle) * ((double)y - middleY))
-                                 + middleX);
-            newY
-                = (unsigned int)((double)(cos(angle) * ((double)y - middleY)
-                                          + sin(angle) * ((double)x - middleX))
-                                 + middleY);
+            newX = (int)((double)(cos(angle) * ((double)x - middleX)
+                                  - sin(angle) * ((double)y - middleY))
+                         + middleX);
+            newY = (int)((double)(cos(angle) * ((double)y - middleY)
+                                  + sin(angle) * ((double)x - middleX))
+                         + middleY);
 
             // Assign it into new image and make sure he is in the image
-            if (newX > 0 && newX < width && newY > 0 && newY < height)
+            if (newX >= 0 && newX < width && newY >= 0 && newY < height)
             {
-
                 // Get the pixel on the copied image
                 pixel = image->pixels[x][y];
 
@@ -104,17 +99,19 @@ double detectDiffAngle(Image *image, float precision)
     accumulator = malloc(sizeof(double *) * (_precision + 1));
     if (accumulator == NULL)
     {
-        errx(1, "Error");
+        errx(EXIT_FAILURE, "Error");
     }
+
     unsigned int i = 0;
     for (; i < _precision; i++)
     {
         accumulator[i] = malloc(sizeof(double) * (diagonal + 1));
         if (accumulator[i] == NULL)
         {
-            errx(1, "Error");
+            errx(EXIT_FAILURE, "Error");
         }
     }
+    accumulator[i] = NULL;
 
     double maxAngle = 0.0;
     double tempMaxAngle = 0.0;

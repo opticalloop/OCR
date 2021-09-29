@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
     newImage(image);
 
     // displayImage(image);
-    // rotate(image, 180);
+    rotate(image, 180);
 
     // grayscale(image);
     // blackandwhite(image);
-    autoRotate(image, 0.01);
+    // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);
 

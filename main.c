@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "NeuralNetwork/XOR.h"
+#include "NeuralNetwork/save_load.h"
 
 static char isNumber(char *text)
 {
@@ -41,7 +43,6 @@ static void printHelpNN()
            "hidden layer\n"
            "    -reset : reset weights of the neural network (need to train "
            "the network after doing that)\n"
-           "    -save : \n"
            "    --help : print neural network help\n");
 }
 

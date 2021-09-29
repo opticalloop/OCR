@@ -17,7 +17,7 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
     unsigned int color = 0;
     unsigned int averageColor = 0;
 
-    Pixel **results = malloc(sizeof(Pixel *) * (newWidth + 1));
+    Pixel** results = malloc(sizeof(Pixel *) * (newWidth + 1));
     if (results == NULL)
     {
         errx(1, "Error while allocating memory");
@@ -39,10 +39,10 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
         for (unsigned int y = 0; y < newHeight; y++)
         {
             printf("x1 : %u, y1 : %u\n", x1, y1);
-            color = image->pixels[x1][y1].g * (x2 - x1) * (y2 - y1);
-            color += image->pixels[x1][y2].g * (x2 - x1) * (y1 - y2 + 1);
-            color += image->pixels[x2][y1].g * (x1 - x2 + 1) * (y2 - y1);
-            color += image->pixels[x2][y2].g * (x1 - x2 + 1) * (y1 - y2 + 1);
+            color = image->pixels[x1][y1].r * (x2 - x1) * (y2 - y1);
+            color += image->pixels[x1][y2].r * (x2 - x1) * (y1 - y2 + 1);
+            color += image->pixels[x2][y1].r * (x1 - x2 + 1) * (y2 - y1);
+            color += image->pixels[x2][y2].r * (x1 - x2 + 1) * (y1 - y2 + 1);
 
             results[x][y].r = color;
             results[x][y].g = color;
