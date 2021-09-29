@@ -167,8 +167,8 @@ int main(int argc, char **argv)
     }
     else
     {
-        errx(EXIT_FAILURE,
-            "The first argument should be ocr or nn (Neural network)");
+        errx(EXIT_FAILURE, "The first argument should be ocr or nn (Neural "
+                           "network)\n See --help for more");
     }
 
     return EXIT_SUCCESS;
