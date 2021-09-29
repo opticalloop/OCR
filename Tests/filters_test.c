@@ -1,1 +1,0 @@
-#include <criterion/criterion.h>

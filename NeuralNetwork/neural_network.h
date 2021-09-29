@@ -53,4 +53,6 @@ double sigmoid(double x);
 
 double sigmoidPrime(double x);
 
+void printWeights(Network *network);
+
 #endif

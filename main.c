@@ -2,17 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "NeuralNetwork/XOR.h"
 
 static char isNumber(char *text)
 {
-    int j;
-    j = strlen(text);
+    int j = strlen(text);
     while (j--)
     {
-        if (text[j] >= '0' && text[j] <= '9')
-            continue;
+        // Accept comma but need to convert it to a point
+        if (text[j] == ',')
+        {
+            text[j] = '.';
+        }
 
-        return 0;
+        if ((text[j] < '0' || text[j] > '9') && text[j] != '.')
+            return 0;
     }
     return 1;
 }
@@ -32,11 +36,11 @@ static void printHelpNN()
     printf("Options nn :\n"
            "    -xor <nb_hidden_layer> <nb_node_per_hidden> : train the "
            "neural network on the xor function\n"
-           "    -reset : reset weights of the neural network (need to train "
-           "the network after doing that)\n"
            "    -train <nb_hidden_layer> <nb_node_per_hidden> : train the "
            "network with the speficied number of hidden layer and node per "
            "hidden layer\n"
+           "    -reset : reset weights of the neural network (need to train "
+           "the network after doing that)\n"
            "    -save : \n"
            "    --help : print neural network help\n");
 }
@@ -54,17 +58,27 @@ static void printHelp()
 
 static void analyzeOCR(int argc, char **argv)
 {
-    char *input_path = argv[1];
+    if (argc <= 2)
+    {
+        printHelpOCR();
+        return;
+    }
+    char *input_path = argv[2];
     char *output_path = "auto_save.bmp";
     double rotateAngle = 0.0;
 
     // Parse all input
-    for (int i = 2; i < argc; i++)
+    for (int i = 3; i < argc; i++)
     {
         // GUI
         if (!strcmp(argv[i], "gui"))
         {
             // TODO : Launch GUI
+            return;
+        }
+        else if (!strcmp(argv[i], "--help"))
+        {
+            printHelpOCR();
             return;
         }
         // Output path
@@ -91,26 +105,46 @@ static void analyzeOCR(int argc, char **argv)
             }
             rotateAngle = atof(argv[i]);
         }
-        else if (!strcmp(argv[i], "--help"))
-        {
-            printHelpOCR();
-            return;
-        }
     }
 
-    printf("%s %f", output_path, rotateAngle);
+    printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 
 static void analyzeNN(int argc, char **argv)
 {
-    // unsigned int nbHidden = 0;
-    // unsigned int sizeHidden = 0;
+    unsigned int nbHidden = 0;
+    unsigned int sizeHidden = 0;
 
     for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "--help"))
         {
             printHelpNN();
+        }
+        else if (!strcmp(argv[i], "-xor"))
+        {
+            i++;
+            // nb hidden layer
+            if (i >= argc)
+            {
+                errx(EXIT_FAILURE, "You need to specify a number of hidden "
+                                   "layer to train the network on the xor "
+                                   ". See help with --help for more");
+            }
+            nbHidden = atoi(argv[i]);
+
+            i++;
+            // nb node per layer
+            if (i >= argc)
+            {
+                errx(EXIT_FAILURE,
+                    "You need to specify a number of node per hidden layer to "
+                    "train the network on the xor "
+                    ". See help with --help for more");
+            }
+            sizeHidden = atoi(argv[i]);
+
+            launchXOR(nbHidden, sizeHidden);
         }
     }
 }

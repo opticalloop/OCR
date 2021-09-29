@@ -2,14 +2,14 @@ CC=gcc
 
 CPPFLAGS = `pkg-config --cflags sdl` -MMD
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
-LDLFLAGS = -lcriterion -lm
+LDLFLAGS = -lm
 LDLIBS = -lSDL -lpthread -lSDL_image 
 OBJ = main.o
 
 all: main
 
 main: $(OBJ)
-	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
+	gcc -o $@ $(CFLAGS) $^ NeuralNetwork/neural_network.c NeuralNetwork/XOR.c $(LDLFLAGS) $(LDLIBS)
 
 nn:
 	make -C NeuralNetwork nn
