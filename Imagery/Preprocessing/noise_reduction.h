@@ -11,15 +11,13 @@
 
 void Preprocessing(Image *image);
 
-typedef struct {
-    unsigned int minX, maxX, minY, maxY;
-} MinMaxXY;
 
-unsigned int AverageFilter(Image *image, unsigned int x, unsigned int y);
+unsigned int AverageFilter(Pixel *matrix, float *binomialFilter);
 
-unsigned int MedianFilter(Image *image, unsigned int x, unsigned int y);
+unsigned int MedianFilter(Pixel *matrix);
 
-MinMaxXY GetMinMaxXY(unsigned int x, unsigned int y, unsigned int h, unsigned int w);
+unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram);
 
-
+unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h);
+void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h, unsigned int *histogram);
 #endif //OCR_NOISE_REDUCTION_H

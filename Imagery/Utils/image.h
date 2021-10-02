@@ -6,13 +6,12 @@
 #include "op.h"
 #include "pixel_operations.h"
 
-typedef struct Pixel
-{
+typedef struct Pixel {
     unsigned int r, g, b;
+    struct Pixel *matrix;
 } Pixel;
 
-typedef struct Image
-{
+typedef struct Image {
     unsigned int width;
     unsigned int height;
     double averageColor;
@@ -32,5 +31,12 @@ void saveImage(Image *image, char *path);
 void freeImage(Image *image);
 
 void updatePixelToSameValue(Pixel *pixel, unsigned int value);
+
+Pixel InstantiatePixelZero();
+
+Pixel **copyPixelsArray(Image *image);
+
+void freeMatrixArray(Pixel **mask, int w, int h);
+
 
 #endif

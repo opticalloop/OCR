@@ -2,10 +2,10 @@
 // Created by dov on 11/09/2021.
 //
 
-//#include "array_sort.h"
+#include "array_sort.h"
 
-void array_sort(unsigned int *arr,int n) {
-
+void array_sort(Pixel *arr,int n) {
+// considering the picture is at least a true grayscale.
 
     int i, j, min_idx;
 
@@ -13,11 +13,11 @@ void array_sort(unsigned int *arr,int n) {
 
         min_idx = i;
         for (j = i + 1; j < n; j++)
-            if (arr[j] < arr[min_idx])
+            if (arr[j].b < arr[min_idx].b)
                 min_idx = j;
 
 
-        int temp = arr[min_idx];
+        Pixel temp = arr[min_idx];
         arr[min_idx] = arr[i];
         arr[i] = temp;
     }
