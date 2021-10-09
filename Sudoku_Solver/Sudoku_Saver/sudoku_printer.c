@@ -36,14 +36,26 @@ Image createSudokuImage(unsigned int grid[dim][dim])
     image.pixels = NULL;
     newImage(&image);
 
+    //unsigned int temp_increment_x = 0;
+    //unsigned int temp_increment_y = 0;
     for (unsigned int x = 0; x < 266; x++)
     {
+        //temp_increment_x = (unsigned int)(x + temp_increment_x) / 87;
         for (unsigned int y = 0; y < 266; y++)
         {
-            if (x != 0 && x != 1 && y != 0 && y != 1 && x != 264 && x != 265
-                && y != 264 && y != 265 && x != 31 && x != 59 && x != 87
-                && x != 88 && x != 116 && x != 144 && x != 172 && x != 173
-                && x != 201 && x != 229)
+            //temp_increment_y = (unsigned int)(y + temp_increment_y) / 87;
+            if ((x != 0 && x != 1 && x != 264 && x != 265 && x != 30 && x !=
+               59 && x != 88
+                && x != 89 && x != 118 && x != 147 && x != 176 && x != 177
+                && x != 206 && x != 235) &&
+                (y != 0 && y != 1
+                && y != 264 && y != 265
+                && y != 30 && y != 59
+                && y != 88 && y != 89
+                && y != 118 && y != 147
+                && y != 176 && y != 177
+                && y != 206 && y != 235))
+            //if ((x + temp_increment_x - 1) % 29 != 0 && x != 0)
             {
                 image.pixels[x][y].r = 255;
                 image.pixels[x][y].g = 255;

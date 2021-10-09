@@ -54,6 +54,8 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
         }
     }
 
+    printf("\033[0;32mDone\033[0m\n");
+
     // printWeights(network);
 
     freeNetwork(network);

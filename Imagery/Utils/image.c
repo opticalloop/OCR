@@ -1,4 +1,5 @@
 #include <err.h>
+#include <stdlib.h>
 #include <string.h>
 #include "image.h"
 
@@ -18,7 +19,8 @@ void newImage(Image *image)
 
     if (image->pixels == NULL)
     {
-        errx(1, "Error while allocating pixels pointers for the image");
+        errx(EXIT_FAILURE,
+            "Error while allocating pixels pointers for the image");
     }
 
     unsigned int x;
@@ -27,7 +29,8 @@ void newImage(Image *image)
         image->pixels[x] = malloc((height + 1) * sizeof(Pixel));
         if (image->pixels[x] == NULL)
         {
-            errx(1, "Error while allocating pixels pointers for the image");
+            errx(EXIT_FAILURE,
+                "Error while allocating pixels pointers for the image");
         }
     }
     // Make sure we don't have the '\0'
@@ -41,7 +44,6 @@ void newImage(Image *image)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-
             // Get pixel from surface
             pixel = get_pixel(surface, x, y);
 
@@ -64,7 +66,7 @@ void displayImage(Image *image)
 {
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(1, "Could not initialize SDL: %s.\n", SDL_GetError());
+        errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
 
     // Display img on screen
     display_image(image->surface);
@@ -106,17 +108,16 @@ void saveImage(Image *image, char *path)
 {
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(1, "Could not initialize SDL: %s.\n", SDL_GetError());
+        errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
 
     // Update SDL_Surface inside Image struct
     updateSurface(image);
 
     if (SDL_SaveBMP(image->surface, path) != 0)
     {
-        errx(1, "Error while saving file");
+        errx(EXIT_FAILURE, "Error while saving file");
     }
 
-    // Free memory took by SDL
     SDL_Quit();
 }
 

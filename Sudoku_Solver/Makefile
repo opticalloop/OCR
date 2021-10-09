@@ -5,14 +5,25 @@ CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
 LDLFLAGS = -lm
 LDLIBS = -lSDL -lpthread -lSDL_image 
 
-SUDOKU_OBJ = main.o ../Imagery/Utils/image.o ../Imagery/Utils/pixel_operations.o ../Imagery/Utils/op.o sudoku_solver.o Sudoku_Printer/sudoku_printer.o Sudoku_Saver/sudoku_saver.o Sudoku_Solvable/sudoku_solvable.o Sudoku_Solved/sudoku_solved.o
-SUDOKU_DEPEND = main.d ../Imagery/Utils/image.d ../Imagery/Utils/pixel_operations.d ../Imagery/Utils/op. sudoku_solver.d Sudoku_Printer/sudoku_printer.d Sudoku_Saver/sudoku_saver.d Sudoku_Solvable/sudoku_solvable.d Sudoku_Solved/sudoku_solved.d
+BUILD := build
 
-all: solver
+SRC = main.c ../Imagery/Utils/image.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/op.c sudoku_solver.c Sudoku_Saver/sudoku_printer.c Sudoku_Saver/sudoku_saver.c Sudoku_Solvable/sudoku_solvable.c Sudoku_Solved/sudoku_solved.c
+SUDOKU_DEPEND = $(SRC:%.c=$(BUILD)/%.d)
+SUDOKU_OBJ = $(SRC:%.c=$(BUILD)/%.o)
+
+all: init solver
+
+init:
+	$(shell mkdir -p $(BUILD))
+	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
 solver: $(SUDOKU_OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
+$(BUILD)/%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	make -C ../Imagery clean
+	rm -rf $(BUILD)
 	${RM} $(SUDOKU_OBJ) $(SUDOKU_DEPEND) solver out.bmp

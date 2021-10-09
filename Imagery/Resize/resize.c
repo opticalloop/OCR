@@ -17,7 +17,7 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
     unsigned int color = 0;
     unsigned int averageColor = 0;
 
-    Pixel** results = malloc(sizeof(Pixel *) * (newWidth + 1));
+    Pixel **results = malloc(sizeof(Pixel *) * (newWidth + 1));
     if (results == NULL)
     {
         errx(1, "Error while allocating memory");

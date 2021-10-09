@@ -2,14 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
 
 static char isNumber(char *text)
 {
-    int j = strlen(text);
-    while (j--)
+    int len = strlen(text);
+    for (int j = 0; j < len; j++)
     {
         // Accept comma but need to convert it to a point
         if (text[j] == ',')

@@ -1,5 +1,3 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
@@ -13,26 +11,7 @@
 #include "neural_network.h"
 #include "save_load.h"
 
-static const unsigned int nbImages = 1;
-
-static void printWeights(Network *network)
-{
-    printf("\n######## ALL WEIGHTS ########\n");
-    for (unsigned int i = 0; i < network->nbLayers; i++)
-    {
-        printf("###### LAYER %u ######\n", i);
-        for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
-        {
-            printf("#### NEURONS %u #### \n", j);
-            for (unsigned int k = 0;
-                 k < network->layers[i].neurons[j].nbWeights; k++)
-            {
-                printf("Weight %u : %f\n", k,
-                    network->layers[i].neurons[j].weights[k]);
-            }
-        }
-    }
-}
+#define NBIMAGES 1
 
 static void printResult(double expected[], Neuron neuron[])
 {
@@ -65,10 +44,10 @@ static void checkInputs(double inputs[28 * 28])
 
 // launch pixel value in the intputPaths array, and define expected digit
 // Consider that the image is already in grayscale
-static void createData(char *path, double intputs[28 * 28], double expected[9])
+static void createData(char *path, double intputs[], double expected[])
 {
     // Get absolute path
-    char actualpath[PATH_MAX + 1];
+    char actualpath[345 + 1];
     char *ptr;
 
     ptr = realpath(path, actualpath);
@@ -106,11 +85,11 @@ static void createData(char *path, double intputs[28 * 28], double expected[9])
 }
 
 static void createAllData(char *directory, char *intputPaths[],
-    double input[nbImages][28 * 28], double expected[nbImages][9])
+    double input[NBIMAGES][28 * 28], double expected[NBIMAGES][9])
 {
     // Get all images paths
-    DIR *FD;
-    struct dirent *in_file;
+    DIR* FD;
+    struct dirent* in_file;
     /* Scanning the in directory */
     if ((FD = opendir(directory)) == NULL)
     {
@@ -132,7 +111,7 @@ static void createAllData(char *directory, char *intputPaths[],
     closedir(FD);
 
     // Create all images data
-    for (unsigned int i = 0; i < nbImages; i++)
+    for (unsigned int i = 0; i < NBIMAGES; i++)
     {
         char directory[50];
         strcpy(directory, "Images/");
@@ -142,7 +121,7 @@ static void createAllData(char *directory, char *intputPaths[],
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // Need the directory
     if (argc != 2)
@@ -150,8 +129,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    double input[nbImages][28 * 28];
-    double expected[nbImages][9];
+    double input[NBIMAGES][28 * 28];
+    double expected[NBIMAGES][9];
 
     unsigned int nbInputs = 28 * 28;
     unsigned int nbOutputs = 9;
@@ -160,8 +139,8 @@ int main(int argc, char **argv)
 
     unsigned int epoch = 10000;
 
-    char *intputPaths[nbImages];
-    char *directory = argv[1];
+    char* intputPaths[NBIMAGES];
+    char* directory = argv[1];
 
     createAllData(directory, intputPaths, input, expected);
 
@@ -183,7 +162,7 @@ int main(int argc, char **argv)
         {
             printf("###### Epoch : %d ######\n", i);
         }
-        for (unsigned int j = 0; j < nbImages; j++)
+        for (unsigned int j = 0; j < NBIMAGES; j++)
         {
 
             // checkInputs(input[j]);

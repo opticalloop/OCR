@@ -1,16 +1,29 @@
-CC=gcc
+CC = gcc
 
 CPPFLAGS = `pkg-config --cflags sdl` -MMD
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lcriterion -lm
 LDLIBS = -lSDL -lpthread -lSDL_image 
 
-XOR_OBJ = XOR.o neural_network.o save_load.o
-XOR_DEPEND = XOR.d neural_network.d save_load.d
-NN_OBJ = main.o neural_network.o save_load.o ../Imagery/Utils/image.o ../Imagery/Utils/pixel_operations.o ../Imagery/Utils/op.o
-NN_DEPEND = main.d neural_network.d save_load.d ../Imagery/Utils/image.d ../Imagery/Utils/pixel_operations.d ../Imagery/Utils/op.d
+BUILD := build
 
-all: nn xor
+XOR_SRC = XOR.c neural_network.c save_load.c
+XOR_OBJ = $(XOR_SRC:%.c=$(BUILD)/%.o)
+XOR_DEP = $(XOR_SRC:%.c=$(BUILD)/%.d)
+
+NN_SRC = main.c neural_network.c save_load.c ../Imagery/Utils/image.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/op.c
+NN_OBJ = $(NN_SRC:%.c=$(BUILD)/%.o)
+NN_DEP = $(NN_SRC:%.c=$(BUILD)/%.d)
+
+all: init nn xor clear
+
+clear:
+	find . -type d -empty -delete
+
+init: 
+	$(shell mkdir -p $(BUILD))
+	$(shell mkdir -p $(XOR_SRC:%=$(BUILD)/%))
+	$(shell mkdir -p $(NN_SRC:%=$(BUILD)/%))
 
 nn: $(NN_OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
@@ -18,5 +31,9 @@ nn: $(NN_OBJ)
 xor: $(XOR_OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS)
 
+$(BUILD)/%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	${RM} $(NN_OBJ) $(NN_DEPEND) $(XOR_OBJ) $(XOR_DEPEND) xor nn
+	rm -rf $(BUILD)
+	${RM} $(NN_OBJ) $(NN_DEP) $(XOR_OBJ) $(XOR_DEP) xor nn
