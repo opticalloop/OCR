@@ -88,8 +88,8 @@ static void createAllData(char *directory, char *intputPaths[],
     double input[NBIMAGES][28 * 28], double expected[NBIMAGES][9])
 {
     // Get all images paths
-    DIR* FD;
-    struct dirent* in_file;
+    DIR *FD;
+    struct dirent *in_file;
     /* Scanning the in directory */
     if ((FD = opendir(directory)) == NULL)
     {
@@ -121,7 +121,7 @@ static void createAllData(char *directory, char *intputPaths[],
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     // Need the directory
     if (argc != 2)
@@ -139,8 +139,8 @@ int main(int argc, char** argv)
 
     unsigned int epoch = 10000;
 
-    char* intputPaths[NBIMAGES];
-    char* directory = argv[1];
+    char *intputPaths[NBIMAGES];
+    char *directory = argv[1];
 
     createAllData(directory, intputPaths, input, expected);
 

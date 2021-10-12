@@ -7,7 +7,7 @@ LDLIBS = -lSDL -lpthread -lSDL_image
 
 BUILD := build
 
-SRC = main.c ../Imagery/Utils/image.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/op.c sudoku_solver.c Sudoku_Saver/sudoku_printer.c Sudoku_Saver/sudoku_saver.c Sudoku_Solvable/sudoku_solvable.c Sudoku_Solved/sudoku_solved.c
+SRC = main.c ../Imagery/Utils/image.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/op.c sudoku_solver.c Sudoku_Saver/sudoku_saver.c Sudoku_Solvable/sudoku_solvable.c Sudoku_Solved/sudoku_solved.c
 SUDOKU_DEPEND = $(SRC:%.c=$(BUILD)/%.d)
 SUDOKU_OBJ = $(SRC:%.c=$(BUILD)/%.o)
 
