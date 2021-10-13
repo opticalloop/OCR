@@ -39,7 +39,7 @@ void freeLayer(Layer *layer);
 
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
-    unsigned int nbHiddenLayers, unsigned int sizeOutput);
+                   unsigned int nbHiddenLayers, unsigned int sizeOutput);
 void initNetwork(Network *network);
 void frontPropagationNetwork(Network *network, double input[]);
 void freeNetwork(Network *network);

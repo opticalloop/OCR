@@ -1,5 +1,6 @@
 #include <err.h>
 #include <stdio.h>
+
 #include "Color_Treatment/blackandwhite.h"
 #include "Color_Treatment/grayscale.h"
 #include "Resize/resize.h"

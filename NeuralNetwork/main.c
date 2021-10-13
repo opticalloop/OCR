@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include "../Imagery/Utils/image.h"
 #include "neural_network.h"
 #include "save_load.h"
@@ -27,7 +28,7 @@ static void printResult(double expected[], Neuron neuron[])
     for (unsigned int k = 0; k < 9; k++)
     {
         printf("Output : %f, expected : %u\n", neuron[k].value,
-            (unsigned int)expected[k]);
+               (unsigned int)expected[k]);
     }
 }
 
@@ -85,7 +86,8 @@ static void createData(char *path, double intputs[], double expected[])
 }
 
 static void createAllData(char *directory, char *intputPaths[],
-    double input[NBIMAGES][28 * 28], double expected[NBIMAGES][9])
+                          double input[NBIMAGES][28 * 28],
+                          double expected[NBIMAGES][9])
 {
     // Get all images paths
     DIR *FD;
@@ -146,8 +148,8 @@ int main(int argc, char **argv)
 
     printf("Creating network\n");
 
-    Network n
-        = newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
+    Network n =
+        newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
     Network *network = &n;
 
     printf("Initing network\n");
@@ -164,7 +166,6 @@ int main(int argc, char **argv)
         }
         for (unsigned int j = 0; j < NBIMAGES; j++)
         {
-
             // checkInputs(input[j]);
 
             frontPropagationNetwork(network, input[j]);
@@ -173,8 +174,8 @@ int main(int argc, char **argv)
 
             if (i % (epoch / 10) == 0)
             {
-                printResult(
-                    expected[j], network->layers[nbHiddenLayers + 1].neurons);
+                printResult(expected[j],
+                            network->layers[nbHiddenLayers + 1].neurons);
             }
         }
     }

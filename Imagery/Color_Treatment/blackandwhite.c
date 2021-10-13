@@ -10,7 +10,6 @@ void blackandwhite(Image *image)
     {
         for (int y = 0; y < height; y++)
         {
-
             Pixel pixel = image->pixels[x][y];
 
             if ((pixel.r + pixel.b + pixel.g) / 3 >= 127)

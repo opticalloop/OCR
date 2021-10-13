@@ -1,8 +1,9 @@
+#include "neural_network.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h> // To call srand(time(NULL));
-#include "neural_network.h"
 
 // ------ Neuron ------
 
@@ -51,7 +52,7 @@ void freeNeuron(Neuron *neuron)
 
 Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 {
-    Layer layer = {size, NULL};
+    Layer layer = { size, NULL };
 
     // Allocate memory for neurons, calloc already put the + 1 for the \0
     layer.neurons = malloc((size + 1) * sizeof(struct Neuron));
@@ -80,14 +81,14 @@ void freeLayer(Layer *layer)
 // ------ Network ------
 
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
-    unsigned int nbHiddenLayers, unsigned int sizeOutput)
+                   unsigned int nbHiddenLayers, unsigned int sizeOutput)
 {
-    Network network
-        = {.nbLayers = nbHiddenLayers + 2, // Add input and output layer
-            .sizeInput = sizeInput,
-            .sizeHidden = sizeHidden,
-            .sizeOutput = sizeOutput,
-            .layers = NULL};
+    Network network = { .nbLayers =
+                            nbHiddenLayers + 2, // Add input and output layer
+                        .sizeInput = sizeInput,
+                        .sizeHidden = sizeHidden,
+                        .sizeOutput = sizeOutput,
+                        .layers = NULL };
 
     // Allocate memory for all layers
     network.layers = malloc((network.nbLayers + 1) * sizeof(struct Layer));
@@ -101,13 +102,13 @@ Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
     // Create all hidden layer with the nbNeurons of the previous one
     for (unsigned int i = 1; i < network.nbLayers - 1; i++)
     {
-        network.layers[i]
-            = newLayer(sizeHidden, network.layers[i - 1].nbNeurons);
+        network.layers[i] =
+            newLayer(sizeHidden, network.layers[i - 1].nbNeurons);
     }
 
     // Create the ouput layer
-    network.layers[network.nbLayers - 1]
-        = newLayer(sizeOutput, network.layers[network.nbLayers - 2].nbNeurons);
+    network.layers[network.nbLayers - 1] =
+        newLayer(sizeOutput, network.layers[network.nbLayers - 2].nbNeurons);
 
     return network;
 }
@@ -121,7 +122,6 @@ void initNetwork(Network *network)
 
     for (unsigned int i = 0; i < nbLayers; i++)
     {
-
         // printf("Initing all neurons for layer %u\n", i);
 
         Layer *layer = &(network->layers[i]);
@@ -206,8 +206,8 @@ void backPropagation(Network *network, double expected[])
     for (unsigned int i = nbLayers - 1; i >= 2; i--)
     {
         Layer layer = network->layers[i];
-        Layer *previousLayer
-            = &(network->layers[i - 1]); // Modify weights of this layer
+        Layer *previousLayer =
+            &(network->layers[i - 1]); // Modify weights of this layer
         // For each neurons
         for (unsigned int j = 0; j < previousLayer->nbNeurons; j++)
         {
@@ -217,8 +217,8 @@ void backPropagation(Network *network, double expected[])
             // all weights of the actual neuron
             for (unsigned int k = 0; k < layer.nbNeurons; k++)
             {
-                errorTemp
-                    += layer.neurons[k].delta * layer.neurons[k].weights[j];
+                errorTemp +=
+                    layer.neurons[k].delta * layer.neurons[k].weights[j];
             }
             neuron->delta = errorTemp * sigmoidPrime(neuron->value);
             // printf("Delta : %f\n", neuron->delta);
@@ -241,8 +241,8 @@ void gradientDescent(Network *network)
             for (unsigned int k = 0; k < previousLayer->nbNeurons; k++)
             {
                 // For each weights on the neuron of the previous layer
-                neuron->weights[k]
-                    += neuron->delta * previousLayer->neurons[k].value;
+                neuron->weights[k] +=
+                    neuron->delta * previousLayer->neurons[k].value;
             }
         }
     }
@@ -271,7 +271,7 @@ void printWeights(Network *network)
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
                 printf("Weight %u : %f\n", k,
-                    network->layers[i].neurons[j].weights[k]);
+                       network->layers[i].neurons[j].weights[k]);
             }
         }
     }

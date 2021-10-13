@@ -1,5 +1,6 @@
-#include <err.h>
 #include "resize.h"
+
+#include <err.h>
 
 void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
 {
@@ -84,7 +85,7 @@ void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight)
     image->height = newHeight;
     image->averageColor = averageColor / (newWidth * newHeight);
     SDL_FreeSurface(image->surface);
-    image->surface
-        = SDL_CreateRGBSurface(0, newWidth, newHeight, 32, 0, 0, 0, 0);
+    image->surface =
+        SDL_CreateRGBSurface(0, newWidth, newHeight, 32, 0, 0, 0, 0);
     updateSurface(image);
 }

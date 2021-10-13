@@ -26,13 +26,12 @@ SDL_Surface *display_image(SDL_Surface *img)
     SDL_Surface *screen;
 
     // Set the window to the same size as the image
-    screen
-        = SDL_SetVideoMode(img->w, img->h, 0, SDL_SWSURFACE | SDL_ANYFORMAT);
+    screen = SDL_SetVideoMode(img->w, img->h, 0, SDL_SWSURFACE | SDL_ANYFORMAT);
     if (screen == NULL)
     {
         // error management
         errx(1, "Couldn't set %dx%d video mode: %s\n", img->w, img->h,
-            SDL_GetError());
+             SDL_GetError());
     }
 
     // Blit onto the screen surface

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
 
@@ -24,12 +25,11 @@ static char isNumber(char *text)
 
 static void printHelpOCR()
 {
-    printf(
-        "Options ocr :\n"
-        "    gui : open graphical interface\n"
-        "    -o <output_path> : specify an output path\n"
-        "    -r <angle> : manually rotate the image by the angle in degree\n"
-        "    --help : print ocr help\n");
+    printf("Options ocr :\n"
+           "    gui : open graphical interface\n"
+           "    -o <output_path> : specify an output path\n"
+           "    -r <angle> : manually rotate the image by the angle in degree\n"
+           "    --help : print ocr help\n");
 }
 
 static void printHelpNN()
@@ -88,8 +88,8 @@ static void analyzeOCR(int argc, char **argv)
             if (i >= argc)
             {
                 errx(EXIT_FAILURE,
-                    "You need to specify an output path after -o. See "
-                    "help with --help for more");
+                     "You need to specify an output path after -o. See "
+                     "help with --help for more");
             }
             output_path = argv[i];
         }
@@ -100,8 +100,8 @@ static void analyzeOCR(int argc, char **argv)
             if (i >= argc || !isNumber(argv[i]))
             {
                 errx(EXIT_FAILURE,
-                    "You need to specify an rotation angle in degree "
-                    "after -r. See help with --help for more");
+                     "You need to specify an rotation angle in degree "
+                     "after -r. See help with --help for more");
             }
             rotateAngle = atof(argv[i]);
         }
@@ -127,9 +127,10 @@ static void analyzeNN(int argc, char **argv)
             // nb hidden layer
             if (i >= argc)
             {
-                errx(EXIT_FAILURE, "You need to specify a number of hidden "
-                                   "layer to train the network on the xor "
-                                   ". See help with --help for more");
+                errx(EXIT_FAILURE,
+                     "You need to specify a number of hidden "
+                     "layer to train the network on the xor "
+                     ". See help with --help for more");
             }
             nbHidden = atoi(argv[i]);
 
@@ -138,9 +139,9 @@ static void analyzeNN(int argc, char **argv)
             if (i >= argc)
             {
                 errx(EXIT_FAILURE,
-                    "You need to specify a number of node per hidden layer to "
-                    "train the network on the xor "
-                    ". See help with --help for more");
+                     "You need to specify a number of node per hidden layer to "
+                     "train the network on the xor "
+                     ". See help with --help for more");
             }
             sizeHidden = atoi(argv[i]);
 
@@ -167,8 +168,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        errx(EXIT_FAILURE, "The first argument should be ocr or nn (Neural "
-                           "network)\n See --help for more");
+        errx(EXIT_FAILURE,
+             "The first argument should be ocr or nn (Neural "
+             "network)\n See --help for more");
     }
 
     return EXIT_SUCCESS;

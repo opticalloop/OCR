@@ -1,7 +1,8 @@
+#include "sudoku_saver.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "sudoku_saver.h"
 
 void basicPrint(unsigned int grid[dim][dim])
 {
@@ -28,8 +29,7 @@ void basicPrint(unsigned int grid[dim][dim])
 
 void readGrid(unsigned int grid[dim][dim], char inputPath[])
 {
-
-    FILE* fp;
+    FILE *fp;
 
     fp = fopen(inputPath, "r");
 
@@ -39,21 +39,22 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
         return;
     }
 
-    char ch;
+    char ch = 0;
 
     unsigned int xIndex = 0;
     unsigned int yIndex = 0;
 
-    for (int i = 0; i < 11 && ch != EOF; i++)
+    for (int i = 0; i < 12 && ch != EOF; i++)
     {
-        for (int j = 0; j < 11 && ch != EOF; j++)
+        for (int j = 0; j < 12 && (ch = fgetc(fp)) != EOF; j++)
         {
-            ch = fgetc(fp);
-
-            printf("%c", ch);
-
             if (ch == '\n' || ch == '\0' || ch == ' ')
             {
+                if (i == 3 || i == 7)
+                {
+                    xIndex--; // Dont move, it's an empty line
+                    break;
+                }
                 continue;
             }
 
@@ -64,31 +65,45 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
             yIndex++;
         }
         yIndex = 0;
-        if (i != 3 && i != 7)
-        {
-            xIndex++;
-        }
+        xIndex++;
     }
     fclose(fp);
 }
 
 void saveGrid(unsigned int grid[dim][dim], char outputPath[])
 {
-    FILE *f = fopen("file.txt", "w");
+    FILE *f = fopen(outputPath, "w");
     if (f == NULL)
     {
-        errx(1, "Error opening file!\n");
+        errx(EXIT_FAILURE, "Error opening file!\n");
     }
 
-    /* print some text */
-    const char *text = "Write this to the file";
-    fprintf(f, "Some text: %s\n", text);
-
-    /* print integers and floats */
-    int i = 1;
-    float pi = 3.1415927;
-    fprintf(f, "Integer: %d, float: %f\n", i, pi);
-
+    for (unsigned int i = 0; i < dim; i++)
+    {
+        for (unsigned int j = 0; j < dim; j++)
+        {
+            if (grid[i][j] == 0)
+            {
+                fprintf(f, "%c", '.');
+            }
+            else
+            {
+                fprintf(f, "%d", grid[i][j]);
+            }
+            if (j == 2 || j == 5)
+            {
+                fprintf(f, " ");
+            }
+        }
+        if (i != 8)
+        {
+            fprintf(f, "\n");
+        }
+        if (i == 2 || i == 5)
+        {
+            fprintf(f, "\n");
+        }
+    }
     fclose(f);
 }
 
@@ -108,8 +123,8 @@ Image createSudokuImage(unsigned int grid[dim][dim])
         for (unsigned int y = 0; y < 266; y++)
         {
             if ((x != 0 && x != 1 && x != 264 && x != 265 && x != 30 && x != 59
-                    && x != 88 && x != 89 && x != 118 && x != 147 && x != 176
-                    && x != 177 && x != 206 && x != 235)
+                 && x != 88 && x != 89 && x != 118 && x != 147 && x != 176
+                 && x != 177 && x != 206 && x != 235)
                 && (y != 0 && y != 1 && y != 264 && y != 265 && y != 30
                     && y != 59 && y != 88 && y != 89 && y != 118 && y != 147
                     && y != 176 && y != 177 && y != 206 && y != 235))

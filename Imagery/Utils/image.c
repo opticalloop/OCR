@@ -1,13 +1,14 @@
+#include "image.h"
+
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
-#include "image.h"
 
 void newImage(Image *image)
 {
-    SDL_Surface *surface = !strcmp(image->path, "") ? SDL_CreateRGBSurface(
-                               0, 266, 266, 32, 0, 0, 0, 0)
-                                                    : load_image(image->path);
+    SDL_Surface *surface = !strcmp(image->path, "")
+        ? SDL_CreateRGBSurface(0, 266, 266, 32, 0, 0, 0, 0)
+        : load_image(image->path);
 
     const unsigned int width = surface->w;
     const unsigned int height = surface->h;
@@ -20,7 +21,7 @@ void newImage(Image *image)
     if (image->pixels == NULL)
     {
         errx(EXIT_FAILURE,
-            "Error while allocating pixels pointers for the image");
+             "Error while allocating pixels pointers for the image");
     }
 
     unsigned int x;
@@ -30,7 +31,7 @@ void newImage(Image *image)
         if (image->pixels[x] == NULL)
         {
             errx(EXIT_FAILURE,
-                "Error while allocating pixels pointers for the image");
+                 "Error while allocating pixels pointers for the image");
         }
     }
     // Make sure we don't have the '\0'
@@ -90,13 +91,12 @@ void updateSurface(Image *image)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-
             // Get pixel from image
             Pixel _pixel = image->pixels[x][y];
 
             // Get pixel value for SDL
-            Uint32 pixel
-                = SDL_MapRGB(pixel_format, _pixel.r, _pixel.g, _pixel.b);
+            Uint32 pixel =
+                SDL_MapRGB(pixel_format, _pixel.r, _pixel.g, _pixel.b);
 
             // Put pixel in img
             put_pixel(image->surface, x, y, pixel);

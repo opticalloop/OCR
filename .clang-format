@@ -1,90 +1,79 @@
-Language: Cpp
-
-# Use 80 columns. (2.1)
-ColumnLimit: 79
-
-# Indentation MUST be done using whitespaces only (2.2)
-UseTab: Never
-
-# Regex denoting the diff #include categories used for ordering them. (5.11)
-IncludeCategories:
-  - Regex:           '".*"'
-    Priority:        1
-  - Regex:           '<.*>'
-    Priority:        -1
-  - Regex:           '.*'
-    Priority:        2
-# Merge multiple #include blocks together and sort as one.
-IncludeBlocks: Merge
-
-# Tabulation. (6.4)
-IndentWidth: 4
-TabWidth: 4
-
-# Make all braces {} on new line. (6.5)
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Right
+AlignOperands: false
+AlignTrailingComments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: true
+BinPackParameters: true
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterClass: false
-  AfterControlStatement: true
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterStruct: true
-  AfterUnion: true
-  AfterExternBlock: true
-  BeforeCatch: true
-  BeforeElse: true
-
-# Pointer and reference alignment style (7.2)
-PointerAlignment: Right
-
-# Add space before assignment operators. (7.15)
-SpaceBeforeAssignmentOperators: true
-
-# Break before operators. (7.17)
-BreakBeforeBinaryOperators: All
+    AfterEnum: true
+    AfterClass: true
+    AfterControlStatement: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterStruct: true
+    AfterUnion: true
+    AfterExternBlock: true
+    BeforeCatch: true
+    BeforeElse: true
+    IndentBraces: false
+    SplitEmptyFunction: false
+    SplitEmptyRecord: false
+    SplitEmptyNamespace: false
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
-
-# Spaces will not be inserted after ( and before ). (7.18)
-SpacesInParentheses: false
-# Spaces may not be inserted into C style casts.
-SpacesInCStyleCastParentheses: false
-# Spaces may not be inserted into ().
-SpaceInEmptyParentheses: false
-
-# Indent case labels one level from the switch statement. (7.27)
-IndentCaseLabels: true
-
-# Horizontally aligns arguments after an open bracket.
-AlignAfterOpenBracket: DontAlign
-BinPackParameters: true
-
-# Indents directives after the hash.
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: true
+ColumnLimit: 80
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+FixNamespaceComments: true
+ForEachMacros: ['ILIST_FOREACH', 'ILIST_FOREACH_ENTRY']
+IncludeBlocks: Regroup
+IncludeCategories:
+    - Regex: '<.*>'
+      Priority: 1
+    - Regex: '.*'
+      Priority: 2
+IndentCaseLabels: false
 IndentPPDirectives: AfterHash
-
-# If true, clang-format will sort #includes.
+IndentWidth: 4
+IndentWrappedFunctionNames: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+Language: Cpp
+NamespaceIndentation: All
+PointerAlignment: Right
+ReflowComments: true
 SortIncludes: true
-
-# A space will be inserted before a C++11 braced list used to init an obj.
-SpaceBeforeCpp11BracedList: true
-
-# Put a space before opening parentheses only after control statement keywords.
+SortUsingDeclarations: false
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
 SpaceBeforeParens: ControlStatements
-
-# Spaces will not be inserted after < and before > in template argument lists.
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
-
-# The maximum number of consecutive empty lines to keep.
-MaxEmptyLinesToKeep: 1
-
-# Dependent on the value, int f() { return 0; } can be put on a single line.
-AllowShortFunctionsOnASingleLine: None
-
-# The function declaration return type breaking style to use.
-AlwaysBreakAfterReturnType: None
-
-# Align escaped newlines as far left as possible.
-AlignEscapedNewlines: true
-
-# Prevent comment formatting
-CommentPragmas:  '^\* .*'
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+TabWidth: 4
+UseTab: Never

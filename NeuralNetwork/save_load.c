@@ -1,10 +1,11 @@
+#include "save_load.h"
+
 #include <ctype.h> // To use toupper()
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "save_load.h"
 
 static void writeToFile(FILE *path, double number, char *extra)
 {
@@ -71,7 +72,7 @@ void saveWeights(Network *network, char *path)
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
                 writeToFile(file, network->layers[i].neurons[j].weights[k],
-                    k == 0 ? "" : "|");
+                            k == 0 ? "" : "|");
             }
             fputs("|", file);
         }
@@ -130,8 +131,7 @@ void launchWeights(Network *network, char *path)
             // Save weights
             network->layers[layerIndex]
                 .neurons[neuronIndex]
-                .weights[weightIndex]
-                = atof(tempStr);
+                .weights[weightIndex] = atof(tempStr);
 
             printf("Weight launched : %f\n", atof(tempStr));
 

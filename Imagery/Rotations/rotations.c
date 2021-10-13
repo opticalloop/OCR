@@ -1,7 +1,8 @@
+#include "rotations.h"
+
 #include <err.h>
 #include <math.h>
 #include <stdio.h>
-#include "rotations.h"
 
 #define PI M_PI
 
@@ -89,8 +90,8 @@ double detectDiffAngle(Image *image, float precision)
     const unsigned int height = image->height;
 
     // Get diagonal
-    const unsigned int diagonal
-        = (unsigned int)sqrt(width * width + height * height);
+    const unsigned int diagonal =
+        (unsigned int)sqrt(width * width + height * height);
 
     double **accumulator;
 
@@ -119,7 +120,6 @@ double detectDiffAngle(Image *image, float precision)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-
             // Only when encounter black pixel try the circle around
             if (image->pixels[x][y].r != 0)
             {
@@ -133,8 +133,8 @@ double detectDiffAngle(Image *image, float precision)
                 int diff = (int)((x * sin(angle) + y * cos(angle)));
                 if (diff >= 0)
                 {
-                    int teta = (int)((
-                        angle * (1 / precision) + (PI / 2) * (1 / precision)));
+                    int teta = (int)((angle * (1 / precision)
+                                      + (PI / 2) * (1 / precision)));
                     accumulator[teta][diff]++;
 
                     if (accumulator[teta][diff] > tempMaxAngle)
