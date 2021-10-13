@@ -1,5 +1,6 @@
 #include "neural_network.h"
 
+#include <SDL/SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

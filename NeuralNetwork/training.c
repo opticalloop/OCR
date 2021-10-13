@@ -13,11 +13,15 @@
 #include "save_load.h"
 
 #define NBIMAGES 1
+#define NBINPUTS 28 * 28;
+#define NBOUTPUTS 9;
+#define NBHIDDENLAYERS 2;
+#define NBNODESPERHIDDEN 16;
 
-static void printResult(double expected[], Neuron neuron[])
+void printResult(double expected[], Neuron neuron[])
 {
     // Print expected
-    for (unsigned int l = 0; l < 9; l++)
+    for (unsigned int l = 0; l < NBOUTPUTS; l++)
     {
         if (expected[l] == 1.0)
         {
@@ -25,16 +29,16 @@ static void printResult(double expected[], Neuron neuron[])
             break;
         }
     }
-    for (unsigned int k = 0; k < 9; k++)
+    for (unsigned int k = 0; k < NBOUTPUTS; k++)
     {
         printf("Output : %f, expected : %u\n", neuron[k].value,
                (unsigned int)expected[k]);
     }
 }
 
-static void checkInputs(double inputs[28 * 28])
+void checkInputs(double inputs[NBINPUTS])
 {
-    for (unsigned int i = 0; i < 28 * 28; i++)
+    for (unsigned int i = 0; i < NBINPUTS; i++)
     {
         if (inputs[i] > 234124.0)
         {
@@ -43,9 +47,28 @@ static void checkInputs(double inputs[28 * 28])
     }
 }
 
+void imageToBinary(SDL_Surface *surface, double inputs[])
+{
+    SDL_Color rgb;
+    Uint32 pixel;
+    for (unsigned int i = 0; i < 28; i++)
+    {
+        for (unsigned int j = 0; j < 28; j++)
+        {
+            // Get pixel colors
+            pixel = get_pixel(surface, i, j);
+            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
+
+            intputs[i * j] = (double)(1.0 - ((double)rgb.r / 255.0));
+
+            // printf("Input in creation of data : %f\n", intputs[i * j]);
+        }
+    }
+}
+
 // launch pixel value in the intputPaths array, and define expected digit
 // Consider that the image is already in grayscale
-static void createData(char *path, double intputs[], double expected[])
+void createData(char *path, double inputs[], double expected[])
 {
     // Get absolute path
     char actualpath[345 + 1];
@@ -56,26 +79,13 @@ static void createData(char *path, double intputs[], double expected[])
     printf("File : %s\n", ptr);
     SDL_Surface *surface = load_image(ptr);
 
-    SDL_Color rgb;
-    for (unsigned int i = 0; i < 28; i++)
-    {
-        for (unsigned int j = 0; j < 28; j++)
-        {
-            // Get pixel colors
-            Uint32 pixel = get_pixel(surface, i, j);
-            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
-
-            intputs[i * j] = (double)(1.0 - ((double)rgb.r / 255.0));
-
-            // printf("Input in creation of data : %f\n", intputs[i * j]);
-        }
-    }
+    imageToBinary(surface, inputs);
 
     // Get expected value
     int num = path[17] - '0';
 
     // Init expected value
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < NBOUTPUTS; i++)
     {
         expected[i] = i + 1 == num ? 1.0 : 0.0;
     }
@@ -85,9 +95,9 @@ static void createData(char *path, double intputs[], double expected[])
     SDL_FreeSurface(surface);
 }
 
-static void createAllData(char *directory, char *intputPaths[],
-                          double input[NBIMAGES][28 * 28],
-                          double expected[NBIMAGES][9])
+void createAllData(char *directory, char *intputPaths[],
+                   double input[NBIMAGES][NBINPUTS],
+                   double expected[NBIMAGES][NBOUTPUTS])
 {
     // Get all images paths
     DIR *FD;
@@ -123,7 +133,7 @@ static void createAllData(char *directory, char *intputPaths[],
     }
 }
 
-int main(int argc, char **argv)
+int train(int argc, char **argv)
 {
     // Need the directory
     if (argc != 2)
@@ -131,13 +141,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    double input[NBIMAGES][28 * 28];
-    double expected[NBIMAGES][9];
-
-    unsigned int nbInputs = 28 * 28;
-    unsigned int nbOutputs = 9;
-    unsigned int nbHiddenLayers = 2;
-    unsigned int nbNodesPerHidden = 16;
+    double input[NBIMAGES][NBINPUTS];
+    double expected[NBIMAGES][NBOUTPUTS];
 
     unsigned int epoch = 10000;
 
@@ -149,7 +154,7 @@ int main(int argc, char **argv)
     printf("Creating network\n");
 
     Network n =
-        newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
+        newNetwork(NBINPUTS, NBNODESPERHIDDEN, NBHIDDENLAYERS, NBOUTPUTS);
     Network *network = &n;
 
     printf("Initing network\n");
@@ -175,7 +180,7 @@ int main(int argc, char **argv)
             if (i % (epoch / 10) == 0)
             {
                 printResult(expected[j],
-                            network->layers[nbHiddenLayers + 1].neurons);
+                            network->layers[NBHIDDENLAYERS + 1].neurons);
             }
         }
     }
@@ -187,4 +192,24 @@ int main(int argc, char **argv)
     freeNetwork(network);
 
     return 0;
+}
+
+int getNetworkOutput(Network *network, SDL_Surface *image)
+{
+    double inputs[28 * 28];
+    imageToBinary(image, inputs);
+    frontPropagationNetwork(network, inputs);
+
+    double temp = network->layers[NBHIDDENLAYERS + 1].neurons[0].value;
+    int result = 1;
+
+    for (unsigned int i = 1; i < NBOUTPUTS; i++)
+    {
+        if (network->layers[NBHIDDENLAYERS + 1].neurons[i].value > temp)
+        {
+            temp = network->layers[NBHIDDENLAYERS + 1].neurons[i].value;
+            result = i + 1;
+        }
+    }
+    return result;
 }

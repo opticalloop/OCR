@@ -1,8 +1,11 @@
 #include "sudoku_saver.h"
 
+#include <SDL/SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../../Imagery/Utils/image.h"
 
 void basicPrint(unsigned int grid[dim][dim])
 {
@@ -133,6 +136,44 @@ Image createSudokuImage(unsigned int grid[dim][dim])
                 image.pixels[x][y].g = 255;
                 image.pixels[x][y].b = 255;
             }
+        }
+    }
+
+    unsigned int increment = 2;
+    unsigned int posX;
+    unsigned int posY;
+    SDL_Rect rect;
+    rect.width = 28;
+    rect.height = 28;
+    for (unsigned int i = 0; i < dim; i++)
+    {
+        for (unsigned int j = 0; j < dim; j++)
+        {
+            if (j == 3 || j == 6)
+            {
+                increment++;
+            }
+            posX = i * 29 + increment;
+            posY = j * 29 + increment;
+            rect.x = posX;
+            rect.y = posY;
+            printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX, posY);
+            // Put image at posX and posY
+            
+            image.pixels[posX][posY].g = 0;
+            image.pixels[posX][posY].b = 0;
+            if (j == 3 || j == 6)
+            {
+                increment--;
+            }
+        }
+        if (i == 3 || i == 6)
+        {
+            increment--;
+        }
+        if (i == 2 || i == 5)
+        {
+            increment++;
         }
     }
 

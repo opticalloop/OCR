@@ -11,7 +11,10 @@ SRC = main.c ../Imagery/Utils/image.c ../Imagery/Utils/pixel_operations.c ../Ima
 SUDOKU_DEPEND = $(SRC:%.c=$(BUILD)/%.d)
 SUDOKU_OBJ = $(SRC:%.c=$(BUILD)/%.o)
 
-all: init solver
+all: init solver clear
+
+clear:
+	find . -type d -empty -delete
 
 init:
 	$(shell mkdir -p $(BUILD))

@@ -28,11 +28,9 @@ int main(int argc, char **argv)
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
-    // createSudokuImage(grid);
+    createSudokuImage(grid);
 
     readGrid(grid, argv[1]);
-
-    basicPrint(grid);
 
     if (isSolvable(grid) == false)
     {
@@ -41,7 +39,6 @@ int main(int argc, char **argv)
 
     printf("Start solving\n");
     solveSuduko(grid, 0, 0);
-    basicPrint(grid);
 
     saveGrid(grid, argv[2]);
 
