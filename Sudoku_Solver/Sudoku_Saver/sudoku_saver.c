@@ -159,7 +159,7 @@ Image createSudokuImage(unsigned int grid[dim][dim])
             rect.y = posY;
             printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX, posY);
             // Put image at posX and posY
-            
+
             image.pixels[posX][posY].g = 0;
             image.pixels[posX][posY].b = 0;
             if (j == 3 || j == 6)
