@@ -143,8 +143,8 @@ Image createSudokuImage(unsigned int grid[dim][dim])
     unsigned int posX;
     unsigned int posY;
     SDL_Rect rect;
-    rect.width = 28;
-    rect.height = 28;
+    rect.w = 28;
+    rect.h = 28;
     for (unsigned int i = 0; i < dim; i++)
     {
         for (unsigned int j = 0; j < dim; j++)
@@ -157,8 +157,8 @@ Image createSudokuImage(unsigned int grid[dim][dim])
             posY = j * 29 + increment;
             rect.x = posX;
             rect.y = posY;
-            printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX, posY);
-            // Put image at posX and posY
+            // printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX,
+            // posY); Put image at posX and posY
 
             image.pixels[posX][posY].g = 0;
             image.pixels[posX][posY].b = 0;

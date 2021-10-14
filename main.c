@@ -115,7 +115,13 @@ static void analyzeNN(int argc, char **argv)
     unsigned int nbHidden = 0;
     unsigned int sizeHidden = 0;
 
-    for (int i = 1; i < argc; i++)
+    if (argc == 2)
+    {
+        printHelpNN();
+        return;
+    }
+
+    for (int i = 2; i < argc; i++)
     {
         if (!strcmp(argv[i], "--help"))
         {
