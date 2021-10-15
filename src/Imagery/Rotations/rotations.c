@@ -4,8 +4,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#define PI M_PI
-
 void rotate(Image *image, double angleDegree)
 {
     const unsigned int width = image->width;
@@ -14,7 +12,7 @@ void rotate(Image *image, double angleDegree)
     const double middleX = ((double)width / 2.0);
     const double middleY = ((double)height / 2.0);
 
-    const double angle = (angleDegree / 360.0) * 2.0 * PI;
+    const double angle = (angleDegree / 360.0) * 2.0 * M_PI;
 
     // Create two dimensional array of pixels
     Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
@@ -82,6 +80,7 @@ void rotate(Image *image, double angleDegree)
     }
     free(image->pixels);
     image->pixels = _pixels;
+    updateSurface(&image);
 }
 
 double detectDiffAngle(Image *image, float precision)
@@ -95,7 +94,7 @@ double detectDiffAngle(Image *image, float precision)
 
     double **accumulator;
 
-    double _precision = PI * (1 / precision);
+    double _precision = M_PI * (1 / precision);
 
     accumulator = malloc(sizeof(double *) * (_precision + 1));
     if (accumulator == NULL)
@@ -127,14 +126,14 @@ double detectDiffAngle(Image *image, float precision)
             }
 
             // From 0 to 180
-            double angle = -PI / 2;
-            for (; angle <= PI / 2; angle += precision)
+            double angle = -M_PI / 2;
+            for (; angle <= M_PI / 2; angle += precision)
             {
                 int diff = (int)((x * sin(angle) + y * cos(angle)));
                 if (diff >= 0)
                 {
                     int teta = (int)((angle * (1 / precision)
-                                      + (PI / 2) * (1 / precision)));
+                                      + (M_PI / 2) * (1 / precision)));
                     accumulator[teta][diff]++;
 
                     if (accumulator[teta][diff] > tempMaxAngle)
@@ -159,7 +158,7 @@ double detectDiffAngle(Image *image, float precision)
 void autoRotate(Image *image, float precision)
 {
     double angle = detectDiffAngle(image, precision);
-    angle *= (180 / PI);
+    angle *= (180 / M_PI);
     printf("Max angle %f\n", angle);
 
     rotate(image, angle);

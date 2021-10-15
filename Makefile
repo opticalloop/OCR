@@ -3,11 +3,12 @@ CC = gcc
 CPPFLAGS = `pkg-config --cflags sdl` -MMD
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
 LDLFLAGS = -lm
-LDLIBS = -lSDL -lpthread -lSDL_image
+LDLIBS = `pkg-config --libs sdl SDL_image`
 
 BUILD := build
+SOURCE_DIR := src
 
-SRC = main.c NeuralNetwork/neural_network.c NeuralNetwork/XOR.c
+SRC = $(shell find $(SOURCE_DIR) -name "*.c" ! -name "main.c")
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
 DEP = $(SRC:%.c=$(BUILD)/%.d)
 
@@ -18,7 +19,7 @@ clear:
 
 init: 
 	$(shell mkdir -p $(BUILD))
-	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
+	$(shell mkdir -p $(SRC:%.c=$(BUILD)/%))
 
 main: $(OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
@@ -39,7 +40,7 @@ tests:
 	make -C Tests
 
 $(BUILD)/%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
 # Format all files
 format:
@@ -47,10 +48,9 @@ format:
 
 # Clean all trash files
 clean:
-	make -C GUI clean
-	make -C Imagery clean
-	make -C NeuralNetwork clean
-	make -C Sudoku_Solver clean
-	make -C Tests clean
+	make -C $(SOURCE_DIR)/GUI clean
+	make -C $(SOURCE_DIR)/Imagery clean
+	make -C $(SOURCE_DIR)/NeuralNetwork clean
+	make -C $(SOURCE_DIR)/Sudoku_Solver clean
 	rm -rf $(BUILD)
 	${RM} ${OBJ} ${DEP} main

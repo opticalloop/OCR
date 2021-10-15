@@ -1,0 +1,30 @@
+CC = gcc
+
+CPPFLAGS = `pkg-config --cflags sdl` -MMD
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
+LDLFLAGS = -lm
+LDLIBS = -lSDL -lSDL_image 
+
+BUILD := build
+
+SRC =  $(shell find -name "*.c")
+OBJ = $(SRC:%.c=$(BUILD)/%.o)
+DEP = $(SRC:%.c=$(BUILD)/%.d)
+
+all: init imagery clear
+
+clear:
+	find . -type d -empty -delete
+
+init: 
+	$(shell mkdir -p $(BUILD))
+	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
+
+imagery: $(OBJ)
+	gcc -o main $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS
+
+$(BUILD)/%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
+
+clean:
+	rm -rf $(BUILD)

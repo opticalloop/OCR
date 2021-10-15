@@ -9,14 +9,19 @@
 #include <unistd.h>
 
 #include "../Imagery/Utils/image.h"
+#include "../Imagery/Utils/pixel_operations.h"
 #include "neural_network.h"
 #include "save_load.h"
 
 #define NBIMAGES 1
+#define NBINPUTS 28 * 28
+#define NBOUTPUTS 9
+#define NBHIDDENLAYERS 2
+#define NBNODESPERHIDDEN 16
 
 void printResult(double expected[], Neuron neuron[]);
 
-void checkInputs(double inputs[28 * 28]);
+void checkInputs(double inputs[NBINPUTS]);
 
 void imageToBinary(SDL_Surface *surface, double inputs[]);
 
@@ -25,8 +30,8 @@ void imageToBinary(SDL_Surface *surface, double inputs[]);
 void createData(char *path, double intputs[], double expected[]);
 
 void createAllData(char *directory, char *intputPaths[],
-                   double input[NBIMAGES][28 * 28],
-                   double expected[NBIMAGES][9]);
+                   double input[NBIMAGES][NBINPUTS],
+                   double expected[NBIMAGES][NBOUTPUTS]);
 
 int train(int argc, char **argv);
 

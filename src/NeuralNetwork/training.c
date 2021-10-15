@@ -8,15 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../Imagery/Utils/image.h"
-#include "neural_network.h"
-#include "save_load.h"
-
-#define NBIMAGES 1
-#define NBINPUTS 28 * 28;
-#define NBOUTPUTS 9;
-#define NBHIDDENLAYERS 2;
-#define NBNODESPERHIDDEN 16;
+#include "training.h"
 
 void printResult(double expected[], Neuron neuron[])
 {
@@ -59,7 +51,7 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
             pixel = get_pixel(surface, i, j);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            intputs[i * j] = (double)(1.0 - ((double)rgb.r / 255.0));
+            inputs[i * j] = (double)(1.0 - ((double)rgb.r / 255.0));
 
             // printf("Input in creation of data : %f\n", intputs[i * j]);
         }
@@ -173,7 +165,7 @@ int train(int argc, char **argv)
         {
             // checkInputs(input[j]);
 
-            frontPropagationNetwork(network, input[j]);
+            frontPropagation(network, input[j]);
             backPropagation(network, expected[j]);
             gradientDescent(network);
 
@@ -196,9 +188,9 @@ int train(int argc, char **argv)
 
 int getNetworkOutput(Network *network, SDL_Surface *image)
 {
-    double inputs[28 * 28];
+    double inputs[NBINPUTS];
     imageToBinary(image, inputs);
-    frontPropagationNetwork(network, inputs);
+    frontPropagation(network, inputs);
 
     double temp = network->layers[NBHIDDENLAYERS + 1].neurons[0].value;
     int result = 1;

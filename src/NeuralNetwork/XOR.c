@@ -14,7 +14,7 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
     unsigned int nbInputs = 2;
     unsigned int nbOutputs = 1;
 
-    unsigned int epoch = 1000000;
+    unsigned int epoch = 1000;
 
     printf("Creating network\n");
 
@@ -28,7 +28,7 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
-        if (i % 10000 == 0)
+        if (i % (epoch / 10) == 0)
         {
             printf("###### Epoch : %d ######\n", i);
         }
@@ -39,11 +39,11 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
                 double input[2] = { inputs[j], inputs[j + 1] };
                 double expected[1] = { expecteds[j / 2] };
 
-                frontPropagationNetwork(network, input);
+                frontPropagation(network, input);
                 backPropagation(network, expected);
                 gradientDescent(network);
 
-                if (i % 10000 == 0)
+                if (i % (epoch / 10) == 0)
                 {
                     printf("Input : %u %u\n", (unsigned int)input[0],
                            (unsigned int)input[1]);
