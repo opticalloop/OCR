@@ -80,7 +80,6 @@ void rotate(Image *image, double angleDegree)
     }
     free(image->pixels);
     image->pixels = _pixels;
-    updateSurface(&image);
 }
 
 double detectDiffAngle(Image *image, float precision)

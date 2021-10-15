@@ -6,6 +6,7 @@ LDLFLAGS = -lm
 LDLIBS = -lSDL -lSDL_image 
 
 BUILD := build
+EXEC := main
 
 SRC =  $(shell find -name "*.c")
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
@@ -21,10 +22,11 @@ init:
 	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
 imagery: $(OBJ)
-	gcc -o main $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS
+	gcc -o $(EXEC) $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 $(BUILD)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
 clean:
 	rm -rf $(BUILD)
+	$(RM) $(EXEC)
