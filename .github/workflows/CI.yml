@@ -39,8 +39,7 @@ jobs:
       - name: Compile Unit Tests
         run:  |
           cd Tests
-          echo `git branch --show-current`
-          echo `pwd`
+          make
         
       - name: Run Tests
         run: ./sudoku
