@@ -55,3 +55,7 @@ dkms.conf
 .idea/
 /cmake-build-debug/
 out.bmp
+
+Imagery/*.jpeg
+Imagery/*.bmp
+Tests/*.jpeg

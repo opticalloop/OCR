@@ -26,6 +26,8 @@ void displayImage(Image *image);
 
 void updateSurface(Image *image);
 
+void updateSurfacePixels(Image *image,Pixel ** pixels);
+
 void saveImage(Image *image, char *path);
 
 void freeImage(Image *image);

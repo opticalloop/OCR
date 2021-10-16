@@ -155,8 +155,10 @@ void displayImage(Image *image) {
     // Free memory took by SDL
     SDL_Quit();
 }
-
 void updateSurface(Image *image) {
+    updateSurfacePixels(image,image->pixels);
+}
+void updateSurfacePixels(Image *image,Pixel ** pixels) {
     // Get pixel format for the given image
     SDL_PixelFormat *pixel_format = image->surface->format;
 
