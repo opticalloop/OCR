@@ -33,6 +33,6 @@ void createAllData(char *directory, char *intputPaths[],
                    double input[NBIMAGES][NBINPUTS],
                    double expected[NBIMAGES][NBOUTPUTS]);
 
-int train(char *directory);
+int train(char *directory, int verbose);
 
 int getNetworkOutput(Network *network, SDL_Surface *image);

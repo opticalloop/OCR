@@ -52,5 +52,6 @@ clean:
 	make -C $(SOURCE_DIR)/Imagery clean
 	make -C $(SOURCE_DIR)/NeuralNetwork clean
 	make -C $(SOURCE_DIR)/Sudoku_Solver clean
+	make -C Tests clean
 	rm -rf $(BUILD)
 	${RM} ${OBJ} ${DEP} main

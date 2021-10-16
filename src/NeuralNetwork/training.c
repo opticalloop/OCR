@@ -132,8 +132,14 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
     }
 }
 
-int train(char *directory)
+int train(char *directory, int verbose)
 {
+    if (verbose)
+    {
+        // printf("    🔍 Launching Neural Network with %u hidden layers and %u
+        // nodes per hidden\n", nbHiddenLayers, nbNodesPerHidden);
+    }
+
     double input[NBIMAGES][NBINPUTS];
     double expected[NBIMAGES][NBOUTPUTS];
 

@@ -36,7 +36,6 @@ void initNeuron(Neuron *neuron)
     for (unsigned int i = 0; i < nbWeights; i++)
     {
         neuron->weights[i] = (double)rand() / RAND_MAX * 2.0 - 1.0;
-        // printf("Weight initialized : %f\n", neuron->weights[i]);
     }
 
     neuron->bias = (double)rand() / RAND_MAX * 2.0 - 1.0;
@@ -182,8 +181,9 @@ void freeNetwork(Network *network)
 
 // ------ /Network ------
 
-void backPropagation(Network *network, double expected[])
+double backPropagation(Network *network, double expected[])
 {
+    double errorRate = 0.0;
     double errorTemp = 0.0;
 
     unsigned int nbLayers = network->nbLayers;
@@ -197,6 +197,7 @@ void backPropagation(Network *network, double expected[])
         Neuron *neuron = &(outputLayer->neurons[i]);
         errorTemp = expected[i] - neuron->value;
         neuron->delta = errorTemp * sigmoidPrime(neuron->value);
+        errorRate += (errorTemp * errorTemp);
         // printf("Error : %f\n", errorTemp);
     }
 
@@ -219,9 +220,9 @@ void backPropagation(Network *network, double expected[])
                     layer.neurons[k].delta * layer.neurons[k].weights[j];
             }
             neuron->delta = errorTemp * sigmoidPrime(neuron->value);
-            // printf("Delta : %f\n", neuron->delta);
         }
     }
+    return errorRate;
 }
 
 void gradientDescent(Network *network)

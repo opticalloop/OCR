@@ -2,11 +2,16 @@
 
 #include <stdio.h>
 
-void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int verbose)
+#include "NeuralNetwork/save_load.h"
+
+void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
+               int verbose, char *launch_path, char *save_path)
 {
     if (verbose)
     {
-        printf("    🔍 Launching XOR with %u hidden layers and %u nodes per hidden\n", nbHiddenLayers, nbNodesPerHidden);
+        printf("    🔍 Launching XOR with %u hidden layers and %u nodes per "
+               "hidden\n",
+               nbHiddenLayers, nbNodesPerHidden);
     }
     // 00 : 0
     // 01 : 1
@@ -29,18 +34,31 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int v
         newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
     Network *network = &n;
 
-    if (verbose)
+    // Does we need to launch weights ?
+    if (!strcmp(launch_path, ""))
     {
-        printf("    🔍 Initing network\n");
+        if (verbose)
+        {
+            printf("    🎰 Initing network\n");
+        }
+        initNetwork(network);
+    }
+    else
+    {
+        if (verbose)
+        {
+            printf("--> 💾 Initing weights from %s\n", launch_path);
+        }
+        launchWeights(network, launch_path);
     }
 
-    initNetwork(network);
+    double errorRate = 0.0;
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
         if (i == epoch && verbose)
         {
-            printf("    📊 ###### EPOCH %u ######\n", i);
+            printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
         for (unsigned int j = 0; j < 8; j += 2)
         {
@@ -50,7 +68,7 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int v
                 double expected[1] = { expecteds[j / 2] };
 
                 frontPropagation(network, input);
-                backPropagation(network, expected);
+                errorRate = backPropagation(network, expected);
                 gradientDescent(network);
 
                 if (i == epoch && verbose)
@@ -65,13 +83,21 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int v
         }
     }
 
-
     if (verbose)
     {
-        printf("    ❗ Error rate = %f\n", averageErrorRate(network));
-        printf("    ✅ Done\n");
+        printf("    ❗ Error rate = %f\n", errorRate);
     }
-    // printWeights(network);
+
+    if (strcmp(save_path, ""))
+    {
+        if (verbose)
+        {
+            printf("<-- 💾 Saving weights to %s\n", save_path);
+        }
+        saveWeights(network, save_path);
+    }
+
+    printf("    ✅ Done\n");
 
     freeNetwork(network);
 }

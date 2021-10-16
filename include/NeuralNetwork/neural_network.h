@@ -40,14 +40,17 @@ void freeLayer(Layer *layer);
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
                    unsigned int nbHiddenLayers, unsigned int sizeOutput);
-void initNetwork(Network *network);
-void frontPropagation(Network *network, double input[]);
-void freeNetwork(Network *network);
-// ------ /Network ------
 
-void backPropagation(Network *network, double expected[]);
+void initNetwork(Network *network);
+
+void frontPropagation(Network *network, double input[]);
+
+void freeNetwork(Network *network);
+
+double backPropagation(Network *network, double expected[]);
 
 void gradientDescent(Network *network);
+// ------ /Network ------
 
 double sigmoid(double x);
 

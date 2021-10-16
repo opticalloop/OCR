@@ -123,7 +123,7 @@ void launchWeights(Network *network, char *path)
                 }
                 else
                 {
-                    neuronIndex = (int)((chr - '0') * 10 + (c - '0'));
+                    neuronIndex = (int)((chr - '0'));
                 }
                 weightIndex = 0;
             }
@@ -134,13 +134,13 @@ void launchWeights(Network *network, char *path)
         }
         else if (chr == '|')
         {
+            printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+                   neuronIndex, weightIndex, atof(tempStr));
+
             // Save weights
             network->layers[layerIndex]
                 .neurons[neuronIndex]
                 .weights[weightIndex] = atof(tempStr);
-
-            printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-                   neuronIndex, weightIndex, atof(tempStr));
 
             // Reset string
             memset(tempStr, 0, sizeof(tempStr));

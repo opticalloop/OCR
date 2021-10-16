@@ -7,17 +7,18 @@
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
 
-static void toUp(char * temp) {
-  char * name;
-  name = strtok(temp,":");
+static void toUp(char *temp)
+{
+    char *name;
+    name = strtok(temp, ":");
 
-  // Convert to upper case
-  char *s = name;
-  while (*s) {
-    *s = toupper((unsigned char) *s);
-    s++;
-  }
-
+    // Convert to upper case
+    char *s = name;
+    while (*s)
+    {
+        *s = toupper((unsigned char)*s);
+        s++;
+    }
 }
 
 static char isNumber(char *text)
@@ -145,14 +146,12 @@ static void analyzeOCR(int argc, char **argv)
 
 static void analyzeNN(int argc, char **argv)
 {
-    int verbose = 1;
+    int verbose = 0;
 
-    int launch = 0;
-    char launch_path[100];
-    
-    int save = 0;
-    char save_path[100];
+    char launch_path[100] = "";
+    char save_path[100] = "";
 
+    int xor = 0;
     unsigned int nbHidden = 0;
     unsigned int sizeHidden = 0;
 
@@ -167,9 +166,11 @@ static void analyzeNN(int argc, char **argv)
         if (!strcmp(argv[i], "--help"))
         {
             printHelpNN();
+            return;
         }
         else if (!strcmp(argv[i], "-xor"))
         {
+            xor = 1;
             i++;
             // nb hidden layer
             if (i >= argc)
@@ -191,7 +192,8 @@ static void analyzeNN(int argc, char **argv)
             if (i >= argc)
             {
                 errx(EXIT_FAILURE,
-                     "⛔ You need to specify a number of node per hidden layer to "
+                     "⛔ You need to specify a number of node per hidden layer "
+                     "to "
                      "train the network on the xor "
                      ". See help with --help for more");
             }
@@ -201,14 +203,12 @@ static void analyzeNN(int argc, char **argv)
                 return;
             }
             sizeHidden = atoi(argv[i]);
-
-            launchXOR(nbHidden, sizeHidden, verbose);
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
             verbose = 1;
         }
-        else if (!strcmp(argv[i], "-L") ||!strcmp(argv[i], "--load"))
+        else if (!strcmp(argv[i], "-L") || !strcmp(argv[i], "--load"))
         {
             i++;
             if (i >= argc)
@@ -223,13 +223,12 @@ static void analyzeNN(int argc, char **argv)
                 return;
             }
             strcpy(launch_path, argv[i]);
-            if(access(launch_path, F_OK) != 0)
+            if (access(launch_path, F_OK) != 0)
             {
                 errx(EXIT_FAILURE,
                      "⛔ The specified file to load weight don't exist"
                      ". See help with --help for more");
             }
-            launch = 1;
         }
         else if (!strcmp(argv[i], "-S") || !strcmp(argv[i], "--save"))
         {
@@ -246,35 +245,32 @@ static void analyzeNN(int argc, char **argv)
                 return;
             }
             strcpy(save_path, argv[i]);
-            if(access(save_path, F_OK) != 0)
-            {
-                save = 1;
-            }
-            else
+            if (access(save_path, F_OK) == 0)
             {
                 char str[100];
-                printf("    ❗ The file specified where to save weights already exist, overwrite it ? [Y/n] : ");
+                printf("    ❗ The file specified where to save weights already "
+                       "exist, overwrite it ? [Y/n] : ");
                 gets(str);
                 toUp(str);
                 // While str != Y, YES, N and NO
-                while (strcmp(str, "Y") && strcmp(str, "YES") && strcmp(str, "N") && strcmp(str, "NO"))
-                {  
+                while (strcmp(str, "Y") && strcmp(str, "YES")
+                       && strcmp(str, "N") && strcmp(str, "NO"))
+                {
                     printf("\n[Y/n] : ");
                     gets(str);
                     toUp(str);
                 }
-                if (!strcmp(str, "Y") || !strcmp(str, "YES"))
+                if (!strcmp(str, "N") || !strcmp(str, "NO"))
                 {
-                    save = 1;
-                }
-                else if (!strcmp(str, "N") || !strcmp(str, "NO"))
-                {
-                    save = 0;
                     return;
                 }
-                printf("Save : %d", save);
             }
         }
+    }
+    if (xor)
+    {
+        launchXOR(nbHidden, sizeHidden, verbose, launch_path, save_path);
+        return;
     }
 }
 
