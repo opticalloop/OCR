@@ -3,6 +3,50 @@
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
+static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
+                       unsigned int w, unsigned int h)
+{
+    Pixel *matrix = pixels[x][y].matrix;
+
+    for (int i = 0; i < 9; ++i)
+    {
+        matrix[i] = InstantiatePixelZero();
+    }
+    matrix[4] = pixels[x][y];
+
+    if (x > 0)
+    {
+        if (y > 0)
+            matrix[0] = pixels[x - 1][y - 1];
+        matrix[3] = pixels[x - 1][y];
+        if (y < h - 1)
+            matrix[6] = pixels[x - 1][y + 1];
+    }
+    if (x < w - 1)
+    {
+        if (y > 0)
+            matrix[2] = pixels[x + 1][y - 1];
+        matrix[5] = pixels[x + 1][y];
+        if (y < h - 1)
+            matrix[8] = pixels[x + 1][y + 1];
+    }
+    if (y > 0)
+    {
+        if (x > 0)
+            matrix[0] = pixels[x - 1][y - 1];
+        matrix[1] = pixels[x][y - 1];
+        if (x < w - 1)
+            matrix[2] = pixels[x + 1][y - 1];
+    }
+    if (y != h - 1)
+    {
+        if (x > 0)
+            matrix[6] = pixels[x - 1][y + 1];
+        matrix[7] = pixels[x][y + 1];
+        if (x < w - 1)
+            matrix[8] = pixels[x + 1][y + 1];
+    }
+}
 
 void newImage(Image *image)
 {
@@ -55,12 +99,63 @@ void newImage(Image *image)
             image->pixels[x][y].g = rgb.g;
             image->pixels[x][y].b = rgb.b;
 
+            image->pixels[x][y].matrix = NULL;
+            image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
             averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
     }
     averageColor /= (width * height);
     image->averageColor = averageColor;
     image->surface = surface;
+
+    // fill the neighbours matrix
+    for (unsigned int i = 0; i < width; ++i)
+    {
+        for (unsigned int j = 0; j < height; ++j)
+        {
+            FillMatrix(image->pixels, i, j, width, height);
+        }
+    }
+}
+Pixel **copyPixelsArray(Image *image)
+{
+    int w = image->width;
+    int h = image->height;
+    Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
+    for (unsigned int i = 0; i < w; i++)
+    {
+        mask[i] = (Pixel *)malloc((h + 1) * sizeof(Pixel));
+        for (unsigned int j = 0; j < h; j++)
+        { // MEDIAN FILTER
+            mask[i][j].r = image->pixels[i][j].r;
+            mask[i][j].g = image->pixels[i][j].g;
+            mask[i][j].b = image->pixels[i][j].b;
+            mask[i][j].matrix = NULL;
+            mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+        }
+    }
+    // fill the neighbours matrix
+    for (unsigned int i = 0; i < w; ++i)
+    {
+        for (unsigned int j = 0; j < h; ++j)
+        {
+            FillMatrix(mask, i, j, w, h);
+        }
+    }
+    return mask;
+}
+void freeMatrixArray(Pixel **mask, int w, int h)
+{
+    for (int i = 0; i < w; ++i)
+    {
+        for (int j = 0; j < h; ++j)
+        {
+            free(mask[i][j].matrix);
+        }
+        free(mask[i]);
+    }
+    free(mask);
 }
 
 void displayImage(Image *image)
@@ -121,12 +216,34 @@ void saveImage(Image *image, char *path)
     SDL_Quit();
 }
 
+void updatePixelToSameValue(Pixel *pixel, unsigned int value)
+{
+    pixel->r = value;
+    pixel->g = value;
+    pixel->b = value;
+}
+
+Pixel InstantiatePixelZero()
+{
+    Pixel pixel;
+    pixel.b = 0;
+    pixel.r = 0;
+    pixel.g = 0;
+
+    return pixel;
+}
+
 void freeImage(Image *image)
 {
     unsigned int width = image->width;
+    unsigned int height = image->height;
 
     for (unsigned int x = 0; x < width; x++)
     {
+        for (unsigned int y = 0; y < height; ++y)
+        {
+            free(image->pixels[x][y].matrix);
+        }
         free(image->pixels[x]);
     }
 

@@ -10,6 +10,7 @@
 typedef struct Pixel
 {
     unsigned int r, g, b;
+    struct Pixel *matrix;
 } Pixel;
 
 typedef struct Image
@@ -28,8 +29,18 @@ void displayImage(Image *image);
 
 void updateSurface(Image *image);
 
+void updateSurfacePixels(Image *image, Pixel **pixels);
+
 void saveImage(Image *image, char *path);
 
 void freeImage(Image *image);
+
+void updatePixelToSameValue(Pixel *pixel, unsigned int value);
+
+Pixel InstantiatePixelZero();
+
+Pixel **copyPixelsArray(Image *image);
+
+void freeMatrixArray(Pixel **mask, int w, int h);
 
 #endif
