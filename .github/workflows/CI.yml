@@ -30,6 +30,7 @@ jobs:
         run:  |
           sudo apt-get update
           sudo apt install libsdl-image1.2 libsdl-image1.2-dev
+          bash ./install_criterion.sh
 
       # Runs a set of commands using the runners shell
       - name: Compile project
