@@ -13,7 +13,7 @@
 #include "neural_network.h"
 #include "save_load.h"
 
-#define NBIMAGES 1
+#define NBIMAGES 10
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 9
 #define NBHIDDENLAYERS 2
@@ -33,6 +33,6 @@ void createAllData(char *directory, char *intputPaths[],
                    double input[NBIMAGES][NBINPUTS],
                    double expected[NBIMAGES][NBOUTPUTS]);
 
-int train(int argc, char **argv);
+int train(char *directory);
 
 int getNetworkOutput(Network *network, SDL_Surface *image);

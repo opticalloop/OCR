@@ -1,3 +1,5 @@
+#include "training.h"
+
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
@@ -7,8 +9,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#include "training.h"
 
 void printResult(double expected[], Neuron neuron[])
 {
@@ -62,11 +62,7 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
 // Consider that the image is already in grayscale
 void createData(char *path, double inputs[], double expected[])
 {
-    // Get absolute path
-    char actualpath[345 + 1];
-    char *ptr;
-
-    ptr = realpath(path, actualpath);
+    char *ptr = path;
 
     printf("File : %s\n", ptr);
     SDL_Surface *surface = load_image(ptr);
@@ -74,7 +70,7 @@ void createData(char *path, double inputs[], double expected[])
     imageToBinary(surface, inputs);
 
     // Get expected value
-    int num = path[17] - '0';
+    int num = path[strlen(path) - 5] - '0';
 
     // Init expected value
     for (int i = 0; i < NBOUTPUTS; i++)
@@ -87,7 +83,7 @@ void createData(char *path, double inputs[], double expected[])
     SDL_FreeSurface(surface);
 }
 
-void createAllData(char *directory, char *intputPaths[],
+void createAllData(char *directory, char *intputPaths[NBIMAGES],
                    double input[NBIMAGES][NBINPUTS],
                    double expected[NBIMAGES][NBOUTPUTS])
 {
@@ -102,6 +98,10 @@ void createAllData(char *directory, char *intputPaths[],
     unsigned int index = 0;
     while ((in_file = readdir(FD)))
     {
+        if (index >= NBIMAGES)
+        {
+            break;
+        }
         // Check that we don't have the parent directory
         if (!strcmp(in_file->d_name, "."))
             continue;
@@ -113,33 +113,28 @@ void createAllData(char *directory, char *intputPaths[],
         index++;
     }
     closedir(FD);
-
+    printf("OERGKN\n");
     // Create all images data
     for (unsigned int i = 0; i < NBIMAGES; i++)
     {
         char directory[50];
-        strcpy(directory, "Images/");
+        strcpy(directory, "Digits-Only/");
         strcat(directory, intputPaths[i]);
         intputPaths[i] = directory;
+        printf("Directory : %s\n", directory);
         createData(directory, input[i], expected[i]);
     }
+    printf("OERGKNZFE34FA\n");
 }
 
-int train(int argc, char **argv)
+int train(char *directory)
 {
-    // Need the directory
-    if (argc != 2)
-    {
-        return 1;
-    }
-
     double input[NBIMAGES][NBINPUTS];
     double expected[NBIMAGES][NBOUTPUTS];
 
     unsigned int epoch = 10000;
 
     char *intputPaths[NBIMAGES];
-    char *directory = argv[1];
 
     createAllData(directory, intputPaths, input, expected);
 
@@ -179,7 +174,7 @@ int train(int argc, char **argv)
 
     // printWeights(network);
 
-    // saveWeights(network, "Weights/test.txt");
+    saveWeights(network, "Weights/weights.txt");
 
     freeNetwork(network);
 
