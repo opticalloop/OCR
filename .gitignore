@@ -56,7 +56,5 @@ dkms.conf
 /cmake-build-debug/
 out.bmp
 
-Imagery/*.jpeg
 Imagery/*.bmp
-Tests/*.jpeg
 Digits-Only/
