@@ -3,7 +3,7 @@ CC = gcc -I../../include/
 CPPFLAGS = `pkg-config --cflags sdl` -MMD
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lm
-LDLIBS = -lSDL -lSDL_image 
+LDLIBS = `pkg-config --libs sdl SDL_image`
 
 BUILD := build
 
