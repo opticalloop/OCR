@@ -11,14 +11,12 @@ SRC = sudoku_test.c ../Sudoku_Solver/sudoku_solver.c ../Sudoku_Solver/Sudoku_Sol
 TESTS_SUDOKU_OBJ = $(SRC:%.c=$(BUILD)/%.o)
 TESTS_SUDOKU_DEPEND = $(SRC:%.c=$(BUILD)/%.d)
 
-all: init sudoku clear
+all: init sudoku
 
 init: 
 	$(shell mkdir -p $(BUILD))
 	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
-clear:
-	find . -type d -empty -delete
 
 sudoku: $(TESTS_SUDOKU_OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
