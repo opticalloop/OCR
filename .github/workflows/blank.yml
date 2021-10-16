@@ -43,4 +43,6 @@ jobs:
           make
 
       - name: Run Tests
-        run: ./sudoku
+        run: |
+          echo `pwd`
+          ./sudoku
