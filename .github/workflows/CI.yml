@@ -34,10 +34,13 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Compile project
-        run: |
-          make
+        run: make
+      - name: Compile Unit Tests
+        run:  |
           cd Tests
+          git branch --show-current
           make
           ls
+        
       - name: Run Tests
         run: ./sudoku
