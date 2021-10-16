@@ -12,9 +12,9 @@
 
 int main(int argc, char **argv)
 {
-    if (argc != 3)
+    if (argc != 2)
     {
-        errx(1, "Usage : ./main input_path output_path");
+        errx(1, "Usage : ./solver input_path");
     }
 
     unsigned int grid[9][9] = {
@@ -40,7 +40,9 @@ int main(int argc, char **argv)
     printf("Start solving\n");
     solveSuduko(grid, 0, 0);
 
-    saveGrid(grid, argv[2]);
+	strcat(argv[1], ".result");
+
+    saveGrid(grid, argv[1]);
 
     return 0;
 }
