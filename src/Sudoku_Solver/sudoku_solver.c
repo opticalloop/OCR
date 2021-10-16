@@ -1,6 +1,6 @@
-#include <stdio.h>
-
 #include "Sudoku_Solver/sudoku_solver.h"
+
+#include <stdio.h>
 
 #define true 1
 #define false 0
