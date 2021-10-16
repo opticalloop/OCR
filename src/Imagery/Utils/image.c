@@ -3,16 +3,6 @@
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
-
-static void printArray(Pixel *array, unsigned int n) {
-    printf("{ ");
-    for (unsigned int i = 0; i < n - 1; ++i) {
-        printf("%u, ", array[i].b);
-    }
-    printf("%u }\n", array[n - 1].b);
-}
-
-
 static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y, unsigned int w, unsigned int h) {
     Pixel *matrix = pixels[x][y].matrix;
 
@@ -51,12 +41,15 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y, unsigned 
     }
 }
 
-
-void newImage(Image *image) {
-    SDL_Surface *surface = load_image(image->path);
+void newImage(Image *image)
+{
+    SDL_Surface *surface = !strcmp(image->path, "")
+        ? SDL_CreateRGBSurface(0, 266, 266, 24, 0, 0, 0, 0)
+        : load_image(image->path);
 
     const unsigned int width = surface->w;
     const unsigned int height = surface->h;
+
     image->width = width;
     image->height = height;
 
@@ -69,7 +62,8 @@ void newImage(Image *image) {
     }
 
     unsigned int x;
-    for (x = 0; x < width; x++) {
+    for (x = 0; x < width; x++)
+    {
         image->pixels[x] = malloc((height + 1) * sizeof(Pixel));
         if (image->pixels[x] == NULL)
         {
@@ -97,6 +91,7 @@ void newImage(Image *image) {
             image->pixels[x][y].r = rgb.r;
             image->pixels[x][y].g = rgb.g;
             image->pixels[x][y].b = rgb.b;
+
             image->pixels[x][y].matrix = NULL;
             image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
 
@@ -113,9 +108,7 @@ void newImage(Image *image) {
             FillMatrix(image->pixels, i, j, width, height);
         }
     }
-
 }
-
 Pixel **copyPixelsArray(Image *image) {
     int w = image->width;
     int h = image->height;
@@ -148,12 +141,12 @@ void freeMatrixArray(Pixel ** mask,int w,int h){
     free(mask);
 }
 
-void displayImage(Image *image) {
+
+void displayImage(Image *image)
+{
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-
-    updateSurface(image);
 
     // Display img on screen
     display_image(image->surface);
@@ -163,10 +156,9 @@ void displayImage(Image *image) {
     // Free memory took by SDL
     SDL_Quit();
 }
-void updateSurface(Image *image) {
-    updateSurfacePixels(image,image->pixels);
-}
-void updateSurfacePixels(Image *image,Pixel ** pixels) {
+
+void updateSurface(Image *image)
+{
     // Get pixel format for the given image
     SDL_PixelFormat *pixel_format = image->surface->format;
 
@@ -191,7 +183,8 @@ void updateSurfacePixels(Image *image,Pixel ** pixels) {
     }
 }
 
-void saveImage(Image *image, char *path) {
+void saveImage(Image *image, char *path)
+{
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
@@ -213,9 +206,21 @@ void updatePixelToSameValue(Pixel *pixel, unsigned int value) {
     pixel->b = value;
 }
 
-void freeImage(Image *image) {
+Pixel InstantiatePixelZero() {
+    Pixel pixel;
+    pixel.b = 0;
+    pixel.r = 0;
+    pixel.g = 0;
+
+    return pixel;
+}
+
+void freeImage(Image *image)
+{
     unsigned int width = image->width;
     unsigned int height = image->height;
+
+
     for (unsigned int x = 0; x < width; x++) {
         for (unsigned int y = 0; y < height; ++y) {
             free(image->pixels[x][y].matrix);
@@ -225,13 +230,4 @@ void freeImage(Image *image) {
 
     free(image->pixels);
     SDL_FreeSurface(image->surface);
-}
-
-Pixel InstantiatePixelZero() {
-    Pixel pixel;
-    pixel.b = 0;
-    pixel.r = 0;
-    pixel.g = 0;
-
-    return pixel;
 }

@@ -2,7 +2,7 @@
 // Created by dov on 11/09/2021.
 //
 
-#include "array_sort.h"
+#include "Imagery/Utils/array_sort.h"
 
 void array_sort(Pixel *arr,int n) {
 // considering the picture is at least a true grayscale.

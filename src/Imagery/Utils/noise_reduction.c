@@ -1,8 +1,7 @@
 
-#include "noise_reduction.h"
+#include "Imagery/Utils/noise_reduction.h"
 #include <stdio.h>
 #include <string.h>
-
 static void printArray(unsigned int *array, unsigned int n) {
     printf("{ ");
     for (unsigned int i = 0; i < n - 1; ++i) {
