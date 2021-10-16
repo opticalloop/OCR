@@ -10,6 +10,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+static double clamp(double val, double max, double min)
+{
+    return val > max ? max : val < min ? min : val;
+}
+
 void printResult(double expected[], Neuron neuron[])
 {
     // Print expected
@@ -34,7 +39,7 @@ void checkInputs(double inputs[NBINPUTS])
     {
         if (inputs[i] > 234124.0)
         {
-            errx(1, "Too long");
+            inputs[i] = 1;
         }
     }
 }
@@ -51,7 +56,8 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
             pixel = get_pixel(surface, i, j);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            inputs[i * j] = (double)(1.0 - ((double)rgb.r / 255.0));
+            inputs[i * j] =
+                clamp((double)(1.0 - ((double)rgb.r / 255.0)), 1.0, 0.0);
 
             // printf("Input in creation of data : %f\n", intputs[i * j]);
         }
@@ -113,7 +119,7 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
         index++;
     }
     closedir(FD);
-    printf("OERGKN\n");
+
     // Create all images data
     for (unsigned int i = 0; i < NBIMAGES; i++)
     {
@@ -124,7 +130,6 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
         printf("Directory : %s\n", directory);
         createData(directory, input[i], expected[i]);
     }
-    printf("OERGKNZFE34FA\n");
 }
 
 int train(char *directory)
@@ -132,7 +137,7 @@ int train(char *directory)
     double input[NBIMAGES][NBINPUTS];
     double expected[NBIMAGES][NBOUTPUTS];
 
-    unsigned int epoch = 10000;
+    unsigned int epoch = 1000;
 
     char *intputPaths[NBIMAGES];
 
@@ -148,24 +153,21 @@ int train(char *directory)
 
     initNetwork(network);
 
-    // launchWeights(network, "Weights/test.txt");
+    // launchWeights(network, "Weights/weights.txt");
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
-        if (i % (epoch / 10) == 0)
-        {
-            printf("###### Epoch : %d ######\n", i);
-        }
         for (unsigned int j = 0; j < NBIMAGES; j++)
         {
-            // checkInputs(input[j]);
+            checkInputs(input[j]);
 
             frontPropagation(network, input[j]);
             backPropagation(network, expected[j]);
             gradientDescent(network);
 
-            if (i % (epoch / 10) == 0)
+            if (i % (epoch / 100) == 0)
             {
+                printf("###### Epoch : %d ######\n", i);
                 printResult(expected[j],
                             network->layers[NBHIDDENLAYERS + 1].neurons);
             }
@@ -174,7 +176,7 @@ int train(char *directory)
 
     // printWeights(network);
 
-    saveWeights(network, "Weights/weights.txt");
+    // saveWeights(network, "Weights/weights.txt");
 
     freeNetwork(network);
 

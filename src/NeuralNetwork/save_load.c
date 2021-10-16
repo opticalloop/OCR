@@ -98,7 +98,6 @@ void launchWeights(Network *network, char *path)
     // For each character
     while ((chr = getc(file)) != EOF)
     {
-        printf("chr : %c\n", chr);
         // New neuron or layer
         if (chr == '#')
         {
@@ -109,7 +108,6 @@ void launchWeights(Network *network, char *path)
                 chr = getc(file); // Should be a ' '
                 chr = getc(file); // Number of the layer
                 layerIndex = (int)((int)chr - (int)'0');
-                printf("New layer index : %d\n", layerIndex);
                 weightIndex = 0;
                 neuronIndex = 0;
             }
@@ -117,8 +115,16 @@ void launchWeights(Network *network, char *path)
             else if (chr == ' ')
             {
                 chr = getc(file); // Number of the neuron
-                neuronIndex = (int)((int)chr - (int)'0');
-                printf("New neuron index : %d\n", neuronIndex);
+                // Need to check if it's 2 digit
+                char c = getc(file);
+                if (c == '\n')
+                {
+                    neuronIndex = (int)((int)chr - (int)'0');
+                }
+                else
+                {
+                    neuronIndex = (int)((chr - '0') * 10 + (c - '0'));
+                }
                 weightIndex = 0;
             }
         }
@@ -133,7 +139,8 @@ void launchWeights(Network *network, char *path)
                 .neurons[neuronIndex]
                 .weights[weightIndex] = atof(tempStr);
 
-            printf("Weight launched : %f\n", atof(tempStr));
+            printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+                   neuronIndex, weightIndex, atof(tempStr));
 
             // Reset string
             memset(tempStr, 0, sizeof(tempStr));
