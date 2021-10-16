@@ -17,7 +17,6 @@ init:
     $(shell mkdir -p $(BUILD))
     $(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
-
 sudoku: $(TESTS_SUDOKU_OBJ)
     gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
