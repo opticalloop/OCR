@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 
-#include "../Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
-#include "../Sudoku_Solver/sudoku_solver.h"
+#include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
+#include "Sudoku_Solver/sudoku_solver.h"
 
 Test(TestsSudoku, EmptyGrid)
 {
