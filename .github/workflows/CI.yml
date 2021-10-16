@@ -31,6 +31,8 @@ jobs:
           sudo apt-get update
           sudo apt install libsdl-image1.2 libsdl-image1.2-dev
           bash ./install_criterion.sh
+          git branch --show-current
+
 
       # Runs a set of commands using the runners shell
       - name: Compile project
@@ -38,7 +40,6 @@ jobs:
       - name: Compile Unit Tests
         run:  |
           cd Tests
-          git branch --show-current
           make
           ls
         
