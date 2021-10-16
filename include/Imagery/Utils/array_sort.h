@@ -7,6 +7,6 @@
 
 #include "Imagery/Utils/image.h"
 
-void array_sort(Pixel *arr,int n);
+void array_sort(Pixel *arr, int n);
 
-#endif //OCR_ARRAY_SORT_H
+#endif // OCR_ARRAY_SORT_H

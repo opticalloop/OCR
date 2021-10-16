@@ -1,17 +1,20 @@
 
 #include "Imagery/Utils/noise_reduction.h"
+
 #include <stdio.h>
 #include <string.h>
-static void printArray(unsigned int *array, unsigned int n) {
+static void printArray(unsigned int *array, unsigned int n)
+{
     printf("{ ");
-    for (unsigned int i = 0; i < n - 1; ++i) {
+    for (unsigned int i = 0; i < n - 1; ++i)
+    {
         printf("%u, ", array[i]);
     }
     printf("%u }\n", array[n - 1]);
 }
 
-
-static float *BinomialFilter() {
+static float *BinomialFilter()
+{
     float *filter = malloc(sizeof(float) * (9 + 1));
     filter[0] = 1 / 16.;
     filter[1] = (1 / 16.) * 2;
@@ -23,16 +26,16 @@ static float *BinomialFilter() {
     filter[7] = (1 / 16.) * 2;
     filter[8] = (1 / 16.) * 1;
     return filter;
-
 }
 
-//static void applyFilter( Pixel **mask, void (* filter,Pixel ** dest){
+// static void applyFilter( Pixel **mask, void (* filter,Pixel ** dest){
 //    for (unsigned int i = 0; i < w; i++)
 //        for (unsigned int j = 0; j < h; j++)
 //            updatePixelToSameValue(&(dest[i][j]), filter);
 
 //}
-void Preprocessing(Image *image) {
+void Preprocessing(Image *image)
+{
     unsigned int w = image->width;
     unsigned int h = image->height;
     printf("--------------------------\n");
@@ -42,63 +45,59 @@ void Preprocessing(Image *image) {
 
     float *binomialFilter = BinomialFilter();
 
-
-
     unsigned int *histogram = GetHistogram(image->pixels, w, h);
     printArray(histogram, 256);
     // printf("Applying constrast Filter\n");
     // for (unsigned int i = 0; i < w; i++)
     //     for (unsigned int j = 0; j < h; j++)
-    //         updatePixelToSameValue(&(image->pixels[i][j]), ConstrastFilter(image->pixels[i][j], histogram));
-    saveImage(image,"path2.bmp");
+    //         updatePixelToSameValue(&(image->pixels[i][j]),
+    //         ConstrastFilter(image->pixels[i][j], histogram));
+    saveImage(image, "path2.bmp");
 
     // displayImage(image);
     Pixel **mask = copyPixelsArray(image);
 
-
     printf("Applying Median Filter\n");
     for (unsigned int i = 0; i < w; i++)
-        for (unsigned int j = 0; j < h; j++){
-            updatePixelToSameValue(&(mask[i][j]), MedianFilter(image->pixels[i][j].matrix));
+        for (unsigned int j = 0; j < h; j++)
+        {
+            updatePixelToSameValue(&(mask[i][j]),
+                                   MedianFilter(image->pixels[i][j].matrix));
         }
-
 
     printf("Applying Average Filter\n");
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
-            updatePixelToSameValue(&(image->pixels[i][j]), AverageFilter(mask[i][j].matrix, binomialFilter));
+            updatePixelToSameValue(
+                &(image->pixels[i][j]),
+                AverageFilter(mask[i][j].matrix, binomialFilter));
     // displayImage(image);
-
-
 
     printf("Applying Otsu Filter\n");
     OtsuFilter(image->pixels, w, h, histogram);
 
-
-
-
-
-//    for (unsigned int i = 0; i < w; i++)
-//        for (unsigned int j = 0; j < h; j++)
-//            updatePixelToSameValue(&(image->pixels[i][j]), mask[i][j].b);
+    //    for (unsigned int i = 0; i < w; i++)
+    //        for (unsigned int j = 0; j < h; j++)
+    //            updatePixelToSameValue(&(image->pixels[i][j]), mask[i][j].b);
 
     free(binomialFilter);
     free(histogram);
     freeMatrixArray(mask, w, h);
-
 }
 
-
-unsigned int AverageFilter(Pixel *matrix, float *binomialFilter) {
+unsigned int AverageFilter(Pixel *matrix, float *binomialFilter)
+{
     float result = 0;
-    for (unsigned int i = 0; i < 9; ++i) result += matrix[i].b * binomialFilter[i];
-    return (unsigned int) result;
+    for (unsigned int i = 0; i < 9; ++i)
+        result += matrix[i].b * binomialFilter[i];
+    return (unsigned int)result;
 }
 
-
-unsigned int MedianFilter(Pixel *matrix) {
+unsigned int MedianFilter(Pixel *matrix)
+{
     Pixel *matrix2 = malloc(sizeof(Pixel) * (9 + 1));
-    for (int i = 0; i < 9; ++i) matrix2[i] = matrix[i];
+    for (int i = 0; i < 9; ++i)
+        matrix2[i] = matrix[i];
 
     array_sort(matrix2, 9);
 
@@ -107,17 +106,21 @@ unsigned int MedianFilter(Pixel *matrix) {
     return result.b;
 }
 
-static unsigned int clamp(unsigned int value, unsigned int min, unsigned int max) {
+static unsigned int clamp(unsigned int value, unsigned int min,
+                          unsigned int max)
+{
     return value < min ? min : value > max ? max : value;
 }
 
-unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram) {
+unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram)
+{
     unsigned int fact = histogram[pixel.b];
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    return abs(255 - clamp(factor * (pixel.b - 128) + 128  - 200, 0, 255));
+    return abs(255 - clamp(factor * (pixel.b - 128) + 128 - 200, 0, 255));
 }
 
-unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h) {
+unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h)
+{
     unsigned int *histogram = calloc((255 + 1), sizeof(unsigned int));
     for (int i = 0; i < w; ++i)
         for (int j = 0; j < h; ++j)
@@ -125,7 +128,8 @@ unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h) {
     return histogram;
 }
 
-static double Thresholding(unsigned int *histogram) {
+static double Thresholding(unsigned int *histogram)
+{
     int bins_num = 256;
 
     // Calculate the bin_edges
@@ -137,12 +141,14 @@ static double Thresholding(unsigned int *histogram) {
 
     // Calculate bin_mids
     long double bin_mids[256];
-    for (int i = 0; i < 255; i++) {
-    //        printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
+    for (int i = 0; i < 255; i++)
+    {
+        //        printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
         bin_mids[i] = (bin_edges[i] + bin_edges[i + 1]) / 2;
     }
 
-    // Iterate over all thresholds (indices) and get the probabilities weight1, weight2
+    // Iterate over all thresholds (indices) and get the probabilities weight1,
+    // weight2
     long double weight1[256];
     weight1[0] = histogram[0];
     for (int i = 1; i < 256; i++)
@@ -184,13 +190,16 @@ static double Thresholding(unsigned int *histogram) {
     long double dnum = 10000000000;
     for (int i = 0; i < 255; i++)
         Inter_class_variance[i] =
-                ((weight1[i] * weight2[i] * (mean1[i] - mean2[i + 1])) / dnum) * (mean1[i] - mean2[i + 1]);
+            ((weight1[i] * weight2[i] * (mean1[i] - mean2[i + 1])) / dnum)
+            * (mean1[i] - mean2[i + 1]);
 
     // Maximize interclass variance
     long double maxi = 0;
     int getmax = 0;
-    for (int i = 0; i < 255; i++) {
-        if (maxi < Inter_class_variance[i]) {
+    for (int i = 0; i < 255; i++)
+    {
+        if (maxi < Inter_class_variance[i])
+        {
             maxi = Inter_class_variance[i];
             getmax = i;
         }
@@ -198,13 +207,16 @@ static double Thresholding(unsigned int *histogram) {
     return bin_mids[getmax];
 }
 
-void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h, unsigned int *histogram) {
+void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
+                unsigned int *histogram)
+{
     double threshold = Thresholding(histogram);
     printf("\tthreshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
-        for (unsigned int j = 0; j < h; j++) {
-        //    printf("%d ",pixels[i][j].b);
-            updatePixelToSameValue(&(pixels[i][j]), pixels[i][j].b >= threshold ? 255 : 0);
+        for (unsigned int j = 0; j < h; j++)
+        {
+            //    printf("%d ",pixels[i][j].b);
+            updatePixelToSameValue(&(pixels[i][j]),
+                                   pixels[i][j].b >= threshold ? 255 : 0);
         }
-
 }

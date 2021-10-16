@@ -7,12 +7,14 @@
 #include "Imagery/Utils/op.h"
 #include "Imagery/Utils/pixel_operations.h"
 
-typedef struct Pixel {
+typedef struct Pixel
+{
     unsigned int r, g, b;
     struct Pixel *matrix;
 } Pixel;
 
-typedef struct Image {
+typedef struct Image
+{
     unsigned int width;
     unsigned int height;
     double averageColor;
@@ -27,7 +29,7 @@ void displayImage(Image *image);
 
 void updateSurface(Image *image);
 
-void updateSurfacePixels(Image *image,Pixel ** pixels);
+void updateSurfacePixels(Image *image, Pixel **pixels);
 
 void saveImage(Image *image, char *path);
 
@@ -40,6 +42,5 @@ Pixel InstantiatePixelZero();
 Pixel **copyPixelsArray(Image *image);
 
 void freeMatrixArray(Pixel **mask, int w, int h);
-
 
 #endif
