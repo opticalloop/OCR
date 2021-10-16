@@ -27,7 +27,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Installing dependencies 
-        run: sudo apt install libdsl-image1.2 libdsl-image1.2-dev
+        run: sudo apt install libsdl-image1.2 libsdl-image1.2-dev
 
       # Runs a set of commands using the runners shell
       - name: Compile project
