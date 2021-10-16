@@ -1,4 +1,4 @@
-#include "resize.h"
+#include "Imagery/Resize/resize.h"
 
 #include <err.h>
 

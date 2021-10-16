@@ -1,4 +1,4 @@
-#include "XOR.h"
+#include "NeuralNetwork/XOR.h"
 
 #include <stdio.h>
 

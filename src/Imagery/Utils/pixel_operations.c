@@ -2,7 +2,7 @@
 // Inspired by code from SDL documentation
 // (http://www.libsdl.org/release/SDL-1.2.15/docs/html/guidevideo.html)
 
-#include "pixel_operations.h"
+#include "Imagery/Utils/pixel_operations.h"
 
 #include <err.h>
 

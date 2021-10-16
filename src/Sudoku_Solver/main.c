@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Sudoku_Saver/sudoku_saver.h"
-#include "Sudoku_Solvable/sudoku_solvable.h"
-#include "sudoku_solver.h"
+#include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
+#include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
+#include "Sudoku_Solver/sudoku_solver.h"
 
 #define true 1
 #define false 0

@@ -8,10 +8,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../Imagery/Utils/image.h"
-#include "../Imagery/Utils/pixel_operations.h"
-#include "neural_network.h"
-#include "save_load.h"
+#include "Imagery/Utils/image.h"
+#include "Imagery/Utils/pixel_operations.h"
+#include "NeuralNetwork/neural_network.h"
+#include "NeuralNetwork/save_load.h"
 
 #define NBIMAGES 10
 #define NBINPUTS 28 * 28

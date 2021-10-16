@@ -4,8 +4,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-#include "op.h"
-#include "pixel_operations.h"
+#include "Imagery/Utils/op.h"
+#include "Imagery/Utils/pixel_operations.h"
 
 typedef struct Pixel
 {

@@ -1,11 +1,10 @@
-#include "sudoku_saver.h"
-
 #include <SDL/SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../Imagery/Utils/image.h"
+#include "Imagery/Utils/image.h"
+#include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 
 void basicPrint(unsigned int grid[dim][dim])
 {

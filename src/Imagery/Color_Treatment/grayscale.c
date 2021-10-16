@@ -1,4 +1,4 @@
-#include "grayscale.h"
+#include "Imagery/Color_Treatment/grayscale.h"
 
 void grayscale(Image *image)
 {

@@ -1,4 +1,4 @@
-#include "training.h"
+#include "NeuralNetwork/training.h"
 
 #include <dirent.h>
 #include <err.h>

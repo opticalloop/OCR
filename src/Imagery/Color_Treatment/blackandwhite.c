@@ -1,4 +1,4 @@
-#include "blackandwhite.h"
+#include "Imagery/Color_Treatment/blackandwhite.h"
 
 void blackandwhite(Image *image)
 {

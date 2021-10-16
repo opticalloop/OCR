@@ -1,11 +1,11 @@
 #include <err.h>
 #include <stdio.h>
 
-#include "Color_Treatment/blackandwhite.h"
-#include "Color_Treatment/grayscale.h"
-#include "Resize/resize.h"
-#include "Rotations/rotations.h"
-#include "Utils/image.h"
+#include "Imagery/Color_Treatment/blackandwhite.h"
+#include "Imagery/Color_Treatment/grayscale.h"
+#include "Imagery/Resize/resize.h"
+#include "Imagery/Rotations/rotations.h"
+#include "Imagery/Utils/image.h"
 
 int main(int argc, char *argv[])
 {
