@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     printf("Start solving\n");
     solveSuduko(grid, 0, 0);
 
-	strcat(argv[1], ".result");
+    strcat(argv[1], ".result");
 
     saveGrid(grid, argv[1]);
 

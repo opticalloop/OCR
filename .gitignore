@@ -53,4 +53,8 @@ dkms.conf
 
 .vscode/
 .idea/
+/cmake-build-debug/
+out.bmp
+
+Imagery/*.bmp
 Digits-Only/
