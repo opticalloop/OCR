@@ -44,5 +44,5 @@ jobs:
 
       - name: Run Tests
         run: |
-          echo `pwd`
+          cd Tests
           ./sudoku
