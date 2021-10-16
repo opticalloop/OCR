@@ -8,7 +8,7 @@ The digit recognization is done thanks to an Neural Network, you can fully train
 ### Dependencies
 #### Install SDL 1.2
 ```sh
-Ubuntu/Debian : sudo apt-get install libsdl-image1.2-dev
+Ubuntu/Debian : sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev 
 Arch/Manjaro  : sudo pacman -S libsdl-image1.2-dev
 NixOS         : sudo nix-env -iA nixos.SDL
 ```
