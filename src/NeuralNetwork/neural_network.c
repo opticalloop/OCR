@@ -93,9 +93,6 @@ Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
 
     // Allocate memory for all layers
     network.layers = malloc((network.nbLayers + 1) * sizeof(struct Layer));
-    ;
-
-    printf("Creating all layers\n");
 
     // Create the input layer
     network.layers[0] = newLayer(sizeInput, 0);
@@ -276,4 +273,19 @@ void printWeights(Network *network)
             }
         }
     }
+}
+
+double averageErrorRate(Network *network)
+{
+    double average = 0.0;
+    for (unsigned int i = 0; i < network->nbLayers; i++)
+    {
+        for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
+        {
+            average += network->layers[i].neurons[j].delta;
+        }
+        average /= network->layers[i].nbNeurons;
+    }
+
+    return average * -1;
 }

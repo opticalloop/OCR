@@ -55,4 +55,6 @@ double sigmoidPrime(double x);
 
 void printWeights(Network *network);
 
+double averageErrorRate(Network *network);
+
 #endif

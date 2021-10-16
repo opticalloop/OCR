@@ -3,6 +3,6 @@
 
 #include "NeuralNetwork/neural_network.h"
 
-void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden);
+void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int verbose);
 
 #endif

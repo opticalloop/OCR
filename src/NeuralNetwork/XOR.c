@@ -2,8 +2,12 @@
 
 #include <stdio.h>
 
-void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
+void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden, int verbose)
 {
+    if (verbose)
+    {
+        printf("    🔍 Launching XOR with %u hidden layers and %u nodes per hidden\n", nbHiddenLayers, nbNodesPerHidden);
+    }
     // 00 : 0
     // 01 : 1
     // 10 : 1
@@ -16,21 +20,27 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
 
     unsigned int epoch = 1000;
 
-    printf("Creating network\n");
+    if (verbose)
+    {
+        printf("    🔨 Creating network\n");
+    }
 
     Network n =
         newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
     Network *network = &n;
 
-    printf("Initing network\n");
+    if (verbose)
+    {
+        printf("    🔍 Initing network\n");
+    }
 
     initNetwork(network);
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
-        if (i % (epoch / 10) == 0)
+        if (i == epoch && verbose)
         {
-            printf("###### Epoch : %d ######\n", i);
+            printf("    📊 ###### EPOCH %u ######\n", i);
         }
         for (unsigned int j = 0; j < 8; j += 2)
         {
@@ -43,11 +53,11 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
                 backPropagation(network, expected);
                 gradientDescent(network);
 
-                if (i % (epoch / 10) == 0)
+                if (i == epoch && verbose)
                 {
-                    printf("Input : %u %u\n", (unsigned int)input[0],
+                    printf("--> 📈 Input : %u %u\n", (unsigned int)input[0],
                            (unsigned int)input[1]);
-                    printf("Output : %f, expected : %u\n\n",
+                    printf("<-- 📉 Output : %f, expected : %u\n\n",
                            network->layers[nbHiddenLayers + 1].neurons[0].value,
                            (unsigned int)expected[0]);
                 }
@@ -55,8 +65,12 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden)
         }
     }
 
-    printf("\033[0;32mDone\033[0m\n");
 
+    if (verbose)
+    {
+        printf("    ❗ Error rate = %f\n", averageErrorRate(network));
+        printf("    ✅ Done\n");
+    }
     // printWeights(network);
 
     freeNetwork(network);
