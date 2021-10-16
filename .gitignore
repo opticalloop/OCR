@@ -53,4 +53,4 @@ dkms.conf
 
 .vscode/
 .idea/
-.clang-format
+Digits-Only/
