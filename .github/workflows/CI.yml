@@ -38,6 +38,7 @@ jobs:
         run: make
       - name: Compile Unit Tests
         run:  |
+          cat ./Makefile
           cd Tests
           make
         
