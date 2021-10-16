@@ -1,46 +1,28 @@
-# This is a basic workflow to help you get started with Actions
+CC = gcc -I../include
 
-name: CI
+CPPFLAGS = `pkg-config --cflags sdl` -MMD
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
+LDLFLAGS = -lcriterion -lm
+LDLIBS = -lSDL -lpthread -lSDL_image 
 
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main, CICD, develop ]
+BUILD := build
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+SRC = sudoku_test.c ../src/Sudoku_Solver/sudoku_solver.c ../src/Sudoku_Solver/Sudoku_Solved/sudoku_solved.c
+TESTS_SUDOKU_OBJ = $(SRC:%.c=$(BUILD)/%.o)
+TESTS_SUDOKU_DEPEND = $(SRC:%.c=$(BUILD)/%.d)
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+all: init sudoku
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+init: 
+    $(shell mkdir -p $(BUILD))
+    $(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
-      # Runs a single command using the runners shell
-      - name: Installing dependencies 
-        run:  |
-          sudo apt-get update
-          sudo apt install libsdl-image1.2 libsdl-image1.2-dev
-          bash ./install_criterion.sh
+sudoku: $(TESTS_SUDOKU_OBJ)
+    gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
+$(BUILD)/%.o : %.c
+    $(CC) $(CFLAGS) -c $< -o $@
 
-      # Runs a set of commands using the runners shell
-      - name: Compile project
-        run: make
-      - name: Compile Unit Tests
-        run:  |
-          cat ./Makefile
-          cd Tests
-          make
-        
-      - name: Run Tests
-        run: ./sudoku
+clean:
+    rm -rf $(BUILD)
+    ${RM} $(TESTS_SUDOKU_OBJ) $(TESTS_SUDOKU_DEPEND) sudoku
