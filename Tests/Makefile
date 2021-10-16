@@ -18,7 +18,7 @@ init:
     $(shell mkdir -p $(SRC:%=$(BUILD)/%))
 
 clear:
-    find . -type d -empty -delete
+    $(shell find . -type d -empty -delete)
 
 sudoku: $(TESTS_SUDOKU_OBJ)
     gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
