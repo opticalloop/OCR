@@ -40,8 +40,7 @@ jobs:
         run:  |
           cd Tests
           echo `git branch --show-current`
-          make
-          ls
+          echo `pwd
         
       - name: Run Tests
         run: ./sudoku
