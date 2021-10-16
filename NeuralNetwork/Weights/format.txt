@@ -1,5 +1,0 @@
-Neural network weights format : 
-
-## Layer_number (1 is the first hidden)
-# Neuron_number
-weight1|weight2|weight3|...|

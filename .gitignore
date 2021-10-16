@@ -59,3 +59,4 @@ out.bmp
 Imagery/*.jpeg
 Imagery/*.bmp
 Tests/*.jpeg
+Digits-Only/
