@@ -10,6 +10,6 @@ void rotate(Image *image, double angleDegree);
 
 double detectDiffAngle(Image *image, float precision);
 
-void autoRotate(Image *image, float precision);
+void autoRotate2(Image *image, float precision);
 
 #endif

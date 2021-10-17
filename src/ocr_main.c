@@ -250,14 +250,14 @@ static void analyzeNN(int argc, char **argv)
                 char str[100];
                 printf("    ❗ The file specified where to save weights already "
                        "exist, overwrite it ? [Y/n] : ");
-                gets(str);
+                scanf("%s", str);
                 toUp(str);
                 // While str != Y, YES, N and NO
                 while (strcmp(str, "Y") && strcmp(str, "YES")
                        && strcmp(str, "N") && strcmp(str, "NO"))
                 {
                     printf("\n[Y/n] : ");
-                    gets(str);
+                    scanf("%s", str);
                     toUp(str);
                 }
                 if (!strcmp(str, "N") || !strcmp(str, "NO"))

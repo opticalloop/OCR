@@ -153,7 +153,7 @@ double detectDiffAngle(Image *image, float precision)
     return maxAngle;
 }
 
-void autoRotate(Image *image, float precision)
+void autoRotate2(Image *image, float precision)
 {
     double angle = detectDiffAngle(image, precision);
     angle *= (180 / M_PI);
