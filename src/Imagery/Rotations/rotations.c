@@ -159,5 +159,10 @@ void autoRotate2(Image *image, float precision)
     angle *= (180 / M_PI);
     printf("Max angle %f\n", angle);
 
+    if (fabs(angle) <= 0.1)
+    {
+        return;
+    }
+
     rotate(image, angle);
 }

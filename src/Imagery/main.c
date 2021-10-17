@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
     Image *image = &_image;
     newImage(image);
 
+    // Stuff to be shown
+
     saveImage(image, argv[2]);
 
     freeImage(image);

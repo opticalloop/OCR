@@ -198,7 +198,6 @@ double backPropagation(Network *network, double expected[])
         errorTemp = expected[i] - neuron->value;
         neuron->delta = errorTemp * sigmoidPrime(neuron->value);
         errorRate += (errorTemp * errorTemp);
-        // printf("Error : %f\n", errorTemp);
     }
 
     // For all layer except the input

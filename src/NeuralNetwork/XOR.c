@@ -4,7 +4,7 @@
 
 #include "NeuralNetwork/save_load.h"
 
-void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
+void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
                int verbose, char *launch_path, char *save_path)
 {
     if (verbose)
@@ -22,8 +22,6 @@ void launchXOR(unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
 
     unsigned int nbInputs = 2;
     unsigned int nbOutputs = 1;
-
-    unsigned int epoch = 1000;
 
     if (verbose)
     {

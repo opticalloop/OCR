@@ -59,6 +59,19 @@ void saveWeights(Network *network, char *path)
     FILE *file;
     file = fopen(path, "w");
 
+    // Write number of hidden layers and node per hidden
+    char str[50];
+    fputs("&", file);
+    if (network->nbLayers - 2 > 0)
+    {
+        sprintf(str, "%d|%d\n", (int)network->nbLayers - 2, network->layers[1].nbNeurons);
+    }
+    else
+    {
+        sprintf(str, "0|0\n");
+    }
+    fputs(str, file);
+
     // First layer don't have any weight
     for (unsigned int i = 1; i < network->nbLayers; i++)
     {
@@ -92,8 +105,23 @@ void launchWeights(Network *network, char *path)
     int neuronIndex = 0;
     int weightIndex = 0;
 
-    char chr;
+    char chr = getc(file);
     char tempStr[50];
+
+    if (chr == '&')
+    {
+        // Check number of hidden and hidden
+        char str[50];
+        for (chr = getc(file); chr != EOF && chr != '|'; chr = getc(file))
+        {
+            strncat(str, &chr, 1);
+        }
+        if (chr == EOF)
+        {
+            freeNetwork(network);
+            errx(EXIT_FAILURE, "Speficied number ");
+        }
+    }
 
     // For each character
     while ((chr = getc(file)) != EOF)
