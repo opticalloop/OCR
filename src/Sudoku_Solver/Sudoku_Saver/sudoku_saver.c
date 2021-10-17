@@ -30,7 +30,7 @@ void basicPrint(unsigned int grid[dim][dim])
     }
 }
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[])
+void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
 {
     FILE *fp;
 
@@ -38,8 +38,15 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
 
     if (fp == NULL)
     {
-        errx(EXIT_FAILURE, "Read Grid : File doesn't exist.");
+        errx(EXIT_FAILURE, "Can't read the input file : File doesn't exist.");
         return;
+    }
+
+    if (verbose)
+    {
+        printf("--> 📂 Reading ");
+        printf(inputPath);
+        printf("\n");
     }
 
     char ch = 0;
@@ -63,6 +70,10 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
 
             if (ch != '.')
             {
+                if (ch < '0' && ch > '9')
+                {
+                    errx(EXIT_FAILURE, "Error in file");
+                }
                 grid[xIndex][yIndex] = ch - '0';
             }
             yIndex++;
@@ -73,12 +84,19 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
     fclose(fp);
 }
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[])
+void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 {
     FILE *f = fopen(outputPath, "w");
     if (f == NULL)
     {
         errx(EXIT_FAILURE, "Error opening file!\n");
+    }
+
+    if (verbose)
+    {
+        printf("<-- 📂 Saving grid to ");
+        printf(outputPath);
+        printf("\n");
     }
 
     for (unsigned int i = 0; i < dim; i++)

@@ -7,9 +7,9 @@
 
 void basicPrint(unsigned int arr[dim][dim]);
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[]);
+void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose);
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[]);
+void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose);
 
 Image createSudokuImage(unsigned int grid[dim][dim]);
 

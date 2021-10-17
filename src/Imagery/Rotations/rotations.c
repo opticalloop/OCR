@@ -95,16 +95,16 @@ double detectDiffAngle(Image *image, float precision)
 
     double _precision = M_PI * (1 / precision);
 
-    accumulator = malloc(sizeof(double *) * (_precision + 1));
+    accumulator = malloc(sizeof(double *) * (width + 1));
     if (accumulator == NULL)
     {
         errx(EXIT_FAILURE, "Error");
     }
 
     unsigned int i = 0;
-    for (; i < _precision; i++)
+    for (; i < width; i++)
     {
-        accumulator[i] = malloc(sizeof(double) * (diagonal + 1));
+        accumulator[i] = malloc(sizeof(double) * (height + 1));
         if (accumulator[i] == NULL)
         {
             errx(EXIT_FAILURE, "Error");

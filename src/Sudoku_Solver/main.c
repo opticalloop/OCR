@@ -12,11 +12,20 @@
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc != 2 && argc != 3)
     {
-        errx(1, "Usage : ./solver input_path");
+        errx(1, "Usage : ./solver input_path [options]\n"
+                "options:\n"
+                "   -v --verbose : print details\n");
     }
 
+    int verbose = 0;
+
+    if (argc == 3 && (!strcmp(argv[2], "-v") || !strcmp(argv[2], "-verbose")))
+    {
+        verbose = 1;
+    }
+    
     unsigned int grid[9][9] = {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -28,21 +37,30 @@ int main(int argc, char **argv)
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
-    createSudokuImage(grid);
+    // createSudokuImage(grid);
 
-    readGrid(grid, argv[1]);
+    readGrid(grid, argv[1], verbose);
 
     if (isSolvable(grid) == false)
     {
         errx(EXIT_FAILURE, "Grid can't be solved\n");
     }
 
-    printf("Start solving\n");
+    if (verbose)
+    {
+        printf("    📈 ");
+        printf(argv[1]);
+        printf(" is solvable\n");
+        printf("    🔧 Solving ");
+        printf(argv[1]);
+        printf("\n");
+    }
+
     solveSuduko(grid, 0, 0);
 
     strcat(argv[1], ".result");
 
-    saveGrid(grid, argv[1]);
+    saveGrid(grid, argv[1], verbose);
 
     return 0;
 }

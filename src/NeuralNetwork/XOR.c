@@ -5,7 +5,7 @@
 #include "NeuralNetwork/save_load.h"
 
 void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
-               int verbose, char *launch_path, char *save_path)
+               const int verbose, char *launch_path, char *save_path)
 {
     if (verbose)
     {
@@ -17,24 +17,26 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers, unsigned int nbN
     // 01 : 1
     // 10 : 1
     // 11 : 0
-    double inputs[] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
-    double expecteds[] = { 0.0, 1.0, 1.0, 0.0 };
+    const double inputs[] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
+    const double expecteds[] = { 0.0, 1.0, 1.0, 0.0 };
 
-    unsigned int nbInputs = 2;
-    unsigned int nbOutputs = 1;
+    const unsigned int nbInputs = 2;
+    const unsigned int nbOutputs = 1;
 
     if (verbose)
     {
         printf("    🔨 Creating network\n");
     }
 
-    Network n =
-        newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
+    Network n;
+    n.sizeInput = nbInputs;
+    n.sizeOutput = nbOutputs;
     Network *network = &n;
 
     // Does we need to launch weights ?
     if (!strcmp(launch_path, ""))
     {
+        *network = newNetwork(nbInputs, nbNodesPerHidden, nbHiddenLayers, nbOutputs);
         if (verbose)
         {
             printf("    🎰 Initing network\n");

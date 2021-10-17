@@ -143,7 +143,7 @@ int train(char *directory, int verbose)
     double input[NBIMAGES][NBINPUTS];
     double expected[NBIMAGES][NBOUTPUTS];
 
-    unsigned int epoch = 1000;
+    const unsigned int epoch = 1000;
 
     char *intputPaths[NBIMAGES];
 
