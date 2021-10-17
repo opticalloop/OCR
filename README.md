@@ -42,7 +42,7 @@ Options nn :
     -reset : reset weights of the neural network (need to train the network after doing that)
     --help : print neural network help
 ```
-#License
+# License
 MIT License
 
 Copyright (c) 2021 opticalloop
