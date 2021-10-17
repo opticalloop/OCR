@@ -122,8 +122,8 @@ unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram)
 unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h)
 {
     unsigned int *histogram = calloc((255 + 1), sizeof(unsigned int));
-    for (int i = 0; i < w; ++i)
-        for (int j = 0; j < h; ++j)
+    for (unsigned int i = 0; i < w; ++i)
+        for (unsigned int j = 0; j < h; ++j)
             histogram[pixels[i][j].b]++;
     return histogram;
 }

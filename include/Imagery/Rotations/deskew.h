@@ -18,10 +18,11 @@ typedef struct Dot
  *  *UR : Upper right 
  *  *DL : Down left 
  *  *DR : Down right
+ *  verbose : print details
  * return :
  *  directly change the image, so void
  */
-void autoRotate(Image *image, Dot *UL, Dot *UR, Dot *DL, Dot *DR);
+void autoRotate(Image *image, Dot *UL, Dot *UR, Dot *DL, Dot *DR, int verbose);
 
 /*
  * Resize the image to be full screen with 4 edges
