@@ -110,7 +110,6 @@ double detectDiffAngle(Image *image, float precision)
             errx(EXIT_FAILURE, "Error");
         }
     }
-    accumulator[i] = NULL;
 
     double maxAngle = 0.0;
     double tempMaxAngle = 0.0;

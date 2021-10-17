@@ -3,9 +3,9 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Color_Treatment/grayscale.h"
-#include "Imagery/Resize/resize.h"
 #include "Imagery/Rotations/rotations.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Utils/noise_reduction.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,15 +23,6 @@ int main(int argc, char *argv[])
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
-
-    // displayImage(image);
-    rotate(image, 180);
-
-    // grayscale(image);
-    // blackandwhite(image);
-    // autoRotate(image, 0.01);
-
-    // resizeImage(image, 1280, 720);
 
     saveImage(image, argv[2]);
 
