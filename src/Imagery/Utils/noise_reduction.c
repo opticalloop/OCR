@@ -88,9 +88,9 @@ void Preprocessing(Image *image)
 unsigned int AverageFilter(Pixel *matrix, float *binomialFilter)
 {
     float result = 0;
-    for (unsigned int i = 0; i < 9; ++i)
+    for (int i = 0; i < 9; ++i)
         result += matrix[i].b * binomialFilter[i];
-    return (unsigned int)result;
+    return (unsigned int) result;
 }
 
 unsigned int MedianFilter(Pixel *matrix)
@@ -128,6 +128,14 @@ unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h)
     return histogram;
 }
 
+static void NegativeImage(Image *image)
+{
+    for (unsigned int x = 0; x < image->width; x++)
+        for (unsigned int y = 0; x < image->height; y++)
+            updatePixelToSameValue(&(image->pixels[x][y]),
+                                   255 - image->pixels[x][y].b);
+}
+
 static double Thresholding(unsigned int *histogram)
 {
     int bins_num = 256;
@@ -143,7 +151,7 @@ static double Thresholding(unsigned int *histogram)
     long double bin_mids[256];
     for (int i = 0; i < 255; i++)
     {
-        //        printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
+        //printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
         bin_mids[i] = (bin_edges[i] + bin_edges[i + 1]) / 2;
     }
 
