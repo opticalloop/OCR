@@ -6,7 +6,11 @@
 
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
+#include "NeuralNetwork/training.h"
 
+/*
+ * Check if the condition is false, if so error
+ */
 static void checkError(int condition, char *message)
 {
     if (condition)
@@ -62,9 +66,10 @@ static void printHelpNN()
            "    -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train "
            "the "
            "neural network on the xor function epoch time\n"
-           "    -train <nb_hidden_layer> <nb_node_per_hidden>  : train the "
+           "    -train <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : "
+           "train the "
            "network with the speficied number of hidden layer and node per "
-           "hidden layer \n"
+           "hidden layer epoch time \n"
            "    -reset : reset weights of the neural network (need to train "
            "the network after doing that)\n"
            "    -v --verbose : print details of process\n"
@@ -157,7 +162,7 @@ static void analyzeNN(int argc, char **argv)
     char save_path[100] = "";
 
     int xor = 0; // train on xor
-    int train = 0; // train on images
+    int trainOnImg = 0; // train on images
     unsigned int epoch = 1000;
     unsigned int nbHidden = 0;
     unsigned int sizeHidden = 0;
@@ -175,9 +180,16 @@ static void analyzeNN(int argc, char **argv)
             printHelpNN();
             return;
         }
-        else if (!strcmp(argv[i], "-xor"))
+        else if (!strcmp(argv[i], "-xor") || !strcmp(argv[i], "-train"))
         {
-            xor = 1;
+            if (!strcmp(argv[i], "-xor"))
+            {
+                xor = 1;
+            }
+            else
+            {
+                trainOnImg = 1;
+            }
             i++;
             // nb hidden layer
 
@@ -285,9 +297,17 @@ static void analyzeNN(int argc, char **argv)
         }
     }
 
-        
+    checkError(!(xor^trainOnImg),
+               "⛔ You're not supposed to train the network on the xor and "
+               "images function at the same time"
+               ". See --help for more");
 
-    if (xor)
+    if (trainOnImg)
+    {
+        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path,
+              "src/NeuralNetwork/Digits-Only/");
+    }
+    else if (xor)
     {
         launchXOR(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
         return;

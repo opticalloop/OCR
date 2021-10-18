@@ -86,8 +86,7 @@ void createAllData(char *directory, char *intputPaths[],
 
 void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
            const unsigned int nbNodesPerHidden, const int verbose,
-           const char *launch_path, const char *save_path,
-           const char *directory);
+           char *launch_path, char *save_path, char *directory);
 
 /*
  * Get the number shown in the image thanks to the network

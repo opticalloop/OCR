@@ -125,8 +125,7 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
 
 void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
            const unsigned int nbNodesPerHidden, const int verbose,
-           const char *launch_path, const char *save_path,
-           const char *directory)
+           char *launch_path, char *save_path, char *directory)
 {
     if (verbose)
     {
@@ -169,7 +168,6 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     DIR *FD;
     struct dirent *in_file;
-    char *filename;
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
@@ -178,18 +176,22 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
 
+        printf("Directory %s\n", directory);
+
         // Open the directory
         if ((FD = opendir(directory)) == NULL)
         {
+            freeNetwork(network);
             errx(1, "Error : Failed to open input directory\n");
         }
 
         for (unsigned int j = 0; j < NBIMAGES; j++, in_file = readdir(FD))
         {
-            filename = in_file->d_name;
-            strcat(filename, "Digits-Only/");
-            printf("File : %s\n", filename);
-            createData(filename, input, expected);
+            char str[1000];
+            strcpy(str, "Digits-Only/");
+            // strcat(str, in_file->d_name);
+            printf("File : %s\n", str);
+            createData(str, input, expected);
 
             // frontPropagation(network, input);
             // errorRate = backPropagation(network, expected);
@@ -202,6 +204,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             }
         }
     }
+    closedir(FD);
 
     if (verbose)
     {
