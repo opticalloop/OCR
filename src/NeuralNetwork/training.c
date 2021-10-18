@@ -1,15 +1,8 @@
 #include "NeuralNetwork/training.h"
 
-#include <dirent.h>
-#include <err.h>
-#include <errno.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
-
+/*
+ * Clamp the double given between max and min
+ */
 static double clamp(double val, double max, double min)
 {
     return val > max ? max : val < min ? min : val;
@@ -64,8 +57,6 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
     }
 }
 
-// launch pixel value in the intputPaths array, and define expected digit
-// Consider that the image is already in grayscale
 void createData(char *path, double inputs[], double expected[])
 {
     char *ptr = path;
@@ -102,7 +93,7 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
         errx(1, "Error : Failed to open input directory\n");
     }
     unsigned int index = 0;
-    while ((in_file = readdir(FD)))
+    while (in_file = readdir(FD))
     {
         if (index >= NBIMAGES)
         {
@@ -128,65 +119,107 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
         strcat(directory, intputPaths[i]);
         intputPaths[i] = directory;
         printf("Directory : %s\n", directory);
-        createData(directory, input[i], expected[i]);
+        createData(directory, input[i], expected[i], i);
     }
 }
 
-int train(char *directory, int verbose)
+void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
+           const unsigned int nbNodesPerHidden, const int verbose,
+           const char *launch_path, const char *save_path,
+           const char *directory)
 {
     if (verbose)
     {
-        // printf("    🔍 Launching Neural Network with %u hidden layers and %u
-        // nodes per hidden\n", nbHiddenLayers, nbNodesPerHidden);
+        printf("    🔍 Launching Neural Network with %u hidden layers and %u "
+               "nodes per hidden\n",
+               nbHiddenLayers, nbNodesPerHidden);
     }
 
-    double input[NBIMAGES][NBINPUTS];
-    double expected[NBIMAGES][NBOUTPUTS];
+    if (verbose)
+    {
+        printf("    🔨 Creating network\n");
+    }
 
-    const unsigned int epoch = 1000;
-
-    char *intputPaths[NBIMAGES];
-
-    createAllData(directory, intputPaths, input, expected);
-
-    printf("Creating network\n");
-
-    Network n =
-        newNetwork(NBINPUTS, NBNODESPERHIDDEN, NBHIDDENLAYERS, NBOUTPUTS);
+    Network n;
+    n.sizeInput = NBINPUTS;
+    n.sizeOutput = NBOUTPUTS;
     Network *network = &n;
 
-    printf("Initing network\n");
+    if (!strcmp(launch_path, ""))
+    {
+        newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
+        if (verbose)
+        {
+            printf("    🎰 Initing network\n");
+        }
+        initNetwork(network);
+    }
+    else
+    {
+        if (verbose)
+        {
+            printf("--> 💾 Initing weights from %s\n", launch_path);
+        }
+        launchWeights(network, launch_path);
+    }
 
-    initNetwork(network);
+    double errorRate = 0.0;
+    double input[NBINPUTS];
+    double expected[NBOUTPUTS];
 
-    // launchWeights(network, "Weights/weights.txt");
+    DIR *FD;
+    struct dirent *in_file;
+    char *filename;
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
-        for (unsigned int j = 0; j < NBIMAGES; j++)
+        if (i == epoch && verbose)
         {
-            checkInputs(input[j]);
+            printf("\n    📊 ###### EPOCH %u ######\n", i);
+        }
 
-            frontPropagation(network, input[j]);
-            backPropagation(network, expected[j]);
-            gradientDescent(network);
+        // Open the directory
+        if ((FD = opendir(directory)) == NULL)
+        {
+            errx(1, "Error : Failed to open input directory\n");
+        }
 
-            if (i % (epoch / 100) == 0)
+        for (unsigned int j = 0; j < NBIMAGES; j++, in_file = readdir(FD))
+        {
+            filename = in_file->d_name;
+            strcat(filename, "Digits-Only/");
+            printf("File : %s\n", filename);
+            createData(filename, input, expected);
+
+            // frontPropagation(network, input);
+            // errorRate = backPropagation(network, expected);
+            // gradientDescent(network);
+
+            if (i == epoch && verbose)
             {
-                printf("###### Epoch : %d ######\n", i);
-                printResult(expected[j],
-                            network->layers[NBHIDDENLAYERS + 1].neurons);
+                printResult(expected,
+                            network->layers[nbHiddenLayers + 1].neurons);
             }
         }
     }
 
-    // printWeights(network);
+    if (verbose)
+    {
+        printf("    ❗ Error rate = %f\n", errorRate);
+    }
 
-    // saveWeights(network, "Weights/weights.txt");
+    if (strcmp(save_path, ""))
+    {
+        if (verbose)
+        {
+            printf("<-- 💾 Saving weights to %s\n", save_path);
+        }
+        saveWeights(network, save_path);
+    }
+
+    printf("    ✅ Done\n");
 
     freeNetwork(network);
-
-    return 0;
 }
 
 int getNetworkOutput(Network *network, SDL_Surface *image)
@@ -195,14 +228,16 @@ int getNetworkOutput(Network *network, SDL_Surface *image)
     imageToBinary(image, inputs);
     frontPropagation(network, inputs);
 
-    double temp = network->layers[NBHIDDENLAYERS + 1].neurons[0].value;
+    double temp = network->layers[(network->nbLayers - 2) + 1].neurons[0].value;
     int result = 1;
 
     for (unsigned int i = 1; i < NBOUTPUTS; i++)
     {
-        if (network->layers[NBHIDDENLAYERS + 1].neurons[i].value > temp)
+        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value
+            > temp)
         {
-            temp = network->layers[NBHIDDENLAYERS + 1].neurons[i].value;
+            temp =
+                network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
             result = i + 1;
         }
     }

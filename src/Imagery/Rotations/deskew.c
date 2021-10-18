@@ -9,7 +9,7 @@ void autoRotate(Image *image, Dot *UL, Dot *UR, Dot *DL, Dot *DR, int verbose)
     double yDistance = DR->y - DL->y;
     double rad = atan(yDistance / xDistance);
     double deg = rad * 180 / M_PI;
-    
+
     if (verbose)
     {
         printf("Rad : %f\n", rad);
@@ -18,6 +18,4 @@ void autoRotate(Image *image, Dot *UL, Dot *UR, Dot *DL, Dot *DR, int verbose)
 }
 
 void resize(Image *image, Dot UL, Dot UR, Dot DL, Dot DR)
-{
-
-}
+{}

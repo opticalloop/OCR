@@ -59,7 +59,8 @@ static void printHelpOCR()
 static void printHelpNN()
 {
     printf("Options nn :\n"
-           "    -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train the "
+           "    -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train "
+           "the "
            "neural network on the xor function epoch time\n"
            "    -train <nb_hidden_layer> <nb_node_per_hidden>  : train the "
            "network with the speficied number of hidden layer and node per "
@@ -113,8 +114,9 @@ static void analyzeOCR(int argc, char **argv)
         else if (!strcmp(argv[i], "-o"))
         {
             i++;
-            checkError(i >= argc, "⛔ You need to specify an output path after -o. See "
-                     "--help with for more");
+            checkError(i >= argc,
+                       "⛔ You need to specify an output path after -o. See "
+                       "--help with for more");
 
             if (!strcmp(argv[i], "--help"))
             {
@@ -127,8 +129,9 @@ static void analyzeOCR(int argc, char **argv)
         else if (!strcmp(argv[i], "-r"))
         {
             i++;
-            checkError(i >= argc || !isNumber(argv[i]), "⛔ You need to specify an rotation angle in degree "
-                     "after -r. See --help for more");
+            checkError(i >= argc || !isNumber(argv[i]),
+                       "⛔ You need to specify an rotation angle in degree "
+                       "after -r. See --help for more");
 
             if (!strcmp(argv[i], "--help"))
             {
@@ -176,7 +179,6 @@ static void analyzeNN(int argc, char **argv)
             xor = 1;
             i++;
             // nb hidden layer
-            
 
             if (!strcmp(argv[i], "--help"))
             {
@@ -188,10 +190,12 @@ static void analyzeNN(int argc, char **argv)
             i++;
 
             // nb node per layer
-            checkError(i >= argc,  "⛔ You need to specify a number of node per hidden layer "
-                     "to "
-                     "train the network on the xor "
-                     ". See --help with for more");
+            checkError(
+                i >= argc,
+                "⛔ You need to specify a number of node per hidden layer "
+                "to "
+                "train the network on the xor "
+                ". See --help with for more");
 
             if (!strcmp(argv[i], "--help"))
             {
@@ -201,18 +205,20 @@ static void analyzeNN(int argc, char **argv)
             sizeHidden = atoi(argv[i]);
             i++;
             // Epoch
-            checkError(i >= argc, "⛔ You need to specify a number of epoch to"
-                     "train the network on the xor "
-                     ". See --help for more");
-            
+            checkError(i >= argc,
+                       "⛔ You need to specify a number of epoch to"
+                       "train the network on the xor "
+                       ". See --help for more");
+
             if (!strcmp(argv[i], "--help"))
             {
                 printHelpNN();
                 return;
             }
 
-            checkError(!isNumber(argv[i]), "⛔ Epoch should be a number"
-                     ". See --help for more");
+            checkError(!isNumber(argv[i]),
+                       "⛔ Epoch should be a number"
+                       ". See --help for more");
 
             epoch = atoi(argv[i]);
         }
@@ -225,9 +231,9 @@ static void analyzeNN(int argc, char **argv)
             i++;
 
             checkError(i >= argc,
-                     "⛔ You need to specify a path for the file to load"
-                     ". See --help for more");
-            
+                       "⛔ You need to specify a path for the file to load"
+                       ". See --help for more");
+
             if (!strcmp(argv[i], "--help"))
             {
                 printHelpNN();
@@ -235,15 +241,16 @@ static void analyzeNN(int argc, char **argv)
             }
             strcpy(launch_path, argv[i]);
             checkError(access(launch_path, F_OK) != 0,
-                     "⛔ The specified file to load weight don't exist"
-                     ". See --help for more");
+                       "⛔ The specified file to load weight don't exist"
+                       ". See --help for more");
         }
         else if (!strcmp(argv[i], "-S") || !strcmp(argv[i], "--save"))
         {
             i++;
-            checkError(i >= argc, "⛔ You need to specify a path for the file to save"
-                     ". See --help for more");
- 
+            checkError(i >= argc,
+                       "⛔ You need to specify a path for the file to save"
+                       ". See --help for more");
+
             if (!strcmp(argv[i], "--help"))
             {
                 printHelpNN();
@@ -257,7 +264,6 @@ static void analyzeNN(int argc, char **argv)
                        "exist, overwrite it ? [Y/n] : ");
                 if (scanf("%s", str) == EOF)
                 {
-                    
                 }
                 toUp(str);
                 // While str != Y, YES, N and NO
@@ -267,7 +273,6 @@ static void analyzeNN(int argc, char **argv)
                     printf("\n[Y/n] : ");
                     if (scanf("%s", str) == EOF)
                     {
-
                     }
                     toUp(str);
                 }
@@ -303,8 +308,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        checkError(1, "⛔ The first argument should be ocr or nn (Neural "
-             "network)\n See --help for more");
+        checkError(1,
+                   "⛔ The first argument should be ocr or nn (Neural "
+                   "network)\n See --help for more");
     }
 
     return EXIT_SUCCESS;

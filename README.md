@@ -42,6 +42,9 @@ Options nn :
     -reset : reset weights of the neural network (need to train the network after doing that)
     --help : print neural network help
 ```
+
+#### The entire code is fully documented in the .h files, all in the include folder
+
 # License
 MIT License
 

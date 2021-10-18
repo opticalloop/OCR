@@ -11,12 +11,12 @@ typedef struct Dot
 
 /*
  * Auto rotate the image with 4 edges, all dot are pointers because we need to
- * calcule their news cord to after resize the image 
- * Params : 
- *  *image : the image to modify 
- *  *UL : Upper left 
- *  *UR : Upper right 
- *  *DL : Down left 
+ * calcule their news cord to after resize the image
+ * Params :
+ *  *image : the image to modify
+ *  *UL : Upper left
+ *  *UR : Upper right
+ *  *DL : Down left
  *  *DR : Down right
  *  verbose : print details
  * return :

@@ -14,9 +14,10 @@ int main(int argc, char **argv)
 {
     if (argc != 2 && argc != 3)
     {
-        errx(1, "Usage : ./solver input_path [options]\n"
-                "options:\n"
-                "   -v --verbose : print details\n");
+        errx(1,
+             "Usage : ./solver input_path [options]\n"
+             "options:\n"
+             "   -v --verbose : print details\n");
     }
 
     int verbose = 0;
@@ -25,7 +26,7 @@ int main(int argc, char **argv)
     {
         verbose = 1;
     }
-    
+
     unsigned int grid[9][9] = {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0 },

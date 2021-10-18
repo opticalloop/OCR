@@ -64,7 +64,8 @@ void saveWeights(Network *network, char *path)
     fputs("&", file);
     if (network->nbLayers - 2 > 0)
     {
-        sprintf(str, "%d|%d\n", (int)(network->nbLayers - 2), network->layers[1].nbNeurons);
+        sprintf(str, "%d|%d\n", (int)(network->nbLayers - 2),
+                network->layers[1].nbNeurons);
     }
     else
     {
@@ -119,7 +120,7 @@ void launchWeights(Network *network, char *path)
         {
             nbHidden = atoi(str);
         }
-         memset(str, 0, sizeof(str));
+        memset(str, 0, sizeof(str));
         for (chr = getc(file); chr != EOF && chr != '|'; chr = getc(file))
         {
             strncat(str, &chr, 1);
@@ -130,7 +131,8 @@ void launchWeights(Network *network, char *path)
         }
     }
 
-    *network = newNetwork(network->sizeInput, nbHidden, nbNodePerHidden, network->sizeOutput);
+    *network = newNetwork(network->sizeInput, nbHidden, nbNodePerHidden,
+                          network->sizeOutput);
 
     int layerIndex = 0;
     int neuronIndex = 0;

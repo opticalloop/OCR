@@ -5,7 +5,7 @@
 
 /*
  * Initialize and train the ocr on the xor function
- * Params : 
+ * Params :
  *  epoch : number of train
  *  nbHiddenLayers : number of hidden layer of the network
  *  nbNodesPerHidden : number of nodes per hidden layer
@@ -16,7 +16,8 @@
  *  void
  */
 
-void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers, unsigned int nbNodesPerHidden,
-               int verbose, char *launch_path, char *save_path);
+void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
+               unsigned int nbNodesPerHidden, int verbose, char *launch_path,
+               char *save_path);
 
 #endif

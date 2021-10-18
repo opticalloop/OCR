@@ -5,7 +5,7 @@
 
 /*
  * Save the weights of the network in the speicied path
- * Params : 
+ * Params :
  *  *network : the network
  *  *path : path where to save the weights
  * return :
@@ -16,7 +16,7 @@ void saveWeights(Network *network, char *path);
 
 /*
  * Load weights of the file in paramter
- * Params : 
+ * Params :
  *  *network : the network where to load the weights
  *  *path : path where from where to load the weights
  * return :
