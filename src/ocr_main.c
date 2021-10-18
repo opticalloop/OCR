@@ -156,7 +156,8 @@ static void analyzeNN(int argc, char **argv)
     char launch_path[100] = "";
     char save_path[100] = "";
 
-    int xor = 0;
+    int xor = 0; // train on xor
+    int train = 0; // train on images
     unsigned int epoch = 1000;
     unsigned int nbHidden = 0;
     unsigned int sizeHidden = 0;
@@ -283,6 +284,9 @@ static void analyzeNN(int argc, char **argv)
             }
         }
     }
+
+        
+
     if (xor)
     {
         launchXOR(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);

@@ -119,7 +119,7 @@ void createAllData(char *directory, char *intputPaths[NBIMAGES],
         strcat(directory, intputPaths[i]);
         intputPaths[i] = directory;
         printf("Directory : %s\n", directory);
-        createData(directory, input[i], expected[i], i);
+        createData(directory, input[i], expected[i]);
     }
 }
 
