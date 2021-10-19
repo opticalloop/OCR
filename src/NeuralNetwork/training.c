@@ -174,8 +174,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
                             network->layers[nbHiddenLayers + 1].neurons);
             }
         }
+        closedir(FD);
     }
-    closedir(FD);
 
     if (verbose)
     {
