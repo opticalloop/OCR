@@ -190,7 +190,7 @@ void displayImage(Image *image)
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-
+    updateSurface(image);
     // Display img on screen
     display_image(image->surface);
 

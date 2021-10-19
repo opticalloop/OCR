@@ -53,15 +53,16 @@ void Preprocessing(Image *image)
 
     float *binomialFilter = BinomialFilter();
 
-    unsigned int *histogram = GetHistogram(image->pixels, w, h);
+    unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
+    GetHistogram(histogram, image->pixels, w, h);
     printArray(histogram, 256);
-
+     int max = image->height * image->width;
     printf("Applying constrast Filter\n");
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
-                ConstrastFilter(image->pixels[i][j], histogram));
+                ConstrastFilter(image->pixels[i][j], histogram,max));
 
     // displayImage(image);
     Pixel **mask = copyPixelsArray(image);
@@ -82,7 +83,8 @@ void Preprocessing(Image *image)
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
                 AverageFilter(mask[i][j].matrix, binomialFilter));
-    // displayImage(image);
+    displayImage(image);
+    GetHistogram(histogram, image->pixels, w, h);
 
     printf("Applying Otsu Filter\n");
     OtsuFilter(image->pixels, w, h, histogram);
@@ -120,20 +122,19 @@ static unsigned int clamp(unsigned int value, unsigned int min,
     return value < min ? min : value > max ? max : value;
 }
 
-unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram)
+unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
 {
-    unsigned int fact = histogram[pixel.b];
+    unsigned int fact = histogram[pixel.b] / max;
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    return clamp(factor * (pixel.b - 128) + 128 - 50, 0, 255);
+    return clamp(factor * (pixel.b - 128) + 128, 0, 255);
 }
 
-unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h)
+unsigned int *GetHistogram(unsigned int *histogram, Pixel **pixels,
+                           unsigned int w, unsigned h)
 {
-    unsigned int *histogram = calloc((255 + 1), sizeof(unsigned int));
     for (unsigned int i = 0; i < w; ++i)
         for (unsigned int j = 0; j < h; ++j)
             histogram[pixels[i][j].b]++;
-    return histogram;
 }
 
 void NegativeImage(Image *image)
@@ -225,11 +226,14 @@ void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram)
 {
     double threshold = Thresholding(histogram);
+
+
     printf("\tthreshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
     {
         for (unsigned int j = 0; j < h; j++)
         {
+            // printf("%d ",pixels[i][j].b);
             updatePixelToSameValue(&(pixels[i][j]),
                                    pixels[i][j].b >= threshold ? 255 : 0);
         }
