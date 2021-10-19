@@ -62,20 +62,6 @@ void imageToBinary(SDL_Surface *surface, double inputs[]);
 void createData(char *path, double inputs[], double expected[]);
 
 /*
- * Call createData on all the image of the directory
- * Params :
- *  *directory : directory where all images are stored
- *  *intputPaths[] : temporar list for the functions itself
- *  input[][] : two dimentional array where all inputs images are saved
- *  expected[][] : two dimentional array where all expected value are saved
- * return :
- *  fill the arrays so empty
- */
-void createAllData(char *directory, char *intputPaths[],
-                   double input[NBIMAGES][NBINPUTS],
-                   double expected[NBIMAGES][NBOUTPUTS]);
-
-/*
  * Train the neural network
  * Params :
  *  *directory : directory where all images are stored

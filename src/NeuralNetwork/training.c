@@ -8,6 +8,15 @@ static double clamp(double val, double max, double min)
     return val > max ? max : val < min ? min : val;
 }
 
+static void printArray(double array[], size_t len)
+{   
+    printf("Array : \n");
+    for (size_t i = 0; i < len; i++)
+    {
+        printf("%f ", array[i]);
+    }
+}
+
 void printResult(double expected[], Neuron neuron[])
 {
     // Print expected
@@ -49,10 +58,8 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
             pixel = get_pixel(surface, i, j);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            inputs[i * j] =
-                clamp((double)(1.0 - ((double)rgb.r / 255.0)), 1.0, 0.0);
-
-            // printf("Input in creation of data : %f\n", intputs[i * j]);
+            inputs[j * 28 + i] =
+                clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
         }
     }
 }
@@ -61,7 +68,6 @@ void createData(char *path, double inputs[], double expected[])
 {
     char *ptr = path;
 
-    printf("File : %s\n", ptr);
     SDL_Surface *surface = load_image(ptr);
 
     imageToBinary(surface, inputs);
@@ -78,49 +84,6 @@ void createData(char *path, double inputs[], double expected[])
     printf("Expected : %d\n", num);
 
     SDL_FreeSurface(surface);
-}
-
-void createAllData(char *directory, char *intputPaths[NBIMAGES],
-                   double input[NBIMAGES][NBINPUTS],
-                   double expected[NBIMAGES][NBOUTPUTS])
-{
-    // Get all images paths
-    DIR *FD;
-    struct dirent *in_file;
-    /* Scanning the in directory */
-    if ((FD = opendir(directory)) == NULL)
-    {
-        errx(1, "Error : Failed to open input directory\n");
-    }
-    unsigned int index = 0;
-    while (in_file = readdir(FD))
-    {
-        if (index >= NBIMAGES)
-        {
-            break;
-        }
-        // Check that we don't have the parent directory
-        if (!strcmp(in_file->d_name, "."))
-            continue;
-        if (!strcmp(in_file->d_name, ".."))
-            continue;
-
-        char *filename = in_file->d_name;
-        intputPaths[index] = filename;
-        index++;
-    }
-    closedir(FD);
-
-    // Create all images data
-    for (unsigned int i = 0; i < NBIMAGES; i++)
-    {
-        char directory[50];
-        strcpy(directory, "Digits-Only/");
-        strcat(directory, intputPaths[i]);
-        intputPaths[i] = directory;
-        printf("Directory : %s\n", directory);
-        createData(directory, input[i], expected[i]);
-    }
 }
 
 void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
@@ -146,7 +109,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     if (!strcmp(launch_path, ""))
     {
-        newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
+        *network = newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
         if (verbose)
         {
             printf("    🎰 Initing network\n");
@@ -185,17 +148,25 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             errx(1, "Error : Failed to open input directory\n");
         }
 
+        in_file = readdir(FD);
         for (unsigned int j = 0; j < NBIMAGES; j++, in_file = readdir(FD))
         {
+            while (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
+            {
+                in_file = readdir(FD);
+            }
+
             char str[1000];
-            strcpy(str, "Digits-Only/");
-            // strcat(str, in_file->d_name);
+            strcpy(str, "src/NeuralNetwork/Digits-Only/");
+            strcat(str, in_file->d_name);
             printf("File : %s\n", str);
             createData(str, input, expected);
 
-            // frontPropagation(network, input);
-            // errorRate = backPropagation(network, expected);
-            // gradientDescent(network);
+            // printArray(input, NBINPUTS);
+
+            frontPropagation(network, input);
+            errorRate = backPropagation(network, expected);
+            gradientDescent(network);
 
             if (i == epoch && verbose)
             {
