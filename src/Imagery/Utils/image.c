@@ -260,6 +260,19 @@ Pixel InstantiatePixelZero()
     return pixel;
 }
 
+void updateNeigbourgs(Image *image)
+{
+    unsigned int h = image->height;
+    unsigned int w = image->width;
+    for (unsigned int i = 0; i < w; ++i)
+    {
+        for (unsigned int j = 0; j < h; ++j)
+        {
+            FillMatrix(image->pixels, i, j, w, h);
+        }
+    }
+}
+
 void freeImage(Image *image)
 {
     unsigned int width = image->width;
