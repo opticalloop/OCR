@@ -12,7 +12,15 @@ static void printArray(unsigned int *array, unsigned int n)
     }
     printf("%u }\n", array[n - 1]);
 }
-
+static void printArrayPixel(Pixel *array, unsigned int n)
+{
+    printf("{ ");
+    for (unsigned int i = 0; i < n - 1; ++i)
+    {
+        printf("%d, ", array[i].b);
+    }
+    printf("%d }\n", array[n - 1].b);
+}
 static float *BinomialFilter()
 {
     float *filter = malloc(sizeof(float) * (9 + 1));
@@ -47,23 +55,26 @@ void Preprocessing(Image *image)
 
     unsigned int *histogram = GetHistogram(image->pixels, w, h);
     printArray(histogram, 256);
-    // printf("Applying constrast Filter\n");
-    // for (unsigned int i = 0; i < w; i++)
-    //     for (unsigned int j = 0; j < h; j++)
-    //         updatePixelToSameValue(&(image->pixels[i][j]),
-    //         ConstrastFilter(image->pixels[i][j], histogram));
-    saveImage(image, "path2.bmp");
+
+    printf("Applying constrast Filter\n");
+    for (unsigned int i = 0; i < w; i++)
+        for (unsigned int j = 0; j < h; j++)
+            updatePixelToSameValue(
+                &(image->pixels[i][j]),
+                ConstrastFilter(image->pixels[i][j], histogram));
 
     // displayImage(image);
     Pixel **mask = copyPixelsArray(image);
 
     printf("Applying Median Filter\n");
     for (unsigned int i = 0; i < w; i++)
+    {
         for (unsigned int j = 0; j < h; j++)
         {
             updatePixelToSameValue(&(mask[i][j]),
                                    MedianFilter(image->pixels[i][j].matrix));
         }
+    }
 
     printf("Applying Average Filter\n");
     for (unsigned int i = 0; i < w; i++)
@@ -90,20 +101,17 @@ unsigned int AverageFilter(Pixel *matrix, float *binomialFilter)
     float result = 0;
     for (int i = 0; i < 9; ++i)
         result += matrix[i].b * binomialFilter[i];
-    return (unsigned int) result;
+    return (unsigned int)result;
 }
 
 unsigned int MedianFilter(Pixel *matrix)
 {
-    Pixel *matrix2 = malloc(sizeof(Pixel) * (9 + 1));
+    Pixel matrix2[9];
     for (int i = 0; i < 9; ++i)
         matrix2[i] = matrix[i];
 
     array_sort(matrix2, 9);
-
-    Pixel result = matrix2[4];
-    free(matrix2);
-    return result.b;
+    return matrix2[4].b;
 }
 
 static unsigned int clamp(unsigned int value, unsigned int min,
@@ -116,19 +124,19 @@ unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram)
 {
     unsigned int fact = histogram[pixel.b];
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    return abs(255 - clamp(factor * (pixel.b - 128) + 128 - 200, 0, 255));
+    return clamp(factor * (pixel.b - 128) + 128 - 50, 0, 255);
 }
 
 unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h)
 {
     unsigned int *histogram = calloc((255 + 1), sizeof(unsigned int));
-    for (int i = 0; i < w; ++i)
-        for (int j = 0; j < h; ++j)
+    for (unsigned int i = 0; i < w; ++i)
+        for (unsigned int j = 0; j < h; ++j)
             histogram[pixels[i][j].b]++;
     return histogram;
 }
 
-static void NegativeImage(Image *image)
+void NegativeImage(Image *image)
 {
     for (unsigned int x = 0; x < image->width; x++)
         for (unsigned int y = 0; x < image->height; y++)
@@ -138,8 +146,6 @@ static void NegativeImage(Image *image)
 
 static double Thresholding(unsigned int *histogram)
 {
-    int bins_num = 256;
-
     // Calculate the bin_edges
     long double bin_edges[256];
     bin_edges[0] = 0.0;
@@ -151,7 +157,7 @@ static double Thresholding(unsigned int *histogram)
     long double bin_mids[256];
     for (int i = 0; i < 255; i++)
     {
-        //printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
+        // printf("%Lf ",(bin_edges[i] + bin_edges[i + 1]));
         bin_mids[i] = (bin_edges[i] + bin_edges[i + 1]) / 2;
     }
 
@@ -221,10 +227,11 @@ void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
     double threshold = Thresholding(histogram);
     printf("\tthreshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
+    {
         for (unsigned int j = 0; j < h; j++)
         {
-            //    printf("%d ",pixels[i][j].b);
             updatePixelToSameValue(&(pixels[i][j]),
                                    pixels[i][j].b >= threshold ? 255 : 0);
         }
+    }
 }

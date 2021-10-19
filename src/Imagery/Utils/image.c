@@ -101,6 +101,12 @@ void newImage(Image *image)
 
             image->pixels[x][y].matrix = NULL;
             image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
+            if (image->pixels[x][y].matrix == NULL)
+            {
+                errx(EXIT_FAILURE,
+                     "Error while allocating pixels pointers for the image "
+                     "(matrix creation)");
+            }
 
             averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
@@ -123,9 +129,23 @@ Pixel **copyPixelsArray(Image *image)
     int w = image->width;
     int h = image->height;
     Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
+    if (mask == NULL)
+    {
+        errx(EXIT_FAILURE,
+             "Error while allocating pixels pointers for the image "
+             "(copy Pixels Array) 1");
+    }
     for (unsigned int i = 0; i < w; i++)
     {
         mask[i] = (Pixel *)malloc((h + 1) * sizeof(Pixel));
+
+        if (mask[i] == NULL)
+        {
+            errx(EXIT_FAILURE,
+                 "Error while allocating pixels pointers for the image "
+                 "(copy Pixels Array) 2");
+        }
+
         for (unsigned int j = 0; j < h; j++)
         { // MEDIAN FILTER
             mask[i][j].r = image->pixels[i][j].r;
@@ -133,6 +153,13 @@ Pixel **copyPixelsArray(Image *image)
             mask[i][j].b = image->pixels[i][j].b;
             mask[i][j].matrix = NULL;
             mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
+            if (mask[i][j].matrix == NULL)
+            {
+                errx(EXIT_FAILURE,
+                     "Error while allocating pixels pointers for the image "
+                     "(matrix)");
+            }
         }
     }
     // fill the neighbours matrix

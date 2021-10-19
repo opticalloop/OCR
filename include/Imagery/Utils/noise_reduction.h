@@ -21,4 +21,6 @@ unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram);
 unsigned int *GetHistogram(Pixel **pixels, unsigned int w, unsigned h);
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram);
+
+void NegativeImage(Image *image);
 #endif // OCR_NOISE_REDUCTION_H
