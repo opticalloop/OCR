@@ -9,7 +9,7 @@ static double clamp(double val, double max, double min)
 }
 
 static void printArray(double array[], size_t len)
-{   
+{
     printf("Array : \n");
     for (size_t i = 0; i < len; i++)
     {
@@ -64,8 +64,7 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
             pixel = get_pixel(surface, i, j);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            inputs[j * 28 + i] =
-                clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
+            inputs[j * 28 + i] = clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
         }
     }
 }
@@ -115,7 +114,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     if (!strcmp(launch_path, ""))
     {
-        *network = newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
+        *network =
+            newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
         if (verbose)
         {
             printf("    🎰 Initing network\n");
@@ -157,7 +157,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
         in_file = readdir(FD);
         for (unsigned int j = 0; j < NBIMAGES; j++, in_file = readdir(FD))
         {
-            while (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
+            while (!strcmp(in_file->d_name, ".")
+                   || !strcmp(in_file->d_name, ".."))
             {
                 in_file = readdir(FD);
             }
