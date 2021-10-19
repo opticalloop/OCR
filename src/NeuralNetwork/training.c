@@ -24,16 +24,21 @@ void printResult(double expected[], Neuron neuron[])
     {
         if (expected[l] == 1.0)
         {
-            printf("\nInput : image of a %u\n", l + 1);
+            printf("\n--> 📈 Input : image of a %u\n", l + 1);
             break;
         }
     }
-        
-    for (unsigned int k = 0; k < NBOUTPUTS; k++)
+    int index = 1;
+    double temp = neuron[0].value;
+    for (unsigned int k = 1; k < NBOUTPUTS; k++)
     {
-        printf("Output : %f, expected : %u\n", neuron[k].value,
-               (unsigned int)expected[k]);
+        if (neuron[k].value > temp)
+        {
+            temp = neuron[k].value;
+            index = k + 1;
+        }
     }
+    printf("<-- 📉 Output : %d\n", index);
 }
 
 void checkInputs(double inputs[NBINPUTS])
@@ -160,10 +165,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             char str[1000];
             strcpy(str, "src/NeuralNetwork/Digits-Only/");
             strcat(str, in_file->d_name);
-            //printf("File : %s\n", str);
-            createData(str, input, expected);
 
-            // printArray(input, NBINPUTS);
+            createData(str, input, expected);
 
             frontPropagation(network, input);
             errorRate = backPropagation(network, expected);

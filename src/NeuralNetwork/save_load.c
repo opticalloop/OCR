@@ -131,7 +131,7 @@ void launchWeights(Network *network, char *path)
         }
     }
 
-    *network = newNetwork(network->sizeInput, nbHidden, nbNodePerHidden,
+    *network = newNetwork(network->sizeInput, nbNodePerHidden, nbHidden,
                           network->sizeOutput);
 
     int layerIndex = 0;

@@ -9,7 +9,7 @@
 #include "NeuralNetwork/training.h"
 
 /*
- * Check if the condition is false, if so error
+ * Check if the condition is true, if so error
  */
 static void checkError(int condition, char *message)
 {
@@ -52,36 +52,36 @@ static char isNumber(char *text)
 
 static void printHelpOCR()
 {
-    printf("Options ocr :\n"
-           "    gui : open graphical interface\n"
-           "    -o <output_path> : specify an output path\n"
-           "    -r <angle> : manually rotate the image by the angle in degree\n"
-           "    -v --verbose : print details of process\n"
-           "    --help : print ocr help\n");
+    printf("🎨 Options ocr :\n"
+           "      gui : open graphical interface\n"
+           "      -o <output_path> : specify an output path\n"
+           "      -r <angle> : manually rotate the image by the angle in degree\n"
+           "      -v --verbose : print details of process\n"
+           "      --help : print ocr help\n");
 }
 
 static void printHelpNN()
 {
-    printf("Options nn :\n"
-           "    -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train "
+    printf("📊 Options nn :\n"
+           "      -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train "
            "the "
            "neural network on the xor function epoch time\n"
-           "    -train <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : "
+           "      -train <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : "
            "train the "
            "network with the speficied number of hidden layer and node per "
            "hidden layer epoch time \n"
-           "    -reset : reset weights of the neural network (need to train "
+           "      -reset : reset weights of the neural network (need to train "
            "the network after doing that)\n"
-           "    -v --verbose : print details of process\n"
-           "    -L --load <weight_path> : launch the network before trade\n"
-           "    -S --save <weight_path> : save the network after train\n"
-           "    --help : print neural network help\n");
+           "      -v --verbose : print details of process\n"
+           "      -L --load <weight_path> : launch the network before trade\n"
+           "      -S --save <weight_path> : save the network after train\n"
+           "      --help : print neural network help\n");
 }
 
 static void printHelp()
 {
     printf(
-        "###### Optical character recognition sudoku solver by opticalloop "
+        "###### Optical character recognition sudoku solver by\033[0;33m opticalloop \033[0m"
         "######\n"
         "Usage : ./main ocr <image_path> [options] or ./main nn [options] \n");
 
