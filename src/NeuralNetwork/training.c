@@ -28,6 +28,7 @@ void printResult(double expected[], Neuron neuron[])
             break;
         }
     }
+        
     for (unsigned int k = 0; k < NBOUTPUTS; k++)
     {
         printf("Output : %f, expected : %u\n", neuron[k].value,
@@ -81,7 +82,7 @@ void createData(char *path, double inputs[], double expected[])
         expected[i] = i + 1 == num ? 1.0 : 0.0;
     }
 
-    printf("Expected : %d\n", num);
+    // printf("Expected : %d\n", num);
 
     SDL_FreeSurface(surface);
 }
@@ -139,7 +140,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
 
-        printf("Directory %s\n", directory);
+        // printf("Directory %s\n", directory);
 
         // Open the directory
         if ((FD = opendir(directory)) == NULL)
@@ -159,7 +160,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             char str[1000];
             strcpy(str, "src/NeuralNetwork/Digits-Only/");
             strcat(str, in_file->d_name);
-            printf("File : %s\n", str);
+            //printf("File : %s\n", str);
             createData(str, input, expected);
 
             // printArray(input, NBINPUTS);
