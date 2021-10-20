@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     readGrid(grid, argv[1], verbose);
 
-    if (isSolvable(grid) == false)
+    if (!isSolvable(grid))
     {
         errx(EXIT_FAILURE, "Grid can't be solved\n");
     }

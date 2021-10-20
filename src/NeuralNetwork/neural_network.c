@@ -119,8 +119,6 @@ void initNetwork(Network *network)
 
     for (unsigned int i = 0; i < nbLayers; i++)
     {
-        // printf("Initing all neurons for layer %u\n", i);
-
         Layer *layer = &(network->layers[i]);
         nbNeurons = layer->nbNeurons;
         for (unsigned int j = 0; j < nbNeurons; j++)
@@ -163,8 +161,6 @@ void frontPropagation(Network *network, double input[])
             }
             // sum += neuron->bias;
             layer->neurons[j].value = sigmoid(sum);
-            // printf("Layer : %d, value of update : %f\n", i,
-            // layer->neurons[j].value);
         }
     }
 }
