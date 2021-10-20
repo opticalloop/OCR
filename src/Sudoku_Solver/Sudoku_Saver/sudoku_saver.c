@@ -45,7 +45,7 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
     if (verbose)
     {
         printf("--> 📂 Reading ");
-        printf(inputPath);
+        printf("%s", inputPath);
         printf("\n");
     }
 
@@ -95,7 +95,7 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
     if (verbose)
     {
         printf("<-- 📂 Saving grid to ");
-        printf(outputPath);
+        printf("%s", outputPath);
         printf("\n");
     }
 
@@ -160,9 +160,9 @@ Image createSudokuImage(unsigned int grid[dim][dim])
     unsigned int increment = 2;
     unsigned int posX;
     unsigned int posY;
-    SDL_Rect rect;
-    rect.w = 28;
-    rect.h = 28;
+    // SDL_Rect rect;
+    // rect.w = 28;
+    // rect.h = 28;
     for (unsigned int i = 0; i < dim; i++)
     {
         for (unsigned int j = 0; j < dim; j++)
@@ -173,8 +173,8 @@ Image createSudokuImage(unsigned int grid[dim][dim])
             }
             posX = i * 29 + increment;
             posY = j * 29 + increment;
-            rect.x = posX;
-            rect.y = posY;
+            // rect.x = posX;
+            // rect.y = posY;
             // printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX,
             // posY); Put image at posX and posY
 

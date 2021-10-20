@@ -6,7 +6,7 @@ static void printVerbose(int verbose, char *message)
 {
     if (verbose)
     {
-        printf(message);
+        printf("%s", message);
     }
 }
 
@@ -24,7 +24,7 @@ void OCR(char *image_path, char *output_path, int verbose)
     Preprocessing(&image);
 
     // Segmentation
-    SDL_Surface **all_cases;
+    SDL_Surface **all_cases = NULL;
 
     // Recognisation + Construction
     printVerbose(verbose, "    📊 Creating neural network\n");
@@ -51,6 +51,12 @@ void OCR(char *image_path, char *output_path, int verbose)
     }
     printVerbose(verbose, "    ✅ Grid is solvable\n");
     solveSuduko(grid, 0, 0);
+
+    if (!isSolved(grid))
+    {
+        errx(EXIT_FAILURE, "    ⛔ Error while solving grid");
+    }
+    printVerbose(verbose, "    ✅ Grid is solved\n");
 
     // SaveResult
     saveGrid(grid, output_path, verbose);

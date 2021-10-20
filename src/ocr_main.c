@@ -7,6 +7,7 @@
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
 #include "NeuralNetwork/training.h"
+#include "ocr.h"
 
 /*
  * Check if the condition is true, if so error
@@ -15,7 +16,7 @@ static void checkError(int condition, char *message)
 {
     if (condition)
     {
-        errx(EXIT_FAILURE, message);
+        errx(EXIT_FAILURE, "%s", message);
     }
 }
 
@@ -153,7 +154,7 @@ static void analyzeOCR(int argc, char **argv)
             verbose = 1;
         }
     }
-
+    OCR(input_path, output_path, verbose);
     printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 

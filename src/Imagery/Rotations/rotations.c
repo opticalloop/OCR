@@ -46,22 +46,23 @@ void rotate(Image *image, double angleDegree)
 
     Pixel pixel;
 
-    int newX;
-    int newY;
+    unsigned int newX;
+    unsigned int newY;
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
             // Calculate new position
-            newX = (int)((double)(cos(angle) * ((double)x - middleX)
-                                  - sin(angle) * ((double)y - middleY))
-                         + middleX);
-            newY = (int)((double)(cos(angle) * ((double)y - middleY)
-                                  + sin(angle) * ((double)x - middleX))
-                         + middleY);
+            newX = (unsigned int)((double)(cos(angle) * ((double)x - middleX)
+                                           - sin(angle) * ((double)y - middleY))
+                                  + middleX);
+            newY = (unsigned int)((double)(cos(angle) * ((double)y - middleY)
+                                           + sin(angle) * ((double)x - middleX))
+                                  + middleY);
 
             // Assign it into new image and make sure he is in the image
-            if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+            // Warning : unsigned int never = 0
+            if (newX > 0 && newX < width && newY > 0 && newY < height)
             {
                 // Get the pixel on the copied image
                 pixel = image->pixels[x][y];
@@ -95,16 +96,16 @@ double detectDiffAngle(Image *image, float precision)
 
     double _precision = M_PI * (1 / precision);
 
-    accumulator = malloc(sizeof(double *) * (width + 1));
+    accumulator = malloc(sizeof(double *) * (_precision + 1));
     if (accumulator == NULL)
     {
         errx(EXIT_FAILURE, "Error");
     }
 
     unsigned int i = 0;
-    for (; i < width; i++)
+    for (; i < _precision; i++)
     {
-        accumulator[i] = malloc(sizeof(double) * (height + 1));
+        accumulator[i] = malloc(sizeof(double) * (diagonal + 1));
         if (accumulator[i] == NULL)
         {
             errx(EXIT_FAILURE, "Error");

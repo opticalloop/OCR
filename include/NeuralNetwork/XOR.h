@@ -1,7 +1,11 @@
 #ifndef XOR_H
 #define XOR_H
 
+#include <stdio.h>
+#include <string.h>
+
 #include "NeuralNetwork/neural_network.h"
+#include "NeuralNetwork/save_load.h"
 
 /*
  * Initialize and train the ocr on the xor function

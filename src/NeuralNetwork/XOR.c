@@ -1,9 +1,5 @@
 #include "NeuralNetwork/XOR.h"
 
-#include <stdio.h>
-
-#include "NeuralNetwork/save_load.h"
-
 void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
                unsigned int nbNodesPerHidden, const int verbose,
                char *launch_path, char *save_path)

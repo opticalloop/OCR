@@ -8,15 +8,6 @@ static double clamp(double val, double max, double min)
     return val > max ? max : val < min ? min : val;
 }
 
-static void printArray(double array[], size_t len)
-{
-    printf("Array : \n");
-    for (size_t i = 0; i < len; i++)
-    {
-        printf("%f ", array[i]);
-    }
-}
-
 void printResult(double expected[], Neuron neuron[])
 {
     // Print expected
