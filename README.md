@@ -37,9 +37,13 @@ OCR options :
     --help : print ocr help
 ./main nn [options]
 Options nn :
- -xor <nb_hidden_layer> <nb_node_per_hidden> : train the neural network on the xor function
-    -train <nb_hidden_layer> <nb_node_per_hidden> : train the network with the speficied number of hidden layer and node per hidden layer
+    -xor <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> : train the neural network on the xor function epoch time
+    -train <nb_hidden_layer> <nb_node_per_hidden> <nb_epoch> :
+    train the network with the speficied number of hidden layer and node per hidden layer epoch time
     -reset : reset weights of the neural network (need to train the network after doing that)
+    -v --verbose : print details of process
+    -L --load <weight_path> : launch the network before trade
+    -S --save <weight_path> : save the network after train
     --help : print neural network help
 ```
 

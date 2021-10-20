@@ -6,7 +6,7 @@ static void printVerbose(int verbose, char *message)
 {
     if (verbose)
     {
-        printf(message);   
+        printf(message);
     }
 }
 
@@ -53,7 +53,5 @@ void OCR(char *image_path, char *output_path, int verbose)
     solveSuduko(grid, 0, 0);
 
     // SaveResult
-    saveGrid(grid, output_path, verbose);    
-
-    // Free
+    saveGrid(grid, output_path, verbose);
 }

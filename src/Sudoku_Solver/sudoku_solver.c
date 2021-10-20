@@ -1,6 +1,5 @@
 #include "Sudoku_Solver/sudoku_solver.h"
 
-
 unsigned int canBePlaced(unsigned int grid[dim][dim], unsigned int x,
                          unsigned int y, unsigned int val)
 {
