@@ -5,7 +5,9 @@
 #ifndef OCR_NOISE_REDUCTION_H
 #define OCR_NOISE_REDUCTION_H
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "Imagery/Utils/array_sort.h"
 #include "Imagery/Utils/image.h"
@@ -18,8 +20,8 @@ unsigned int MedianFilter(Pixel *matrix);
 
 unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max);
 
-void GetHistogram(unsigned int *histogram, Pixel **pixels,
-                           unsigned int w, unsigned h);
+void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
+                  unsigned h);
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram);
 
