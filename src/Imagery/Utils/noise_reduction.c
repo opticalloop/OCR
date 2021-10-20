@@ -35,6 +35,58 @@ static float *BinomialFilter()
     filter[8] = (1 / 16.) * 1;
     return filter;
 }
+static int IsBlackAndWhite(Image *image, unsigned int *histogram,
+                           unsigned int max)
+{
+    unsigned int w = image->width;
+    unsigned int h = image->height;
+    for (unsigned int i = 0; i < w; i++)
+    {
+        for (unsigned int j = 0; j < h; j++)
+        {
+            unsigned int value = image->pixels[i][j].b;
+            if (value > 10 && value < 245
+                && (float)(histogram[value] / max) > 0.05)
+                return 0;
+        }
+    }
+    return 1;
+}
+static int isWhiteImage(Image *image)
+{
+    unsigned int w = image->width;
+    unsigned int h = image->height;
+    int whitePixel = 0;
+    int blackPixel = 0;
+
+    for (unsigned int i = 0; i < w; i++)
+    {
+        for (unsigned int j = 0; j < h; j++)
+        {
+            if (image->pixels[i][j].b == 0)
+                blackPixel++;
+            else
+                whitePixel++;
+        }
+    }
+    return whitePixel > blackPixel;
+}
+static void NegativePictureIfNormal(Image *image)
+{
+    unsigned int w = image->width;
+    unsigned int h = image->height;
+    if (isWhiteImage(image))
+    {
+        for (unsigned int i = 0; i < w; i++)
+        {
+            for (unsigned int j = 0; j < h; j++)
+            {
+                updatePixelToSameValue(&(image->pixels[i][j]),
+                                       255 - image->pixels[i][j].b);
+            }
+        }
+    }
+}
 
 // static void applyFilter( Pixel **mask, void (* filter,Pixel ** dest){
 //    for (unsigned int i = 0; i < w; i++)
@@ -56,15 +108,17 @@ void Preprocessing(Image *image)
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
     printArray(histogram, 256);
-     int max = image->height * image->width;
+    int max = image->height * image->width;
+
     printf("Applying constrast Filter\n");
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
-                ConstrastFilter(image->pixels[i][j], histogram,max));
-
+                ConstrastFilter(image->pixels[i][j], histogram, max));
+    saveImage(image, "test.bmp");
     // displayImage(image);
+
     Pixel **mask = copyPixelsArray(image);
 
     printf("Applying Median Filter\n");
@@ -83,11 +137,11 @@ void Preprocessing(Image *image)
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
                 AverageFilter(mask[i][j].matrix, binomialFilter));
-    displayImage(image);
     GetHistogram(histogram, image->pixels, w, h);
 
     printf("Applying Otsu Filter\n");
     OtsuFilter(image->pixels, w, h, histogram);
+    NegativePictureIfNormal(image);
 
     //    for (unsigned int i = 0; i < w; i++)
     //        for (unsigned int j = 0; j < h; j++)
@@ -129,8 +183,8 @@ unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
     return clamp(factor * (pixel.b - 128) + 128, 0, 255);
 }
 
-unsigned int *GetHistogram(unsigned int *histogram, Pixel **pixels,
-                           unsigned int w, unsigned h)
+void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
+                  unsigned h)
 {
     for (unsigned int i = 0; i < w; ++i)
         for (unsigned int j = 0; j < h; ++j)
@@ -226,7 +280,6 @@ void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram)
 {
     double threshold = Thresholding(histogram);
-
 
     printf("\tthreshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
