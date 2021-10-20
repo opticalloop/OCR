@@ -76,7 +76,7 @@ static void printHelpNN()
         "      -reset : reset weights of the neural network (need to train "
         "the network after doing that)\n"
         "      -v --verbose : print details of process\n"
-        "      -L --load <weight_path> : launch the network before trade\n"
+        "      -L --load <weight_path> : launch the network before train\n"
         "      -S --save <weight_path> : save the network after train\n"
         "      --help : print neural network help\n");
 }
