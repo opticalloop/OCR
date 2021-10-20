@@ -75,4 +75,22 @@ void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram);
 
+/*
+ * Summary
+ * Params :
+ *  *histogram : the image histogram
+
+ * return :
+ *  return Threshold value based on the histogram
+ */
+double Thresholding(unsigned int *histogram);
+
+/*
+ * Summary
+ * Params :
+ *  *image : the image
+
+ *  If the picture contain more white pixels than black, he reverse the picture
+ */
+void NegativePictureIfNormal(Image *image);
 #endif // OCR_NOISE_REDUCTION_H

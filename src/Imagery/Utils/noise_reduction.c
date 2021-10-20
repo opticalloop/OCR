@@ -19,10 +19,7 @@ static void printArrayPixel(Pixel *array, unsigned int n)
     }
     printf("%d }\n", array[n - 1].b);
 }
-/*
- * return :
- *  binomial fitler
- */
+
 static float *BinomialFilter()
 {
     float *filter = malloc(sizeof(float) * (9 + 1));
@@ -91,14 +88,8 @@ static int isWhiteImage(Image *image)
     }
     return whitePixel > blackPixel;
 }
-/*
- * Summary
- * Params :
- *  *image : the image
 
- *  If the picture contain more white pixels than black, he reverse the picture
- */
-static void NegativePictureIfNormal(Image *image)
+void NegativePictureIfNormal(Image *image)
 {
     unsigned int w = image->width;
     unsigned int h = image->height;
@@ -222,15 +213,7 @@ void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
             histogram[pixels[i][j].b]++;
 }
 
-/*
- * Summary
- * Params :
- *  *histogram : the image histogram
-
- * return :
- *  return Threshold value based on the histogram
- */
-static double Thresholding(unsigned int *histogram)
+double Thresholding(unsigned int *histogram)
 {
     // Calculate the bin_edges
     long double bin_edges[256];
