@@ -115,14 +115,6 @@ static void NegativePictureIfNormal(Image *image)
     }
 }
 
-/*
- * Summary
- * Params :
- *  *image : the image
-
-
- *  Apply all filters
- */
 void Preprocessing(Image *image)
 {
     unsigned int w = image->width;
@@ -180,15 +172,7 @@ void Preprocessing(Image *image)
     free(histogram);
     freeMatrixArray(mask, w, h);
 }
-/*
- * Summary
- * Params :
- *  *matrix : neighbours pixels
- *  *binomialFilter : Binomial filter
 
- * return :
- *  average value of the pixel, based on Average Formula with BinominalFilter
- */
 unsigned int AverageFilter(Pixel *matrix, float *binomialFilter)
 {
     float result = 0;
@@ -196,14 +180,7 @@ unsigned int AverageFilter(Pixel *matrix, float *binomialFilter)
         result += matrix[i].b * binomialFilter[i];
     return (unsigned int)result;
 }
-/*
- * Summary
- * Params :
- *  *matrix : neighbours pixels
 
- * return :
- *  median value of the pixel, based on Median Formula
- */
 unsigned int MedianFilter(Pixel *matrix)
 {
     Pixel matrix2[9];
@@ -229,29 +206,14 @@ static unsigned int clamp(unsigned int value, unsigned int min,
 {
     return value < min ? min : value > max ? max : value;
 }
-/*
- * Summary
- * Params :
- *  *pixel : the image
 
- * return :
- *  median value of the pixel, based on Median Formula
- */
 unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
 {
     unsigned int fact = histogram[pixel.b] / max;
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
     return clamp(factor * (pixel.b - 128) + 128, 0, 255);
 }
-/*
- * Summary
- * Params :
- *  *histogram : the image
- *  **pixels : image matrix
- *  w : width of the image
- *  h : height of the image
- * fill the histogram array based on image
- */
+
 void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
                   unsigned h)
 {
@@ -345,15 +307,6 @@ static double Thresholding(unsigned int *histogram)
     return bin_mids[getmax];
 }
 
-/*
- * Summary
- * Params :
- *  **pixels : image matrix
- *  w : width of the image
- *  h : height of the image
- *  *histogram : the image histogram
- * Apply Otsu Filter on a matrix
- */
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
                 unsigned int *histogram)
 {
