@@ -126,8 +126,8 @@ void newImage(Image *image)
 }
 Pixel **copyPixelsArray(Image *image)
 {
-    int w = image->width;
-    int h = image->height;
+    unsigned int w = image->width;
+    unsigned int h = image->height;
     Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
     if (mask == NULL)
     {
