@@ -1,5 +1,6 @@
 #include <math.h>
-#include "./trace.h"
+
+#include "Imagery/Segmentation/trace.h"
 
 double Convolution(SDL_Surface *image, int kernel[3][3], int row, int col)
 {
@@ -37,9 +38,9 @@ void SobelEdgeDetection(SDL_Surface *in, SDL_Surface *out, double threshold)
     Uint32 pixel;
     // Uint8 r, g, b;
 
-    int kernel_x[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+    int kernel_x[3][3] = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
 
-    int kernel_y[3][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+    int kernel_y[3][3] = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
 
     for (int i = 1; i < in->h - 2; i++)
     {
@@ -62,15 +63,4 @@ void SobelEdgeDetection(SDL_Surface *in, SDL_Surface *out, double threshold)
             }
         }
     }
-}
-
-int main()
-{
-    SDL_Surface *in = load_image("../image_05.jpeg");
-    SDL_Surface *out = SDL_CreateRGBSurface(0, in->w, in->h, 32, 0, 0, 0, 0);
-    SobelEdgeDetection(in, out, 5);
-    SDL_SaveBMP(out, "sobelTest.bmp");
-    SDL_FreeSurface(in);
-    SDL_FreeSurface(out);
-    return 0;
 }

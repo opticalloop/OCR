@@ -1,13 +1,16 @@
-#include "./trace.h"
+#include "Imagery/Segmentation/trace.h"
 
 void initTraceImage(unsigned int **trace, size_t width, size_t height)
 {
-    trace = malloc(sizeof(unsigned int*)* height);
-    for (size_t y = 0; y < height; y++){
-        trace[y] = malloc(sizeof(unsigned int)*width);
+    trace = malloc(sizeof(unsigned int *) * height);
+    for (size_t y = 0; y < height; y++)
+    {
+        trace[y] = malloc(sizeof(unsigned int) * width);
     }
-    for (size_t y = 0; y < height; y++){
-        for (size_t x = 0; x < width; x++){
+    for (size_t y = 0; y < height; y++)
+    {
+        for (size_t x = 0; x < width; x++)
+        {
             trace[y][x] = 0;
         }
     }
@@ -15,14 +18,14 @@ void initTraceImage(unsigned int **trace, size_t width, size_t height)
 
 void freeTraceImage(unsigned int **trace, size_t height)
 {
-    for (size_t y = 0; y < height; y++){
+    for (size_t y = 0; y < height; y++)
+    {
         free(trace[y]);
     }
     free(trace);
 }
 
-void drawLine(
-    unsigned int **trace, float a, float b, Dot *d1, Dot *d2)
+void drawLine(unsigned int **trace, float a, float b, Dot *d1, Dot *d2)
 { // style be like y = ax+b
     unsigned int firstValue = d1->X;
     unsigned int secondValue = d2->X;
@@ -63,7 +66,8 @@ void printImage(unsigned int **trace, unsigned int width, unsigned int height)
     printf("}\n");
 }
 
-void testCalc(unsigned int **trace, unsigned int width, unsigned int height, int nbTest)
+void testCalc(unsigned int **trace, unsigned int width, unsigned int height,
+              int nbTest)
 {
     for (int i = 0; i < nbTest; i++)
     {
@@ -76,8 +80,8 @@ void testCalc(unsigned int **trace, unsigned int width, unsigned int height, int
     }
 }
 
-void matriceToImage(
-    unsigned int **trace, unsigned int width, unsigned int height)
+void matriceToImage(unsigned int **trace, unsigned int width,
+                    unsigned int height)
 {
     Image image;
     image.width = width;

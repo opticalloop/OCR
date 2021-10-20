@@ -6,6 +6,7 @@
 #include "Imagery/Resize/resize.h"
 #include "Imagery/Rotations/rotations.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Segmentation/houghtransform.h"    
 
 int main(int argc, char *argv[])
 {
@@ -23,9 +24,10 @@ int main(int argc, char *argv[])
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
-
+    reverse_color(image);
+    detection(image);
     // displayImage(image);
-    rotate(image, 180);
+    // rotate(image, 180);
 
     // grayscale(image);
     // blackandwhite(image);
