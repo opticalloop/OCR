@@ -22,7 +22,7 @@ init:
 	$(shell mkdir -p $(SRC:%.c=$(BUILD)/%))
 
 main: $(OBJ)
-	gcc -o $(BUILD)/$@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
+	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 nn:
 	make -C NeuralNetwork nn
@@ -48,7 +48,6 @@ format:
 
 # Clean all trash files
 clean:
-	make -C $(SOURCE_DIR)/GUI clean
 	make -C $(SOURCE_DIR)/Imagery clean
 	make -C $(SOURCE_DIR)/NeuralNetwork clean
 	make -C $(SOURCE_DIR)/Sudoku_Solver clean
