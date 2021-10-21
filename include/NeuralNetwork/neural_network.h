@@ -1,6 +1,13 @@
 #ifndef NEURAL_NETWORK_H
 #define NEURAL_NETWORK_H
 
+#include <SDL/SDL.h>
+#include <err.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h> // To call srand(time(NULL));
+
 typedef struct Neuron
 {
     unsigned int nbWeights;

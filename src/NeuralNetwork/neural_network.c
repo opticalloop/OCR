@@ -1,11 +1,5 @@
 #include "NeuralNetwork/neural_network.h"
 
-#include <SDL/SDL.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h> // To call srand(time(NULL));
-
 // ------ Neuron ------
 
 Neuron newNeuron(unsigned int nbWeights)
@@ -21,10 +15,10 @@ Neuron newNeuron(unsigned int nbWeights)
     if (nbWeights != 0)
     {
         neuron.weights = malloc((nbWeights + 1) * sizeof(double));
-    }
-    else
-    {
-        neuron.weights = malloc(0 * sizeof(double));
+        if (neuron.weights == NULL)
+        {
+            errx(EXIT_FAILURE, "Error while allocating memory");
+        }
     }
     return neuron;
 }
@@ -56,6 +50,10 @@ Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 
     // Allocate memory for neurons, calloc already put the + 1 for the \0
     layer.neurons = malloc((size + 1) * sizeof(struct Neuron));
+    if (layer.neurons == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
 
     // Create all the neurons depending on the size of the previous layer
     for (unsigned int i = 0; i < size; i++)
@@ -92,6 +90,10 @@ Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
 
     // Allocate memory for all layers
     network.layers = malloc((network.nbLayers + 1) * sizeof(struct Layer));
+    if (network.layers == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
 
     // Create the input layer
     network.layers[0] = newLayer(sizeInput, 0);

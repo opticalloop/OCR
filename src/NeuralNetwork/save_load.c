@@ -134,7 +134,7 @@ void launchWeights(Network *network, char *path)
     *network = newNetwork(network->sizeInput, nbNodePerHidden, nbHidden,
                           network->sizeOutput);
 
-    int layerIndex = 0;
+    int layerIndex = 1;
     int neuronIndex = 0;
     int weightIndex = 0;
 
@@ -162,11 +162,11 @@ void launchWeights(Network *network, char *path)
                 char c = getc(file);
                 if (c == '\n')
                 {
-                    neuronIndex = (int)((int)chr - (int)'0');
+                    neuronIndex = (int)(chr - '0');
                 }
                 else
                 {
-                    neuronIndex = (int)((chr - '0'));
+                    neuronIndex = (int)(chr - '0');
                 }
                 weightIndex = 0;
             }

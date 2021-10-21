@@ -44,6 +44,8 @@ int main(int argc, char **argv)
 
     readGrid(grid, argv[1], verbose);
 
+    basicPrint(grid);
+
     if (!isSolvable(grid))
     {
         errx(EXIT_FAILURE, "Grid can't be solved\n");
@@ -55,8 +57,7 @@ int main(int argc, char **argv)
         printf("%s", argv[1]);
         printf(" is solvable\n");
         printf("    🔧 Solving ");
-        printf("%s", argv[1]);
-        printf("\n");
+        printf("%s\n", argv[1]);
     }
 
     time_t t1 = time(NULL);
@@ -72,6 +73,8 @@ int main(int argc, char **argv)
     printf("    ✅ Solved grid in %fs\n", diff);
 
     strcat(argv[1], ".result");
+
+    basicPrint(grid);
 
     saveGrid(grid, argv[1], verbose);
 
