@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     grayscale(image);
     Preprocessing(image);
 
+    // rotate(image, -30);
+
     saveImage(image, argv[2]);
 
     freeImage(image);

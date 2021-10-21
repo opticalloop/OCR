@@ -2,6 +2,9 @@
 
 #define WEIGHT_PATH "src/NeuralNetwork/Weights/weights.txt"
 
+#define NB_HIDDEN 2
+#define SIZE_HIDDEN 32
+
 static void printVerbose(int verbose, char *message)
 {
     if (verbose)
@@ -31,7 +34,7 @@ void OCR(char *image_path, char *output_path, int verbose)
 
     // Recognisation + Construction
     printVerbose(verbose, "    📊 Creating neural network\n");
-    Network network = newNetwork(NBINPUTS, 2, 32, NBOUTPUTS);
+    Network network = newNetwork(NBINPUTS, SIZE_HIDDEN, NB_HIDDEN, NBOUTPUTS);
 
     printVerbose(verbose, "    💾 Initing weights\n");
     launchWeights(&network, WEIGHT_PATH);

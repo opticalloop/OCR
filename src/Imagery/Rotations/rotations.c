@@ -38,9 +38,13 @@ void rotate(Image *image, double angleDegree)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            _pixels[x][y].r = 255;
-            _pixels[x][y].g = 255;
-            _pixels[x][y].b = 255;
+            _pixels[x][y].r = image->pixels[x][y].r;
+            _pixels[x][y].g = image->pixels[x][y].g;
+            _pixels[x][y].b = image->pixels[x][y].b;
+
+            image->pixels[x][y].r = 0;
+            image->pixels[x][y].g = 0;
+            image->pixels[x][y].b = 0;
         }
     }
 
@@ -65,22 +69,21 @@ void rotate(Image *image, double angleDegree)
             if (newX > 0 && newX < width && newY > 0 && newY < height)
             {
                 // Get the pixel on the copied image
-                pixel = image->pixels[x][y];
+                pixel = _pixels[x][y];
 
                 // Assign the pixel
-                _pixels[newX][newY].r = pixel.r;
-                _pixels[newX][newY].g = pixel.g;
-                _pixels[newX][newY].b = pixel.b;
+                image->pixels[newX][newY].r = pixel.r;
+                image->pixels[newX][newY].g = pixel.g;
+                image->pixels[newX][newY].b = pixel.b;
             }
         }
     }
 
     for (unsigned int i = 0; i < width; i++)
     {
-        free(image->pixels[i]);
+        free(_pixels[i]);
     }
-    free(image->pixels);
-    image->pixels = _pixels;
+    free(_pixels);
 }
 
 double detectDiffAngle(Image *image, float precision)
