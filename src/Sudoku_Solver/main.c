@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
+#include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
 #include "Sudoku_Solver/sudoku_solver.h"
 
 #define true 1
@@ -50,14 +52,24 @@ int main(int argc, char **argv)
     if (verbose)
     {
         printf("    📈 ");
-        printf(argv[1]);
+        printf("%s", argv[1]);
         printf(" is solvable\n");
         printf("    🔧 Solving ");
-        printf(argv[1]);
+        printf("%s", argv[1]);
         printf("\n");
     }
 
+    time_t t1 = time(NULL);
     solveSuduko(grid, 0, 0);
+    time_t t2 = time(NULL);
+    double diff = difftime(t1, t2);
+
+    if (!isSolved(grid))
+    {
+        errx(EXIT_FAILURE, "⛔ Error solving the grid");
+    }
+
+    printf("    ✅ Solved grid in %fs\n", diff);
 
     strcat(argv[1], ".result");
 
