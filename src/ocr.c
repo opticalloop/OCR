@@ -26,6 +26,9 @@ void OCR(char *image_path, char *output_path, int verbose)
     // Segmentation
     SDL_Surface **all_cases = NULL;
 
+    // Free image
+    freeImage(&image);
+
     // Recognisation + Construction
     printVerbose(verbose, "    📊 Creating neural network\n");
     Network network = newNetwork(NBINPUTS, 2, 32, NBOUTPUTS);

@@ -7,6 +7,13 @@
 #include <string.h>
 #include <unistd.h>
 
+static char isNumber(char text)
+{
+    if ((text < '0' || text > '9'))
+        return 0;
+    return 1;
+}
+
 static void writeToFile(FILE *path, double number, char *extra)
 {
     char str[20];
@@ -39,7 +46,7 @@ void saveWeights(Network *network, char *path)
     if (access(path, F_OK) == 0)
     {
         printf("Specified file path to save the neural network already exist\n"
-               "Do you want to overwrite it ? [Y/n] ");
+               "Do you want to overwrite it ? [Y/n] : ");
 
         // Get input result, should be y or n (caps doens't import)
         char answer = toupper(getchar());
@@ -61,7 +68,6 @@ void saveWeights(Network *network, char *path)
 
     // Write number of hidden layers and node per hidden
     char str[50];
-    fputs("&", file);
     if (network->nbLayers - 2 > 0)
     {
         sprintf(str, "%d|%d\n", (int)(network->nbLayers - 2),
@@ -76,19 +82,19 @@ void saveWeights(Network *network, char *path)
     // First layer don't have any weight
     for (unsigned int i = 1; i < network->nbLayers; i++)
     {
-        writeToFile(file, (double)i, "## ");
-
+        // writeToFile(file, (double)i, "## ");
+        fputs("##", file);
         for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
         {
-            writeToFile(file, (double)j, "# ");
-
+            // writeToFile(file, (double)j, "# ");
+            fputs("\n#\n", file);
             for (unsigned int k = 0;
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
                 writeToFile(file, network->layers[i].neurons[j].weights[k],
                             k == 0 ? "" : "|");
             }
-            fputs("|", file);
+            fputs("|\n", file);
         }
     }
 
@@ -108,27 +114,36 @@ void launchWeights(Network *network, char *path)
     int nbHidden = 0;
     int nbNodePerHidden = 0;
 
-    if (chr == '&')
+    // Check number of hidden and hidden
+    char str[1000];
+    memset(str, 0, sizeof(str));
+    while (chr != EOF && chr != '|' && isNumber(chr))
     {
-        // Check number of hidden and hidden
-        char str[50];
-        for (chr = getc(file); chr != EOF && chr != '|'; chr = getc(file))
-        {
-            strncat(str, &chr, 1);
-        }
-        if (chr != EOF)
-        {
-            nbHidden = atoi(str);
-        }
-        memset(str, 0, sizeof(str));
-        for (chr = getc(file); chr != EOF && chr != '|'; chr = getc(file))
-        {
-            strncat(str, &chr, 1);
-        }
-        if (chr != EOF)
-        {
-            nbNodePerHidden = atoi(str);
-        }
+        strncat(str, &chr, 1);
+        chr = getc(file);
+    }
+    if (chr != EOF)
+    {
+        nbHidden = atoi(str);
+    }
+    else
+    {
+        errx(EXIT_FAILURE, "File too short");
+    }
+    memset(str, 0, sizeof(str));
+    chr = getc(file);
+    while (chr != EOF && chr != '|')
+    {
+        strncat(str, &chr, 1);
+        chr = getc(file);
+    }
+    if (chr != EOF)
+    {
+        nbNodePerHidden = atoi(str);
+    }
+    else
+    {
+        errx(EXIT_FAILURE, "File too short");
     }
 
     *network = newNetwork(network->sizeInput, nbNodePerHidden, nbHidden,
@@ -148,26 +163,14 @@ void launchWeights(Network *network, char *path)
             // New layer
             if (chr == '#')
             {
-                chr = getc(file); // Should be a ' '
-                chr = getc(file); // Number of the layer
-                layerIndex = (int)((int)chr - (int)'0');
+                layerIndex++;
+                neuronIndex = -1;
                 weightIndex = 0;
-                neuronIndex = 0;
             }
             // New neuron
-            else if (chr == ' ')
+            else if (chr == '\n')
             {
-                chr = getc(file); // Number of the neuron
-                // Need to check if it's 2 digit
-                char c = getc(file);
-                if (c == '\n')
-                {
-                    neuronIndex = (int)(chr - '0');
-                }
-                else
-                {
-                    neuronIndex = (int)(chr - '0');
-                }
+                neuronIndex++;
                 weightIndex = 0;
             }
         }
@@ -190,7 +193,8 @@ void launchWeights(Network *network, char *path)
             weightIndex++;
         }
         else
-        { // Append digit or - and .
+        {
+            // Append digit or - and .
             strncat(tempStr, &chr, 1);
         }
     }
