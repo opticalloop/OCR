@@ -2,22 +2,24 @@
 
 void detection(Image *image)
 {
-    Graph *accumulator = houghtransform(image, 1.0);
+    Graph *accumulator = houghtransform(image, 0.5);
     printGraph(accumulator);
     // unsigned int m = graphMediane(accumulator);
-    unsigned int m = graphAverage(accumulator);
-    unsigned int **imageDrawn;
-    imageDrawn == lineSimplication(accumulator, image, m);
-
+    // unsigned int **imageDrawn;
+    // imageDrawn = lineSimplication(accumulator, image, m);
     freeGraph(accumulator);
-    freeMatrice(imageDrawn, image->height);
+    // freeMatrice(imageDrawn, image->height);
 }
 
 Graph* houghtransform(Image *image, double delta)
 {
     // Initialisation of accumaltor graph
-    Graph accumulator;
-    initGraph(&accumulator, image);
+    Graph acc; 
+    acc.negativeRho = NULL;
+    acc.positiveRho = NULL;
+    Graph *accumulator = &acc;
+    initGraph(accumulator, image);
+    //printGraph(accumulator);
 
     for (size_t y = 0; y < image->height; y++)
     {
@@ -28,18 +30,18 @@ Graph* houghtransform(Image *image, double delta)
                 for (double theta = 0.0; theta <= 180.0; theta += delta)
                 {
                     long rho = (long)(x * cos(theta)) + (long)(y * sin(theta));
-                    addGraph(&accumulator, rho, theta);
+                    addGraph(accumulator, rho, theta);
                 }
             }
         }
     }
-    return &accumulator;
+    return accumulator;
 }
 
-unsigned int** lineSimplication(Graph *accumulator, Image *image,
-                                unsigned int treshold)
-{
-    unsigned int **imageDrawn = initMatrice(image->width, image->height);
+// unsigned int** lineSimplication(Graph *accumulator, Image *image,
+//                                 unsigned int treshold)
+// {
+//     // unsigned int **imageDrawn = initMatrice(image->width, image->height);
     
-    return imageDrawn;
-}
+//     // return imageDrawn;
+// }
