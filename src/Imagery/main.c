@@ -6,7 +6,10 @@
 #include "Imagery/Rotations/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
+<<<<<<< HEAD
 
+=======
+>>>>>>> f90baff33fc1812ff3468a368a32b046d298e3d2
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -24,7 +27,16 @@ int main(int argc, char *argv[])
     Image *image = &_image;
     newImage(image);
 
-    // Stuff to be shown
+    // displayImage(image);
+    // rotate(image, 180);
+
+    grayscale(image);
+    Preprocessing(image);
+
+    // blackandwhite(image);
+    // autoRotate(image, 0.01);
+
+    // resizeImage(image, 1280, 720);
 
     saveImage(image, argv[2]);
 

@@ -22,7 +22,7 @@ init:
 	$(shell mkdir -p $(SRC:%.c=$(BUILD)/%))
 
 main: $(OBJ)
-	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
+	gcc -o $(BUILD)/$@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 nn:
 	make -C NeuralNetwork nn

@@ -42,5 +42,5 @@ Pixel InstantiatePixelZero();
 Pixel **copyPixelsArray(Image *image);
 
 void freeMatrixArray(Pixel **mask, int w, int h);
-
+void updateNeigbourgs(Image *image);
 #endif
