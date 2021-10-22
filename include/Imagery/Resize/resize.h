@@ -9,8 +9,9 @@
 /*
  *  Summary:
  *      Resize an image with the dimension wanted
- * 
- *  @param:
+ *      Usign the algorithme of bilinear interpolation
+ *
+ *  Params:
  *      *image: the image we want to resize
  *      width: the width of the output image
  *      height: the height of the output image
