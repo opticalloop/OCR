@@ -102,8 +102,13 @@ void saveWeights(Network *network, char *path)
     fclose(file);
 }
 
-void launchWeights(Network *network, char *path)
+void launchWeights(Network *network, char *path, int verbose)
 {
+    if (verbose)
+    {
+        printf("--> 💾 Initing weights from %s\n", path);
+    }
+
     // Open file
     FILE *file;
     file = fopen(path, "r");
@@ -180,8 +185,8 @@ void launchWeights(Network *network, char *path)
         }
         else if (chr == '|')
         {
-            printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-                   neuronIndex, weightIndex, atof(tempStr));
+            // printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+            //       neuronIndex, weightIndex, atof(tempStr));
 
             // Save weights
             network->layers[layerIndex]

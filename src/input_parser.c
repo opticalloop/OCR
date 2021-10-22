@@ -4,13 +4,18 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "Imagery/Utils/op.h"
 #include "NeuralNetwork/XOR.h"
 #include "NeuralNetwork/save_load.h"
 #include "NeuralNetwork/training.h"
 #include "ocr.h"
 
+#define WEIGHT_PATH "src/NeuralNetwork/Weights/w.data"
+#define NB_HIDDEN 2
+#define SIZE_HIDDEN 32
+
 /*
- * Check if the condition is true, if so error
+ * Check if the condition is true, if so print the error
  */
 static void checkError(int condition, char *message)
 {
@@ -73,8 +78,8 @@ static void printHelpNN()
         "train the "
         "network with the speficied number of hidden layer and node per "
         "hidden layer epoch time \n"
-        "      -reset : reset weights of the neural network (need to train "
-        "the network after doing that)\n"
+        "      -test <image_path> : network prediction on the number (should "
+        "be 28 * 28)\n"
         "      -v --verbose : print details of process\n"
         "      -L --load <weight_path> : launch the network before train\n"
         "      -S --save <weight_path> : save the network after train\n"
@@ -161,6 +166,9 @@ static void analyzeOCR(int argc, char **argv)
 static void analyzeNN(int argc, char **argv)
 {
     int verbose = 0;
+
+    int test = 0;
+    char test_input_path[100] = "";
 
     char launch_path[100] = "";
     char save_path[100] = "";
@@ -299,20 +307,66 @@ static void analyzeNN(int argc, char **argv)
                 }
             }
         }
+        else if (!strcmp(argv[i], "-test"))
+        {
+            test = 1;
+            i++;
+            checkError(i >= argc,
+                       "⛔ You need to specify a path for the file to save"
+                       ". See --help for more");
+
+            if (!strcmp(argv[i], "--help"))
+            {
+                printHelpNN();
+                return;
+            }
+            strcpy(test_input_path, argv[i]);
+        }
     }
 
-    checkError(!(xor^trainOnImg),
+    checkError(trainOnImg && xor,
                "⛔ You're not supposed to train the network on the xor and "
                "images function at the same time"
                ". See --help for more");
 
+    if (!(trainOnImg && xor) && test)
+    {
+        Network network;
+        network.sizeInput = NBINPUTS;
+        network.sizeOutput = NBOUTPUTS;
+        if (verbose)
+        {
+            printf("    🔨 Creating network\n");
+        }
+        launchWeights(&network, WEIGHT_PATH, verbose);
+
+        if (verbose)
+        {
+            printf("    💻 Opening %s\n", test_input_path);
+        }
+        SDL_Surface *surface = load_image(test_input_path);
+
+        int output = getNetworkOutput(&network, surface, verbose);
+        printf("<-- ✅ Output : %d\n", output);
+        freeNetwork(&network);
+        SDL_FreeSurface(surface);
+    }
+
     if (trainOnImg)
     {
+        checkError(test,
+                   "⛔ You're not supposed to train the network and "
+                   "test it at the same time"
+                   ". See --help for more");
         train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path,
               "src/NeuralNetwork/Digits-Only/");
     }
     else if (xor)
     {
+        checkError(test,
+                   "⛔ You're not supposed to train the network on the xor and "
+                   "test it at the same time"
+                   ". See --help for more");
         launchXOR(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
         return;
     }
@@ -333,6 +387,10 @@ int main(int argc, char **argv)
     else if (!strcmp(argv[1], "nn"))
     {
         analyzeNN(argc, argv);
+    }
+    else if (!strcmp(argv[1], "--help"))
+    {
+        printHelp();
     }
     else
     {

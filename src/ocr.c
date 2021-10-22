@@ -1,6 +1,6 @@
 #include "ocr.h"
 
-#define WEIGHT_PATH "src/NeuralNetwork/Weights/weights.txt"
+#define WEIGHT_PATH "src/NeuralNetwork/Weights/w.data"
 
 #define NB_HIDDEN 2
 #define SIZE_HIDDEN 32
@@ -24,6 +24,7 @@ void OCR(char *image_path, char *output_path, int verbose)
 
     // Preprocessing
     printVerbose(verbose, "    🎨 Preprocessing image\n");
+    grayscale(&image);
     Preprocessing(&image);
 
     // Segmentation
@@ -45,7 +46,8 @@ void OCR(char *image_path, char *output_path, int verbose)
     {
         for (unsigned int j = 0; j < dim; j++)
         {
-            grid[i][j] = getNetworkOutput(&network, all_cases[i * dim + j]);
+            grid[i][j] =
+                getNetworkOutput(&network, all_cases[i * dim + j], verbose);
         }
     }
     freeNetwork(&network);

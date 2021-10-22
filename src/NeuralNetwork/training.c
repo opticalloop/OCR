@@ -115,11 +115,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     }
     else
     {
-        if (verbose)
-        {
-            printf("--> 💾 Initing weights from %s\n", launch_path);
-        }
-        launchWeights(network, launch_path);
+        launchWeights(network, launch_path, verbose);
     }
 
     double errorRate = 0.0;
@@ -192,8 +188,12 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     freeNetwork(network);
 }
 
-int getNetworkOutput(Network *network, SDL_Surface *image)
+int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
 {
+    if (verbose)
+    {
+        printf("    📈 Getting network output\n");
+    }
     double inputs[NBINPUTS];
     imageToBinary(image, inputs);
     frontPropagation(network, inputs);

@@ -13,7 +13,7 @@
 #include "NeuralNetwork/neural_network.h"
 #include "NeuralNetwork/save_load.h"
 
-#define NBIMAGES 1000
+#define NBIMAGES 37503
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 9
 
@@ -79,8 +79,9 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
  * Params :
  *  *network : the network already trained
  *  *image : the image to identify
+ *  verbose : print the details
  * return :
  *   number shown in the image
  */
 
-int getNetworkOutput(Network *network, SDL_Surface *image);
+int getNetworkOutput(Network *network, SDL_Surface *image, int verbose);
