@@ -1,5 +1,4 @@
 #include "Imagery/Resize/resize.h"
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 static double bilinearly_interpolate(unsigned int top, unsigned int bottom,
                                      unsigned int left, unsigned int right,
@@ -53,9 +52,9 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
             double oldx = x / xscale;
             double oldy = y / yscale;
 
-            unsigned int top = MIN(floor(oldy), height - 1);
+            unsigned int top = floor(oldy);
             unsigned int bottom = top + 1;
-            unsigned int left = MIN(floor(oldx), width - 1);
+            unsigned int left = floor(oldx);
             unsigned int right = left + 1;
 
             if (top < height && left < width && bottom < height

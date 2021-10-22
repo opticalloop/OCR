@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);
-    Image newimage = resize(image, 28, 28);
+    Image newimage = resize(image, 100, 100);
 
     saveImage(&newimage, argv[2]);
 
