@@ -1,12 +1,5 @@
 #include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 
-#include <SDL/SDL.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "Imagery/Utils/image.h"
-
 void basicPrint(unsigned int grid[dim][dim])
 {
     printf("\n");
@@ -30,7 +23,7 @@ void basicPrint(unsigned int grid[dim][dim])
     }
 }
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[])
+void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
 {
     FILE *fp;
 
@@ -38,8 +31,14 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
 
     if (fp == NULL)
     {
-        errx(EXIT_FAILURE, "Read Grid : File doesn't exist.");
+        errx(EXIT_FAILURE, "Can't read the input file : File doesn't exist.");
         return;
+    }
+
+    if (verbose)
+    {
+        printf("--> 📂 Reading ");
+        printf("%s\n", inputPath);
     }
 
     char ch = 0;
@@ -51,6 +50,7 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
     {
         for (int j = 0; j < 12 && (ch = fgetc(fp)) != EOF; j++)
         {
+            printf("%d : %c\n", j, ch);
             if (ch == '\n' || ch == '\0' || ch == ' ')
             {
                 if (i == 3 || i == 7)
@@ -63,6 +63,10 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
 
             if (ch != '.')
             {
+                if (ch < '0' || ch > '9')
+                {
+                    errx(EXIT_FAILURE, "Error in file");
+                }
                 grid[xIndex][yIndex] = ch - '0';
             }
             yIndex++;
@@ -73,12 +77,19 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
     fclose(fp);
 }
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[])
+void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 {
     FILE *f = fopen(outputPath, "w");
     if (f == NULL)
     {
         errx(EXIT_FAILURE, "Error opening file!\n");
+    }
+
+    if (verbose)
+    {
+        printf("<-- 📂 Saving grid to ");
+        printf("%s", outputPath);
+        printf("\n");
     }
 
     for (unsigned int i = 0; i < dim; i++)
@@ -109,7 +120,7 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[])
     }
     fclose(f);
 }
-
+/*
 Image createSudokuImage(unsigned int grid[dim][dim])
 {
     Image image;
@@ -142,9 +153,9 @@ Image createSudokuImage(unsigned int grid[dim][dim])
     unsigned int increment = 2;
     unsigned int posX;
     unsigned int posY;
-    SDL_Rect rect;
-    rect.w = 28;
-    rect.h = 28;
+    // SDL_Rect rect;
+    // rect.w = 28;
+    // rect.h = 28;
     for (unsigned int i = 0; i < dim; i++)
     {
         for (unsigned int j = 0; j < dim; j++)
@@ -155,8 +166,8 @@ Image createSudokuImage(unsigned int grid[dim][dim])
             }
             posX = i * 29 + increment;
             posY = j * 29 + increment;
-            rect.x = posX;
-            rect.y = posY;
+            // rect.x = posX;
+            // rect.y = posY;
             // printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX,
             // posY); Put image at posX and posY
 
@@ -182,4 +193,4 @@ Image createSudokuImage(unsigned int grid[dim][dim])
     freeImage(&image);
 
     return image;
-}
+}*/
