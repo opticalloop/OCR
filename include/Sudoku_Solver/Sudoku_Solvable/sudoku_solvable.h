@@ -1,6 +1,8 @@
 #ifndef SOLVABLE_H
 #define SOLVABLE_H
 
+#include <stdio.h>
+
 #define dim 9
 
 unsigned int isRowSolvable(unsigned int grid[dim][dim], unsigned int y);

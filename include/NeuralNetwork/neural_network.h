@@ -1,6 +1,13 @@
 #ifndef NEURAL_NETWORK_H
 #define NEURAL_NETWORK_H
 
+#include <SDL/SDL.h>
+#include <err.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h> // To call srand(time(NULL));
+
 typedef struct Neuron
 {
     unsigned int nbWeights;
@@ -40,19 +47,24 @@ void freeLayer(Layer *layer);
 // ------ Network ------
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
                    unsigned int nbHiddenLayers, unsigned int sizeOutput);
-void initNetwork(Network *network);
-void frontPropagation(Network *network, double input[]);
-void freeNetwork(Network *network);
-// ------ /Network ------
 
-void backPropagation(Network *network, double expected[]);
+void initNetwork(Network *network);
+
+void frontPropagation(Network *network, double input[]);
+
+void freeNetwork(Network *network);
+
+double backPropagation(Network *network, double expected[]);
 
 void gradientDescent(Network *network);
+// ------ /Network ------
 
 double sigmoid(double x);
 
 double sigmoidPrime(double x);
 
 void printWeights(Network *network);
+
+double averageErrorRate(Network *network);
 
 #endif

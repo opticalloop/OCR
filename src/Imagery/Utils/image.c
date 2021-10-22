@@ -3,6 +3,7 @@
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
+
 static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
                        unsigned int w, unsigned int h)
 {
@@ -124,10 +125,11 @@ void newImage(Image *image)
         }
     }
 }
+
 Pixel **copyPixelsArray(Image *image)
 {
-    unsigned int w = image->width;
-    unsigned int h = image->height;
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
     Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
     if (mask == NULL)
     {
@@ -172,6 +174,7 @@ Pixel **copyPixelsArray(Image *image)
     }
     return mask;
 }
+
 void freeMatrixArray(Pixel **mask, int w, int h)
 {
     for (int i = 0; i < w; ++i)
@@ -275,12 +278,12 @@ void updateNeigbourgs(Image *image)
 
 void freeImage(Image *image)
 {
-    unsigned int width = image->width;
-    unsigned int height = image->height;
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
 
     for (unsigned int x = 0; x < width; x++)
     {
-        for (unsigned int y = 0; y < height; ++y)
+        for (unsigned int y = 0; y < height; y++)
         {
             free(image->pixels[x][y].matrix);
         }
