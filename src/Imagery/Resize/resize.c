@@ -1,5 +1,5 @@
 #include "Imagery/Resize/resize.h"
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y)) 
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 static double bilinearly_interpolate(unsigned int top, unsigned int bottom,
                                      unsigned int left, unsigned int right,
@@ -31,38 +31,44 @@ static double bilinearly_interpolate(unsigned int top, unsigned int bottom,
     return top_block + vertical_progress * (bottom_block - top_block);
 }
 
-Image resize(Image *image, unsigned int newwidth, unsigned int newheight){
-        unsigned int width = image->width;
-        unsigned int height = image->height;
+Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
+{
+    unsigned int width = image->width;
+    unsigned int height = image->height;
 
-        double xscale = newwidth/(double)width;
-        double yscale = newheight/(double)height;
+    double xscale = newwidth / (double)width;
+    double yscale = newheight / (double)height;
 
-        Image newimage;
-        newimage.width = newwidth;
-        newimage.height = newheight;
-        newimage.path = "";
+    Image newimage;
+    newimage.width = newwidth;
+    newimage.height = newheight;
+    newimage.path = "";
 
-        newImage(&newimage);
+    newImage(&newimage);
 
-        for(unsigned int x = 0; x < newwidth; x++){
-            for(unsigned int y = 0; y < newheight; y++){
-                double oldx = x/xscale;
-                double oldy = y/yscale;
+    for (unsigned int x = 0; x < newwidth; x++)
+    {
+        for (unsigned int y = 0; y < newheight; y++)
+        {
+            double oldx = x / xscale;
+            double oldy = y / yscale;
 
-                unsigned int top = MIN(floor(oldy),height-1);
-                unsigned int bottom = top + 1;
-                unsigned int left = MIN(floor(oldx),width-1);
-                unsigned int right = left + 1;
+            unsigned int top = MIN(floor(oldy), height - 1);
+            unsigned int bottom = top + 1;
+            unsigned int left = MIN(floor(oldx), width - 1);
+            unsigned int right = left + 1;
 
-                if(top < height && left < width && bottom < height && right < width){
-                    double pixel = bilinearly_interpolate(top,bottom,left,right,
-                    oldx,oldy,image->pixels);
-                
+            if (top < height && left < width && bottom < height
+                && right < width)
+            {
+                double pixel = bilinearly_interpolate(
+                    top, bottom, left, right, oldx, oldy, image->pixels);
+
                 updatePixelToSameValue(&(newimage.pixels[x][y]), pixel);
-                }
             }
         }
-        freeImage(image);
-        return newimage;
+    }
+
+    freeImage(image);
+    return newimage;
 }

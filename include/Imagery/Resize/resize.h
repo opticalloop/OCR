@@ -1,11 +1,11 @@
 #ifndef RESIZE_H
 #define RESIZE_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <math.h>
+#include <stdio.h>
 
 #include "Imagery/Utils/image.h"
 
-void resizeImage(Image *image, unsigned int newWidth, unsigned int newHeight);
+Image resize(Image *image, unsigned int width, unsigned int height);
 
 #endif
