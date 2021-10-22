@@ -65,8 +65,8 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
                 inputs[j * 28 + i] = 0.0;
             }
 
-
-            // inputs[j * 28 + i] = clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
+            // inputs[j * 28 + i] = clamp(1.0 - ((double)rgb.r / 255.0), 1.0,
+            // 0.0);
         }
     }
 }
