@@ -38,7 +38,7 @@ void OCR(char *image_path, char *output_path, int verbose)
     Network network = newNetwork(NBINPUTS, SIZE_HIDDEN, NB_HIDDEN, NBOUTPUTS);
 
     printVerbose(verbose, "    💾 Initing weights\n");
-    launchWeights(&network, WEIGHT_PATH);
+    launchWeights(&network, WEIGHT_PATH, verbose);
 
     printVerbose(verbose, "    🔨 Creating sudoku grid\n");
     unsigned int grid[dim][dim];

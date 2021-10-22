@@ -25,6 +25,17 @@ static void checkError(int condition, char *message)
     }
 }
 
+/*
+ * Check if verbose, if so print
+ */
+static void printVerbose(int verbose, char *message)
+{
+    if (verbose)
+    {
+        printf("%s", message);
+    }
+}
+
 static void toUp(char *temp)
 {
     char *name;
@@ -334,16 +345,16 @@ static void analyzeNN(int argc, char **argv)
         Network network;
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
-        if (verbose)
-        {
-            printf("    🔨 Creating network\n");
-        }
+        
+        printVerbose(verbose, "    🔨 Creating network\n");
+        
         launchWeights(&network, WEIGHT_PATH, verbose);
 
         if (verbose)
         {
             printf("    💻 Opening %s\n", test_input_path);
         }
+        
         SDL_Surface *surface = load_image(test_input_path);
 
         int output = getNetworkOutput(&network, surface, verbose);

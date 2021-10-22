@@ -55,7 +55,18 @@ void imageToBinary(SDL_Surface *surface, double inputs[])
             pixel = get_pixel(surface, i, j);
             SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            inputs[j * 28 + i] = clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
+            // Black and white
+            if ((rgb.r + rgb.g + rgb.b) / 3 > 128)
+            {
+                inputs[j * 28 + i] = 1.0;
+            }
+            else
+            {
+                inputs[j * 28 + i] = 0.0;
+            }
+
+
+            // inputs[j * 28 + i] = clamp(1.0 - ((double)rgb.r / 255.0), 1.0, 0.0);
         }
     }
 }

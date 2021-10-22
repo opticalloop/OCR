@@ -48,7 +48,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
         {
             printf("--> 💾 Initing weights from %s\n", launch_path);
         }
-        launchWeights(network, launch_path);
+        launchWeights(network, launch_path, verbose);
     }
 
     double errorRate = 0.0;
