@@ -3,6 +3,7 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Color_Treatment/grayscale.h"
+#include "Imagery/Resize/resize.h"
 #include "Imagery/Rotations/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
@@ -21,8 +22,8 @@ int main(int argc, char *argv[])
     // displayImage(image);
     // rotate(image, 180);
 
-    // grayscale(image);
-    // Preprocessing(image);
+    grayscale(image);
+    Preprocessing(image);
 
     // blackandwhite(image);
     // autoRotate(image, 0.01);
