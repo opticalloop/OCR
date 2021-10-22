@@ -42,6 +42,8 @@ int main(int argc, char **argv)
 
     readGrid(grid, argv[1], verbose);
 
+    basicPrint(grid);
+
     // Copy array to have different color when saving the image
     unsigned int copy[dim][dim];
     copyArray(grid, copy);
