@@ -1,8 +1,34 @@
 #include "Imagery/Rotations/rotations.h"
 
-#include <err.h>
-#include <math.h>
-#include <stdio.h>
+static double bilinearly_interpolate(unsigned int top, unsigned int bottom,
+                                     unsigned int left, unsigned int right,
+                                     double horizontal_position,
+                                     double vertical_position, Pixel **pixels)
+{
+    // Determine the values of the corners.
+    double top_left = pixels[left][top].r;
+    double top_right = pixels[right][top].r;
+    double bottom_left = pixels[left][bottom].r;
+    double bottom_right = pixels[right][bottom].r;
+
+    // Figure out "how far" the output pixel being considered is
+    // between *_left and *_right.
+    double horizontal_progress = horizontal_position - (double)left;
+    double vertical_progress = vertical_position - (double)top;
+
+    // Combine top_left and top_right into one large, horizontal
+    // block.
+    double top_block = top_left + horizontal_progress * (top_right - top_left);
+
+    // Combine bottom_left and bottom_right into one large, horizontal
+    // block.
+    double bottom_block =
+        bottom_left + horizontal_progress * (bottom_right - bottom_left);
+
+    // Combine the top_block and bottom_block using vertical
+    // interpolation and return as the resulting pixel.
+    return top_block + vertical_progress * (bottom_block - top_block);
+}
 
 void rotate(Image *image, double angleDegree)
 {
@@ -12,7 +38,7 @@ void rotate(Image *image, double angleDegree)
     const double middleX = ((double)width / 2.0);
     const double middleY = ((double)height / 2.0);
 
-    const double angle = (angleDegree / 360.0) * 2.0 * M_PI;
+    const double angle = angleDegree * M_PI / 180.0;
 
     // Create two dimensional array of pixels
     Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
@@ -41,14 +67,8 @@ void rotate(Image *image, double angleDegree)
             _pixels[x][y].r = image->pixels[x][y].r;
             _pixels[x][y].g = image->pixels[x][y].g;
             _pixels[x][y].b = image->pixels[x][y].b;
-
-            image->pixels[x][y].r = 0;
-            image->pixels[x][y].g = 0;
-            image->pixels[x][y].b = 0;
         }
     }
-
-    Pixel pixel;
 
     unsigned int newX;
     unsigned int newY;
@@ -64,17 +84,21 @@ void rotate(Image *image, double angleDegree)
                                            + sin(angle) * ((double)x - middleX))
                                   + middleY);
 
-            // Assign it into new image and make sure he is in the image
-            // Warning : unsigned int never = 0
-            if (newX > 0 && newX < width && newY > 0 && newY < height)
-            {
-                // Get the pixel on the copied image
-                pixel = _pixels[x][y];
+            // Get the four locations around pixels
+            // floor() : Round at inferior
+            unsigned int top = floor(newY);
+            unsigned int bottom = top + 1;
+            unsigned int left = floor(newX);
+            unsigned int right = left + 1;
 
-                // Assign the pixel
-                image->pixels[newX][newY].r = pixel.r;
-                image->pixels[newX][newY].g = pixel.g;
-                image->pixels[newX][newY].b = pixel.b;
+            // Check if any of the four locations are invalid. If so,
+            // skip interpolating this pixel
+            // Unsigned int : always > 0
+            if (top > 0 && bottom < height && left > 0 && right < width)
+            {
+                unsigned int interpolated = bilinearly_interpolate(
+                    top, bottom, left, right, newX, newY, _pixels);
+                updatePixelToSameValue(&(image->pixels[x][y]), interpolated);
             }
         }
     }

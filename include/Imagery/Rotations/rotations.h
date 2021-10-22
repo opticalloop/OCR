@@ -3,6 +3,9 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <err.h>
+#include <math.h>
+#include <stdio.h>
 
 #include "Imagery/Utils/image.h"
 
