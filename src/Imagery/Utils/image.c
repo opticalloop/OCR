@@ -52,7 +52,7 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
 void newImage(Image *image)
 {
     SDL_Surface *surface = !strcmp(image->path, "")
-        ? SDL_CreateRGBSurface(0, 266, 266, 24, 0, 0, 0, 0)
+        ? SDL_CreateRGBSurface(0, image->width, image->height, 32, 0, 0, 0, 0)
         : load_image(image->path);
 
     const unsigned int width = surface->w;

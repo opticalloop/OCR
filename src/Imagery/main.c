@@ -24,14 +24,21 @@ int main(int argc, char *argv[])
     Image *image = &_image;
     newImage(image);
 
-    grayscale(image);
+    // displayImage(image);
+    // rotate(image, 180);
+
+    // grayscale(image);
     // Preprocessing(image);
 
-    rotate(image, 34);
+    // blackandwhite(image);
+    // autoRotate(image, 0.01);
 
-    saveImage(image, argv[2]);
+    // resizeImage(image, 1280, 720);
+    Image newimage = resize(image, 100, 100);
 
-    freeImage(image);
+    saveImage(&newimage, argv[2]);
+
+    freeImage(&newimage);
 
     return 0;
 }
