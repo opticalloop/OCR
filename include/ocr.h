@@ -14,6 +14,17 @@
 #include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
 #include "Sudoku_Solver/sudoku_solver.h"
 
+/*
+ *  Summary:
+ *
+ *  Params:
+ *      *image_path:
+ *      *output_path:
+ *      verbose:
+ *
+ *  Return:
+ *
+ */
 void OCR(char *image_path, char *output_path, int verbose);
 
 #endif
