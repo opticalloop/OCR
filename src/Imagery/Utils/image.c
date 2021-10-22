@@ -125,6 +125,7 @@ void newImage(Image *image)
         }
     }
 }
+
 Pixel **copyPixelsArray(Image *image)
 {
     const unsigned int w = image->width;
@@ -173,6 +174,7 @@ Pixel **copyPixelsArray(Image *image)
     }
     return mask;
 }
+
 void freeMatrixArray(Pixel **mask, int w, int h)
 {
     for (int i = 0; i < w; ++i)

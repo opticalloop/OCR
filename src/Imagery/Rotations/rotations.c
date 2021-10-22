@@ -64,37 +64,44 @@ void rotate(Image *image, double angleDegree)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            _pixels[x][y].r = image->pixels[x][y].r;
-            _pixels[x][y].g = image->pixels[x][y].g;
-            _pixels[x][y].b = image->pixels[x][y].b;
+            // Consider that the image is in grayscale
+            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
+            updatePixelToSameValue(&(image->pixels[x][y]), 0);
         }
     }
 
-    unsigned int newX;
-    unsigned int newY;
+    double newX;
+    double newY;
+    // Four pixels around
+    unsigned int top;
+    unsigned int bottom;
+    unsigned int left;
+    unsigned int right;
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
             // Calculate new position
-            newX = (unsigned int)((double)(cos(angle) * ((double)x - middleX)
-                                           - sin(angle) * ((double)y - middleY))
-                                  + middleX);
-            newY = (unsigned int)((double)(cos(angle) * ((double)y - middleY)
-                                           + sin(angle) * ((double)x - middleX))
-                                  + middleY);
+            newX = ((double)(cos(angle) * ((double)x - middleX)
+                             - sin(angle) * ((double)y - middleY))
+                    + middleX);
+            newY = ((double)(cos(angle) * ((double)y - middleY)
+                             + sin(angle) * ((double)x - middleX))
+                    + middleY);
 
             // Get the four locations around pixels
             // floor() : Round at inferior
-            unsigned int top = floor(newY);
-            unsigned int bottom = top + 1;
-            unsigned int left = floor(newX);
-            unsigned int right = left + 1;
+            top = floor(newY);
+            bottom = top + 1;
+            left = floor(newX);
+            right = left + 1;
 
             // Check if any of the four locations are invalid. If so,
             // skip interpolating this pixel
-            // Unsigned int : always > 0
-            if (top > 0 && bottom < height && left > 0 && right < width)
+            // Unsigned int : always > 0, so dont need to check if top and left
+            // are superior to 0
+            if (top < height && bottom < height && left < width
+                && right < width)
             {
                 unsigned int interpolated = bilinearly_interpolate(
                     top, bottom, left, right, newX, newY, _pixels);
