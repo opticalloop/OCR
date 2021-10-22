@@ -27,17 +27,18 @@ int main(int argc, char *argv[])
     // displayImage(image);
     // rotate(image, 180);
 
-    grayscale(image);
-    Preprocessing(image);
+    //grayscale(image);
+    //Preprocessing(image);
 
     // blackandwhite(image);
     // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);
+    Image newimage = resize(image, 28,28);
 
-    saveImage(image, argv[2]);
+    saveImage(&newimage, argv[2]);
 
-    freeImage(image);
+    freeImage(&newimage);
 
     return 0;
 }
