@@ -1,4 +1,4 @@
-make \
+make && \
 ./main image_01.jpeg t1.bmp || \
 ./main image_02.jpeg t2.bmp || \
 ./main image_03.jpeg t3.bmp || \
