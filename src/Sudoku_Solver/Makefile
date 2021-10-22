@@ -1,6 +1,6 @@
 CC=gcc -I../../include/
 
-CPPFLAGS = `pkg-config --cflags sdl` -MMD
+CPPFLAGS = `pkg-config --cflags sdl` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lm
 LDLIBS = `pkg-config --libs sdl SDL_image`
