@@ -162,7 +162,6 @@ void launchWeights(Network *network, char *path, int verbose)
     // For each character
     while ((chr = getc(file)) != EOF)
     {
-        printf("chr : %c\n", chr);
         // New neuron or layer
         if (chr == '#')
         {
