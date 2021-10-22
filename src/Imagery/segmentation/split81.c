@@ -1,4 +1,4 @@
-#include "split81.h"
+#include"Imagery/segmentation/split81.h"
 
 int isBlackLine(Image image, unsigned int y)
 {
@@ -71,7 +71,7 @@ typedef struct
     unsigned int yend;
 } coordonnes;
 
-void split(Image image, SDL_Surface *seg81[], int save)
+void split(Image image, SDL_Surface *seg81[], int save, char *imagename)
 {
     const unsigned int width = image.width;
     const unsigned int height = image.height;
@@ -80,6 +80,12 @@ void split(Image image, SDL_Surface *seg81[], int save)
     unsigned int ystart = 0;
     coordonnes coorarray[9];
     unsigned int i = 0;
+
+    char directory[200];
+    snprintf(directory,sizeof(directory), "mkdir %s",imagename);
+    printf("%s",directory);
+    system(directory);
+
     for (unsigned int y = 0; y < height && i < 9; y++)
     {
         if (!isBlackLine(image, y))
@@ -144,7 +150,9 @@ void split(Image image, SDL_Surface *seg81[], int save)
                 char str[200];
                 int dizaine = iall/9;
                 int unite = iall % 9;
-                snprintf(str,sizeof(str),"%d%d.bmp",dizaine,unite);
+
+                snprintf(str,sizeof(str),"%s/%d%d.bmp",imagename,dizaine,unite);
+
                 printf("%s\n",str);
                 if(SDL_SaveBMP(surface,str) != 0){
                     printf("SDL_SaveBMP failed: %s\n",SDL_GetError());
@@ -154,13 +162,10 @@ void split(Image image, SDL_Surface *seg81[], int save)
         i++;
         y += ytaille;
         for (; i < 9 && y < height
-               && image.pixels[coorarray[0].xstart][y].r == 255;
-             y++)
-            ;
+               && image.pixels[coorarray[0].xstart][y].r == 255;y++);
+
         for (; i < 9 && y < height
-               && image.pixels[coorarray[0].xstart][y].r == 0;
-             y++)
-            ;
+               && image.pixels[coorarray[0].xstart][y].r == 0;y++);
     }
 }
 
