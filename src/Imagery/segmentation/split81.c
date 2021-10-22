@@ -1,4 +1,4 @@
-#include"Imagery/segmentation/split81.h"
+#include "Imagery/segmentation/split81.h"
 
 int isBlackLine(Image image, unsigned int y)
 {
@@ -19,9 +19,8 @@ int isBlackLine(Image image, unsigned int y)
  */
 
 void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
-    unsigned int xend, unsigned int yend)
+                  unsigned int xend, unsigned int yend)
 {
-
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
@@ -82,15 +81,14 @@ void split(Image image, SDL_Surface *seg81[], int save, char *imagename)
     unsigned int i = 0;
 
     char directory[200];
-    snprintf(directory,sizeof(directory), "mkdir %s",imagename);
-    printf("%s",directory);
+    snprintf(directory, sizeof(directory), "mkdir %s", imagename);
+    printf("%s", directory);
     system(directory);
 
     for (unsigned int y = 0; y < height && i < 9; y++)
     {
         if (!isBlackLine(image, y))
         {
-
             for (unsigned int x = 0; x < width && i < 9; x++)
             {
                 if (i != 0)
@@ -105,10 +103,9 @@ void split(Image image, SDL_Surface *seg81[], int save, char *imagename)
                         ;
                     for (; y < height && image.pixels[xstart][y].r == 255; y++)
                         ;
-                    coordonnes coord = {.xstart = xstart,
-                        .ystart = ystart,
-                        .xend = x,
-                        .yend = y};
+                    coordonnes coord = {
+                        .xstart = xstart, .ystart = ystart, .xend = x, .yend = y
+                    };
                     coorarray[i] = coord;
                     updateSurface(&image);
                     // SDL_BlitSurface(image.surface, &block,seg81[i], NULL);
@@ -124,53 +121,62 @@ void split(Image image, SDL_Surface *seg81[], int save, char *imagename)
     unsigned int iall = 0;
     for (unsigned int y = coorarray[0].ystart; y < height && i < 9;)
     {
-        for (unsigned int x = 0; x < 9; x++,iall++)
+        for (unsigned int x = 0; x < 9; x++, iall++)
         {
-            //printf("xstart:%d, ystart:%d, xend:%d, yend:%d\n",
+            // printf("xstart:%d, ystart:%d, xend:%d, yend:%d\n",
             //    coorarray[x].xstart, coorarray[x].ystart, coorarray[x].xend,
             //    coorarray[x].yend);
 
             displayblock(&image, coorarray[x].xstart, y, coorarray[x].xend,
-                coorarray[x].yend + y - yinit);
+                         coorarray[x].yend + y - yinit);
 
             block.x = coorarray[x].xstart;
             block.y = y;
             block.w = coorarray[x].xend - coorarray[x].xstart;
-            printf("w= %d\n",block.w);
+            printf("w= %d\n", block.w);
             block.h = coorarray[x].yend - coorarray[x].ystart;
-            
-            SDL_Surface *surface = 
-                SDL_CreateRGBSurface(0,block.w,block.h,24,0,0,0,0);
-            //printf("iall=%d\n",iall);
+
+            SDL_Surface *surface =
+                SDL_CreateRGBSurface(0, block.w, block.h, 24, 0, 0, 0, 0);
+            // printf("iall=%d\n",iall);
             SDL_BlitSurface(image.surface, &block, surface, NULL);
             SDL_Surface *test = display_image(surface);
             SDL_FreeSurface(test);
             seg81[iall] = surface;
-            if(save){
+            if (save)
+            {
                 char str[200];
-                int dizaine = iall/9;
+                int dizaine = iall / 9;
                 int unite = iall % 9;
 
-                snprintf(str,sizeof(str),"%s/%d%d.bmp",imagename,dizaine,unite);
+                snprintf(str, sizeof(str), "%s/%d%d.bmp", imagename, dizaine,
+                         unite);
 
-                printf("%s\n",str);
-                if(SDL_SaveBMP(surface,str) != 0){
-                    printf("SDL_SaveBMP failed: %s\n",SDL_GetError());
+                printf("%s\n", str);
+                if (SDL_SaveBMP(surface, str) != 0)
+                {
+                    printf("SDL_SaveBMP failed: %s\n", SDL_GetError());
                 }
             }
         }
         i++;
         y += ytaille;
         for (; i < 9 && y < height
-               && image.pixels[coorarray[0].xstart][y].r == 255;y++);
+             && image.pixels[coorarray[0].xstart][y].r == 255;
+             y++)
+            ;
 
-        for (; i < 9 && y < height
-               && image.pixels[coorarray[0].xstart][y].r == 0;y++);
+        for (;
+             i < 9 && y < height && image.pixels[coorarray[0].xstart][y].r == 0;
+             y++)
+            ;
     }
 }
 
-void freeList(SDL_Surface *surface[], unsigned int len){
-    for(unsigned int i = 0; i < len; i++){
+void freeList(SDL_Surface *surface[], unsigned int len)
+{
+    for (unsigned int i = 0; i < len; i++)
+    {
         SDL_FreeSurface(surface[i]);
     }
 }
