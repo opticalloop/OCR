@@ -5,8 +5,8 @@
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Resize/resize.h"
 #include "Imagery/Rotations/rotations.h"
+#include "Imagery/Segmentation/houghtransform.h"
 #include "Imagery/Utils/image.h"
-#include "Imagery/Segmentation/houghtransform.h"    
 
 int main(int argc, char *argv[])
 {
