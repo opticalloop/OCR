@@ -60,10 +60,10 @@ void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
 void savesquare(Image *image, unsigned int iall, char *imagename)
 {
     char str[200];
-    int dizaine = iall / 9;
-    int unite = iall % 9;
+    int dozen = iall / 9;
+    int unit = iall % 9;
 
-    snprintf(str, sizeof(str), "%s/%d%d.bmp", imagename, dizaine, unite);
+    snprintf(str, sizeof(str), "%s/%d%d.bmp", imagename, dozen, unit);
     saveImage(image, str);
 }
 
@@ -75,7 +75,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
     printf("width: %d, height: %d\n", width, width);
     unsigned int xstart = 0;
     unsigned int ystart = 0;
-    coordonnes coorarray[9];
+    coordinates coorarray[9];
     unsigned int i = 0;
 
     char directory[200];
@@ -106,7 +106,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                         ;
                     for (; y < height && image->pixels[xstart][y].r == 255; y++)
                         ;
-                    coordonnes coord = {
+                    coordinates coord = {
                         .xstart = xstart, .ystart = ystart, .xend = x, .yend = y
                     };
                     coorarray[i] = coord;
