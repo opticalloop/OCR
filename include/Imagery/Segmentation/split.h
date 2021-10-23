@@ -34,65 +34,50 @@ int isBlackLine(Image *image, unsigned int y);
 
 /*
  *  Summary:
- *
+ *      Put a red square on the image
+ * 
  *  Params:
- *      *image:
- *      xstart:
- *      ystart:
- *      xend:
- *      yend:
+ *      *image: image where we want to draw
+ *      xstart: coordinate of x top right of the block
+ *      ystart: coordinate of y top right of the block
+ *      xend: coordiate of x bottom left of the block
+ *      yend: coordiate of y bottom left of the block
  *
  *  Return:
- *
+ *      Nothing it's directly done to the image
  */
 void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
                   unsigned int xend, unsigned int yend);
 
 /*
  *  Summary:
+ *      save the block taken from the big image
  *
  *  Params:
- *      *image:
+ *      *image: the square taken from the big image
+ *      iall: the position of the square in the grid to know how to name the file
+ *      *imagename: name of the big image
  *
  *  Return:
- *
- */
-void equalsplit(Image *image);
-
-/*
- *  Summary:
- *
- *  Params:
- *      imagename:
- *
- *  Return:
+ *      Nothing it save directly in a folder
  *
  */
 void savesquare(Image *image, unsigned int iall, char *imagename);
 
 /*
- *  Summary:
- *
- *  Params:
- *      image:
- *      seg81:
- *      save:
- *      imagename:
- *
- *  Return:
- *
+Not sure we're going to use it
  */
 void split(Image *image, SDL_Surface *seg81[], int save, char *imagename);
 
 /*
  *  Summary:
- *
+ *      Free a list of SDL_Surface*
  *  Params:
- *      *surface:
- *      len:
+ *      *surface: list to free
+ *      len: len of the list
  *
  *  Return:
- *
+ *      Nothing
  */
 
 void freeList(SDL_Surface *surface[], unsigned int len);
