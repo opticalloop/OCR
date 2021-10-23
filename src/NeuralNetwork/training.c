@@ -1,13 +1,5 @@
 #include "NeuralNetwork/training.h"
 
-/*
- * Clamp the double given between max and min
- */
-static double clamp(double val, double max, double min)
-{
-    return val > max ? max : val < min ? min : val;
-}
-
 void printResult(double expected[], Neuron neuron[])
 {
     // Print expected

@@ -11,11 +11,10 @@ unsigned int isRowSolvable(unsigned int grid[dim][dim], unsigned int y)
     for (unsigned int i = 0; i < dim; i++)
     {
         val = grid[y][i];
-
         if (val != 0)
         {
             // Check if already in row, if yes not solvable
-            for (unsigned int j = i + 1; j < i; j++)
+            for (unsigned int j = i + 1; j < dim; j++)
             {
                 if (grid[y][j] == val)
                 {
@@ -38,7 +37,7 @@ unsigned int isColumnSolvable(unsigned int grid[dim][dim], unsigned int x)
         if (val != 0)
         {
             // Check if already in column, if yes not solvable
-            for (unsigned int j = i + 1; j < i; j++)
+            for (unsigned int j = i + 1; j < dim; j++)
             {
                 if (grid[j][x] == val)
                 {
@@ -67,9 +66,9 @@ unsigned int isSquareSolvable(unsigned int grid[dim][dim], unsigned int x,
             if (val != 0)
             {
                 // Check if val is in the square
-                for (unsigned int k = x + i; k < 3; k++)
+                for (unsigned int k = x + i; k < x + 3; k++)
                 {
-                    for (unsigned int l = y + j + 1; l < 3; l++)
+                    for (unsigned int l = y + j + 1; l < y + 3; l++)
                     {
                         if (grid[k][l] == val)
                         {
@@ -87,31 +86,28 @@ unsigned int isSolvable(unsigned int grid[dim][dim])
 {
     for (unsigned int x = 0; x < dim; x++)
     {
+        if (isColumnSolvable(grid, x) == false)
+        {
+            return false;
+        }
+    }
+
+    for (unsigned int y = 0; y < dim; y++)
+    {
+        if (isRowSolvable(grid, y) == false)
+        {
+            return false;
+        }
+    }
+
+    for (unsigned int x = 0; x < dim; x++)
+    {
         for (unsigned int y = 0; y < dim; y++)
         {
-            if (isRowSolvable(grid, x) == false)
-            {
-                printf("IsSolvable returned false with row check : x = %d and "
-                       "y = %d\n",
-                       x, y);
-                return false;
-            }
-
-            if (isColumnSolvable(grid, y) == false)
-            {
-                printf("IsSolvable returned false with column check : x = %d "
-                       "and y = %d\n",
-                       x, y);
-                return false;
-            }
-
             // Check square only when enter it
             if (y % 3 == 0 && x % 3 == 0
                 && isSquareSolvable(grid, x, y) == false)
             {
-                printf("IsSolvable returned false with square check : x = %d "
-                       "and y = %d\n",
-                       x, y);
                 return false;
             }
         }

@@ -50,7 +50,7 @@ static void toUp(char *temp)
     }
 }
 
-static char isNumber(char *text)
+static int isNumber(char *text)
 {
     int len = strlen(text);
     for (int j = 0; j < len; j++)

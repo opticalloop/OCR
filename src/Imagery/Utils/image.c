@@ -238,10 +238,6 @@ void updateSurface(Image *image)
 
 void saveImage(Image *image, char *path)
 {
-    // Init SDL (malloc inside so need to free at the end)
-    if (SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-
     // Update SDL_Surface inside Image struct
     updateSurface(image);
 
@@ -249,8 +245,6 @@ void saveImage(Image *image, char *path)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-
-    SDL_Quit();
 }
 
 void updatePixelToSameValue(Pixel *pixel, unsigned int value)

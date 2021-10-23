@@ -92,19 +92,11 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
  *      Get the number shown in the image thanks to the network
  *
  * Params :
-<<<<<<< HEAD
- *  *network : the network already trained
- *  *image : the image to identify
- *  verbose : print the details
- * return :
- *   number shown in the image
-=======
  *      *network : the network already trained
  *      *image : the image to identify
  *
  * Return :
- *   Number shown in the image
->>>>>>> 32c5340e3a3eee604bf5faafe88ec9c5e48e4302
+ *      Number shown in the image
  */
 
 int getNetworkOutput(Network *network, SDL_Surface *image, int verbose);
