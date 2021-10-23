@@ -1,4 +1,4 @@
-#include "Imagery/Resize/resize.h"
+#include "Imagery/Rotations_Resize/resize.h"
 
 static double bilinearly_interpolate(unsigned int top, unsigned int bottom,
                                      unsigned int left, unsigned int right,
