@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     int verbose = 0;
 
-    if (argc == 3 && (!strcmp(argv[2], "-v") || !strcmp(argv[2], "-verbose")))
+    if (argc == 3 && (!strcmp(argv[2], "-v") || !strcmp(argv[2], "--verbose")))
     {
         verbose = 1;
     }

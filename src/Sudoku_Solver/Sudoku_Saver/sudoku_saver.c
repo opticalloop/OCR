@@ -48,43 +48,77 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
 
     if (verbose)
     {
-        printf("--> 📂 Reading ");
-        printf("%s\n", inputPath);
+        printf("--> 📂 Reading %s\n", inputPath);
     }
 
     char ch = 0;
+    unsigned int tempGrid[dim * dim];
+    unsigned int index = 0;
 
-    unsigned int xIndex = 0;
-    unsigned int yIndex = 0;
-
-    for (int i = 0; i < 12 && ch != EOF; i++)
+    while ((ch = fgetc(fp)) != EOF)
     {
-        for (int j = 0; j < 12 && (ch = fgetc(fp)) != EOF; j++)
+        if (ch == '.')
         {
-            printf("%d : %c\n", j, ch);
-            if (ch == '\n' || ch == '\0' || ch == ' ')
-            {
-                if (i == 3 || i == 7)
-                {
-                    xIndex--; // Dont move, it's an empty line
-                    break;
-                }
-                continue;
-            }
-
-            if (ch != '.')
-            {
-                if (ch < '0' || ch > '9')
-                {
-                    errx(EXIT_FAILURE, "Error in file");
-                }
-                grid[xIndex][yIndex] = ch - '0';
-            }
-            yIndex++;
+            tempGrid[index] = 0;
         }
-        yIndex = 0;
-        xIndex++;
+        else if (ch > '0' && ch <= '9')
+        {
+            tempGrid[index] = ch - '0';
+        }
+        else if (ch != '\n' && ch != '\0' && ch != ' ')
+        {
+            errx(EXIT_FAILURE, "File doesn't respect the format");
+        }
+        else
+        {
+            continue;
+        }
+        index++;
     }
+
+    for (unsigned int i = 0; i < dim; i++)
+    {
+        for (unsigned int j = 0; j < dim; j++)
+        {
+            grid[i][j] = tempGrid[i * dim + j];
+        }
+    }
+
+    // for (int i = 0; i < 12 && ch != EOF; i++)
+    // {
+    //     for (int j = 0; j < 12 && ch != EOF; j++)
+    //     {
+    //         ch = fgetc(fp);
+    //         if (ch == '\n'
+    //         {
+    //             break;
+    //         }
+    //         // printf("%d : %c\n", j, ch);
+    //         if (ch == '\n' || ch == '\0' || ch == ' ' || ch == EOF)
+    //         {
+    //             if (i == 3 || i == 7)
+    //             {
+    //                 xIndex--; // Dont move, it's an empty line
+    //                 break;
+    //             }
+    //             continue;
+    //         }
+
+    //         if (ch != '.' && ch != EOF)
+    //         {
+    //             if (ch >= '0' && ch <= '9')
+    //             {
+    //                 strncat(tempStr, &ch, 1);
+    //                 printf("x : %u, y : %u\n", xIndex, yIndex);
+    //                 grid[xIndex][yIndex] = atoi(tempStr);
+    //                 memset(tempStr, 0, sizeof(tempStr));
+    //             }
+    //         }
+    //         yIndex++;
+    //     }
+    //     yIndex = 0;
+    //     xIndex++;
+    // // }
     fclose(fp);
 }
 

@@ -3,8 +3,8 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Color_Treatment/grayscale.h"
-#include "Imagery/Resize/resize.h"
-#include "Imagery/Rotations/rotations.h"
+#include "Imagery/Rotations_Resize/resize.h"
+#include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
 #include "Imagery/segmentation/split81.h"
