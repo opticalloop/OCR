@@ -31,8 +31,8 @@
 //             {
 //                 for (double theta = 0.0; theta < 180.0; theta += delta)
 //                 {
-//                     long rho = (long)(x * cos(theta)) + (long)(y * sin(theta));
-//                     addGraph(accumulator, rho, theta);
+//                     long rho = (long)(x * cos(theta)) + (long)(y *
+//                     sin(theta)); addGraph(accumulator, rho, theta);
 //                 }
 //             }
 //         }
@@ -46,7 +46,6 @@
 //     const unsigned int accY = accumulator->generalY;
 //     const unsigned int width = image->width;
 //     const unsigned int height = image->height;
-
 
 //     searchGraph(accumulator, -1413, 0);
 //     unsigned int **imageDrawn = initMatrice(width, height);
@@ -78,7 +77,8 @@
 //         for (double y = 0; y < height; y += delta)
 //         {
 //             int tmpRho = x * cos(theta) + y * sin(theta);
-//             if ((double)(tmpRho) == rho && image->pixels[(unsigned int)x][(unsigned int)y].r)
+//             if ((double)(tmpRho) == rho && image->pixels[(unsigned
+//             int)x][(unsigned int)y].r)
 //             {
 //                 toDraw[(unsigned int)y][(unsigned int)x]++;
 //             }

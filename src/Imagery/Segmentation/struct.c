@@ -1,4 +1,5 @@
 #include "Imagery/Segmentation/struct.h"
+
 #include <assert.h>
 
 static void init(Graph *graph, unsigned int x, int y)
@@ -67,9 +68,9 @@ unsigned int **initMatrice(unsigned int x, unsigned int y)
     {
         errx(1, "Memory error");
     }
-    for (size_t j = 0; j < y ; j++)
+    for (size_t j = 0; j < y; j++)
     {
-        matrice[j] = calloc(x +1, sizeof(unsigned int));
+        matrice[j] = calloc(x + 1, sizeof(unsigned int));
         if (matrice[j] == NULL)
         {
             errx(1, "Memory error");
@@ -154,8 +155,9 @@ unsigned int searchGraph(Graph *graph, long rho, size_t theta)
         // printf("%p\n", (void*)graph->negativeRho);
         // assert(graph->negativeRho[rho]);
         unsigned int negative = graph->negativeRho[rho][theta];
-        // printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho, theta,
-            //    negative);
+        // printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho,
+        // theta,
+        //    negative);
         return negative;
     }
     unsigned int positive = graph->positiveRho[rho][theta];
@@ -177,7 +179,8 @@ void addGraph(Graph *graph, long rho, size_t theta)
     }
 }
 
-unsigned int graphAverage(Graph *graph){
+unsigned int graphAverage(Graph *graph)
+{
     unsigned long total_sum = 0;
     unsigned int nb = 0;
     const unsigned int accY = graph->generalY;
@@ -202,7 +205,7 @@ unsigned int graphAverage(Graph *graph){
     printf("total_sum : %lu; nb : %u\n", total_sum, nb);
     if (nb)
     {
-        return total_sum/nb;
+        return total_sum / nb;
     }
     return 0;
 }

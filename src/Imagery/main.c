@@ -26,18 +26,25 @@ int main(int argc, char *argv[])
     newImage(image);
     blackandwhite(image);
     reverse_color(image);
-    detection(image);
+
+    Image _drawImage;
+    _drawImage.path = argv[1];
+    _drawImage.surface = NULL;
+    Image *drawImage = &_drawImage;
+    newImage(drawImage);
+    detection(image, drawImage);
     // displayImage(image);
     // rotate(image, 180);
 
     // grayscale(image);
-    
+
     // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);
 
     saveImage(image, argv[2]);
-
+    saveImage(drawImage, "drawImage.bmp");
+    freeImage(drawImage);
     freeImage(image);
 
     return 0;
