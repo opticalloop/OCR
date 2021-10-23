@@ -141,6 +141,21 @@ static void saveMatrix(Pixel **pixels, char path[], unsigned int w,
 
     fclose(fp);
 }
+static void saveArray(unsigned int *t, char path[], unsigned int n)
+{
+    FILE *fp;
+    fp = fopen(path, "w+");
+
+    for (unsigned int j = 0; j < n; j++)
+    {
+        char str[20];
+        sprintf(str, "%u", t[j]);
+        fputs(str, fp);
+        fputs("\n", fp);
+    }
+
+    fclose(fp);
+}
 void Preprocessing(Image *image, char pathToSave[], int verbose)
 {
     unsigned int w = image->width;
@@ -154,6 +169,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
+    saveArray(histogram, "./b1.txt", 256);
     // printArray(histogram, 256);
     int max = image->height * image->width;
 
@@ -184,6 +200,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     ApplyMaskToImage(image, mask, w, h);
     SaveTmpPic(image, pathToSave, "2_median");
     saveMatrix(image->pixels, "./a2.txt", w, h);
+
     updateNeigbourgs(image);
 
     if (verbose)
@@ -199,6 +216,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     saveMatrix(image->pixels, "./a3.txt", w, h);
 
     GetHistogram(histogram, image->pixels, w, h);
+    saveArray(histogram, "./b3.txt", 256);
     // printArray(histogram, 256);
 
     if (verbose)
