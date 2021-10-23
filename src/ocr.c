@@ -27,7 +27,7 @@ void OCR(char *image_path, char *output_path, int verbose)
     grayscale(&image);
 
     // TODO : Change second argument of Preprocessing call
-    Preprocessing(&image, "img_output");
+    Preprocessing(&image, "img_output", verbose);
 
     // Segmentation
     SDL_Surface **all_cases = NULL;
