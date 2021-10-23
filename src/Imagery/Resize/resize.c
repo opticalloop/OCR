@@ -68,7 +68,7 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
             }
         }
     }
-
+    
     freeImage(image);
     return newimage;
 }

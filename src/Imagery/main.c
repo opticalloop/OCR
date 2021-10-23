@@ -36,17 +36,17 @@ int main(int argc, char *argv[])
     // Image newimage = resize(&image, 28, 28);
 
     printf("width : %d - height : %d\n", image.width, image.height);
-    // clearsquare(&image);
-    // const unsigned int height = image.height;
-    // for(unsigned int y = 0; y < height/2; y++){
-    //    clearLine(&image,y);
-    //}
+    //clearsquare(&image);
 
     SDL_Surface *seg81[81];
-    // blackandwhite(&image);
-    // displayblock(&image,10,10,110,110);
-    // split(&image, seg81,1,"image01");
-    split9(&image, seg81, 1, "image01");
+    blackandwhite(&image);
+    //displayblock(&image,10,10,110,110);
+    //split(&image, seg81,1,"image01");
+    split9(&image, seg81, 1, "image01bis");
+    //isColumnPartialBlack(&image,1);
+    /*for(unsigned int y = 0; y < 28; y++){
+        isLinePartialBlack(&image,y);
+    }*/
     updateSurface(&image);
     // displayImage(&image);
     saveImage(&image, argv[2]);
