@@ -5,6 +5,7 @@
 #include <SDL/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Resize/resize.h"
 #include "Imagery/Utils/image.h"
@@ -23,9 +24,9 @@ typedef struct
  *      Verify if the y line is balck or not
  *
  *  Params:
- *      *image: Image where we want to check 
+ *      *image: Image where we want to check
  *      y: the line to check
- * 
+ *
  *  Return:
  *      1 if the line is black 0 if not
  */
@@ -45,7 +46,7 @@ int isBlackLine(Image *image, unsigned int y);
  *
  */
 void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
-    unsigned int xend, unsigned int yend);
+                  unsigned int xend, unsigned int yend);
 
 /*
  *  Summary:

@@ -43,8 +43,8 @@ void clearLine(Image *image, unsigned int y);
  *  Summary:
  *      Make the Column all white
  *  Params:
- *      *image: The image to clear 
- *      x: the column to clear 
+ *      *image: The image to clear
+ *      x: the column to clear
  *
  *  Return:
  *      Nothing clear is applied to the image directly

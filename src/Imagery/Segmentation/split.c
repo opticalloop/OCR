@@ -1,4 +1,4 @@
-#include"Imagery/Segmentation/split.h"
+#include "Imagery/Segmentation/split.h"
 
 int isBlackLine(Image *image, unsigned int y)
 {
@@ -19,9 +19,8 @@ int isBlackLine(Image *image, unsigned int y)
  */
 
 void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
-    unsigned int xend, unsigned int yend)
+                  unsigned int xend, unsigned int yend)
 {
-
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
@@ -58,36 +57,33 @@ void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
     }
 }
 
-void savesquare(Image *image, unsigned int iall, char *imagename){
+void savesquare(Image *image, unsigned int iall, char *imagename)
+{
     char str[200];
-    int dizaine = iall/9;
+    int dizaine = iall / 9;
     int unite = iall % 9;
 
-    snprintf(str,sizeof(str),"%s/%d%d.bmp",imagename,dizaine,unite);
-
-    //printf("%s\n",str);
-    if(SDL_SaveBMP(image->surface,str) != 0){
-        printf("SDL_SaveBMP failed: %s\n",SDL_GetError());
-    }
+    snprintf(str, sizeof(str), "%s/%d%d.bmp", imagename, dizaine, unite);
+    saveImage(image, str);
 }
 
 void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
 {
-    
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
-    printf("width: %d, height: %d\n",width,width);
+    printf("width: %d, height: %d\n", width, width);
     unsigned int xstart = 0;
     unsigned int ystart = 0;
     coordonnes coorarray[9];
     unsigned int i = 0;
 
     char directory[200];
-    snprintf(directory,sizeof(directory), "mkdir %s",imagename);
-    if(!system(directory)){
+    snprintf(directory, sizeof(directory), "mkdir %s", imagename);
+    if (!system(directory))
+    {
         char delete[200];
-        snprintf(delete,sizeof(delete), "rm -rf %s",imagename);
+        snprintf(delete, sizeof(delete), "rm -rf %s", imagename);
         system(delete);
         system(directory);
     }
@@ -106,11 +102,13 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                 {
                     xstart = x;
                     ystart = y;
-                    for (; x < width && image->pixels[x][y].r == 255; x++);
-                    for (; y < height && image->pixels[xstart][y].r == 255; y++);
-                    coordonnes coord = {.xstart = xstart, .ystart = ystart,
-                        .xend = x,
-                        .yend = y};
+                    for (; x < width && image->pixels[x][y].r == 255; x++)
+                        ;
+                    for (; y < height && image->pixels[xstart][y].r == 255; y++)
+                        ;
+                    coordonnes coord = {
+                        .xstart = xstart, .ystart = ystart, .xend = x, .yend = y
+                    };
                     coorarray[i] = coord;
                     updateSurface(image);
                     i++;
@@ -126,21 +124,20 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
     unsigned int iall = 0;
     for (unsigned int y = coorarray[0].ystart; y < height && i < 9;)
     {
-        for (unsigned int x = 0; x < 9; x++,iall++)
+        for (unsigned int x = 0; x < 9; x++, iall++)
         {
             displayblock(image, coorarray[x].xstart, y, coorarray[x].xend,
-                coorarray[x].yend + y - yinit);
+                         coorarray[x].yend + y - yinit);
 
             block.x = coorarray[x].xstart;
             block.y = y;
             block.w = coorarray[x].xend - coorarray[x].xstart;
-            //printf("w= %d\n",block.w);
+            // printf("w= %d\n",block.w);
             block.h = coorarray[x].yend - coorarray[x].ystart;
-            
-            SDL_Surface *surface = 
-                SDL_CreateRGBSurface(0,block.w,block.h,24,0,0,0,0);
 
-            printf("je suis avant le blit surface\n");
+            SDL_Surface *surface =
+                SDL_CreateRGBSurface(0, block.w, block.h, 24, 0, 0, 0, 0);
+
             SDL_BlitSurface(image->surface, &block, surface, NULL);
 
             Image imagebis;
@@ -148,18 +145,22 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
             imagebis.width = block.w;
             imagebis.height = block.h;
 
-            printf("widthnew: %d, heightnew: %d\n", imagebis.surface->w, imagebis.surface->h);
+            printf("widthnew: %d, heightnew: %d\n", imagebis.surface->w,
+                   imagebis.surface->h);
             newImage(&imagebis);
-            
-            resize(&imagebis,28,28);
-            printf("Apres resize widthnew: %d, heightnew: %d\n", imagebis.width, imagebis.height);
+            printf("je suis la\n");
+
+            resize(&imagebis, 28, 28);
+            printf("Apres resize widthnew: %d, heightnew: %d\n", imagebis.width,
+                   imagebis.height);
             updateSurface(&imagebis);
 
             seg81[iall] = imagebis.surface;
 
-            if(save){
+            if (save)
+            {
                 printf("je save ta mère\n");
-                savesquare(&imagebis,iall,imagename);
+                savesquare(&imagebis, iall, imagename);
             }
 
             freeImage(&imagebis);
@@ -167,15 +168,21 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
         i++;
         y += ytaille;
         for (; i < 9 && y < height
-               && image->pixels[coorarray[0].xstart][y].r == 255;y++);
+             && image->pixels[coorarray[0].xstart][y].r == 255;
+             y++)
+            ;
 
         for (; i < 9 && y < height
-               && image->pixels[coorarray[0].xstart][y].r == 0;y++);
+             && image->pixels[coorarray[0].xstart][y].r == 0;
+             y++)
+            ;
     }
 }
 
-void freeList(SDL_Surface *surface[], unsigned int len){
-    for(unsigned int i = 0; i < len; i++){
+void freeList(SDL_Surface *surface[], unsigned int len)
+{
+    for (unsigned int i = 0; i < len; i++)
+    {
         SDL_FreeSurface(surface[i]);
     }
 }
