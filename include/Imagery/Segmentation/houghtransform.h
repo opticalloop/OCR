@@ -5,11 +5,10 @@
 #include "Imagery/Segmentation/struct.h"
 
 void detection(Image *image);
-Graph *houghtransform(Image *image, double delta);
-unsigned int **lineSimplication(Graph *accumulator, Image *image);
-void drawLineRho(Image *image, unsigned int **toDraw, double rho,
-              unsigned int theta, double delta);
+unsigned int **houghtransform(Image *image);
+void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width, double height);
 void matriceToBmp(unsigned int **matrice, unsigned int width,
                   unsigned int height);
+double degrees_ToRadians(double theta);
 
 #endif

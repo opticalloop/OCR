@@ -10,23 +10,23 @@
 
 #include "Imagery/Utils/image.h"
 
-typedef struct Dot
+typedef struct
 {
     unsigned int X;
     unsigned int Y;
 } Dot;
 
-typedef struct Line
+typedef struct
 {
     Dot start;
     Dot end;
 } Line;
 
-typedef struct Graph
+typedef struct
 {
-    unsigned int **positiveRho;    
+    unsigned int **positiveRho;
     unsigned int **negativeRho;
-    unsigned int generalY; 
+    unsigned int generalY;
 } Graph;
 
 void initGraph(Graph *graph, Image *image);

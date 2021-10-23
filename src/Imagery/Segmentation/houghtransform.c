@@ -7,7 +7,7 @@ void detection(Image *image)
     
     // Call major fonction
     unsigned int **copyImage = houghtransform(image);
-    
+    matriceToBmp(copyImage, width, height);
 
     // Free memory
     freeMatrice(copyImage, height);
@@ -41,7 +41,7 @@ unsigned int **houghtransform(Image *image)
     double *saveSin = calloc(nbTheta + 1, sizeof(double));
     for(int theta = 0; theta < nbTheta; theta++){
         // Convert each value of theta's array into radians
-        arrThetas[theta] = degreesToRadians(arrThetas[theta]);
+        arrThetas[theta] = degrees_ToRadians(arrThetas[theta]);
 
         // Save each cos(theta) and sin(theta) into their respective arrays
         saveCos[theta] = cos(arrThetas[theta]);
@@ -64,6 +64,7 @@ unsigned int **houghtransform(Image *image)
             }
         }
     }
+
     // Initialize the matrice that while the copy of the image with the edges
     unsigned int **copyImage = initMatrice(width,height);
     for (int theta = minTheta; theta < maxTheta; theta++)
@@ -85,7 +86,8 @@ unsigned int **houghtransform(Image *image)
                 second.X = (int) (center.X - 1000 * (-s));
                 second.Y = (int) (center.Y - 1000 * c);
 
-                // CALL DRAW LINE
+                // Draw Lines on the copyImage matrice
+                drawLineFromDot(copyImage, &first, &second, width, height);
             }
         }
     }
@@ -99,8 +101,22 @@ unsigned int **houghtransform(Image *image)
     return copyImage;
 }
 
-void drawLine(unsigned int **matrice, Dot *d1, Dot *d2){
+void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width, double height){
+    // Calculate the a and b values for the equation y = a * x + b
+    float a = (float)(d2->Y - d1->Y) / (float)(d2->X - d1->X);
+    float b = (float)d2->Y - (a * (float)d2->X);
+    const int hi = height;
 
+    // Going trough the matrice and calculate the points on the line
+    for (double x = 0; x < width; x+=1.0)
+    {
+        int y = a * x + b;
+        int xi = x;
+        if (y >= 0 && y < hi){
+            matrice[y][xi]++;
+        }
+    }
+    
 }
 
 void matriceToBmp(unsigned int **matrice, unsigned int width,
@@ -125,4 +141,8 @@ void matriceToBmp(unsigned int **matrice, unsigned int width,
     }
     saveImage(&image, "drawingLine.bmp");
     freeImage(&image);
+}
+
+double degrees_ToRad(double degrees){
+    return degrees * M_PI /180.0;
 }
