@@ -123,6 +123,23 @@ static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
         }
     }
 }
+static void saveMatrix(Pixel **pixels, unsigned int w, unsigned int h)
+{
+    FILE *fp;
+    fp = fopen("./test.txt", "w+");
+    for (unsigned int i = 0; i < w; i++)
+    {
+        for (unsigned int j = 0; j < h; j++)
+        {
+            char str[20];
+            sprintf(str, "%u", pixels[i][j].b);
+            fputs(str, fp);
+            fputs("\n", fp);
+        }
+    }
+
+    fclose(fp);
+}
 void Preprocessing(Image *image, char pathToSave[], int verbose)
 {
     unsigned int w = image->width;
@@ -147,7 +164,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
                 ConstrastFilter(image->pixels[i][j], histogram, max));
-
+    saveMatrix(image->pixels, w, h);
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
