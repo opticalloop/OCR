@@ -16,20 +16,14 @@ int main(int argc, char *argv[])
         errx(1, "Usage : ./main input_image output_image folder_name");
     }
 
-    Image _image;
-    _image.width = 0;
-    _image.height = 0;
-    _image.averageColor = 0;
-    _image.pixels = NULL;
-    _image.path = argv[1];
-    _image.surface = NULL;
-    Image *image = &_image;
-    newImage(image);
+    Image image;
+    image.path = argv[1];
+    newImage(&image);
 
     // displayImage(image);
     // rotate(image, 180);
 
-    grayscale(image);
+    grayscale(&image);
     // TODO : Remove the tmp directory
     char s[1000] = "mkdir "; // create tmp directory for presentation
     strcat(s, argv[3]);
@@ -37,17 +31,22 @@ int main(int argc, char *argv[])
     if (system(s))
     {
     }
-    Preprocessing(image, argv[3]);
+    Preprocessing(&image, argv[3]);
 
     // blackandwhite(image);
     // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);
-    Image newimage = resize(image, 100, 100);
 
-    saveImage(&newimage, argv[2]);
-
-    freeImage(&newimage);
+    SDL_Surface *seg81[81];
+    blackandwhite(&image);
+    // displayblock(&image,10,10,110,110);
+    split(image, seg81, 1, "image01");
+    updateSurface(&image);
+    displayImage(&image);
+    saveImage(&image, argv[2]);
+    freeImage(&image);
+    freeList(seg81, 81);
 
     return 0;
 }

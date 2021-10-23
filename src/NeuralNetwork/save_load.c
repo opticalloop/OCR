@@ -102,8 +102,13 @@ void saveWeights(Network *network, char *path)
     fclose(file);
 }
 
-void launchWeights(Network *network, char *path)
+void launchWeights(Network *network, char *path, int verbose)
 {
+    if (verbose)
+    {
+        printf("--> 💾 Initing weights from %s\n", path);
+    }
+
     // Open file
     FILE *file;
     file = fopen(path, "r");
@@ -132,7 +137,7 @@ void launchWeights(Network *network, char *path)
     }
     memset(str, 0, sizeof(str));
     chr = getc(file);
-    while (chr != EOF && chr != '|')
+    while (chr != EOF && chr != '\n')
     {
         strncat(str, &chr, 1);
         chr = getc(file);
@@ -149,13 +154,15 @@ void launchWeights(Network *network, char *path)
     *network = newNetwork(network->sizeInput, nbNodePerHidden, nbHidden,
                           network->sizeOutput);
 
-    int layerIndex = 1;
-    int neuronIndex = 0;
+    int layerIndex = 0; // To begin at 1
+    int neuronIndex = -1; // To begin at 0
     int weightIndex = 0;
 
+    memset(tempStr, 0, sizeof(tempStr));
     // For each character
     while ((chr = getc(file)) != EOF)
     {
+        printf("chr : %c\n", chr);
         // New neuron or layer
         if (chr == '#')
         {
