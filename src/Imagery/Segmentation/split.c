@@ -148,18 +148,15 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
             printf("widthnew: %d, heightnew: %d\n", imagebis.surface->w,
                    imagebis.surface->h);
             newImage(&imagebis);
-            printf("je suis la\n");
+            
 
             resize(&imagebis, 28, 28);
-            printf("Apres resize widthnew: %d, heightnew: %d\n", imagebis.width,
-                   imagebis.height);
             updateSurface(&imagebis);
 
             seg81[iall] = imagebis.surface;
 
             if (save)
             {
-                printf("je save ta mère\n");
                 savesquare(&imagebis, iall, imagename);
             }
 
