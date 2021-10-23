@@ -119,7 +119,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
 
     SDL_Rect block;
     unsigned int yinit = coorarray[0].ystart;
-    const unsigned int ytaille = coorarray[0].yend - coorarray[0].ystart;
+    const unsigned int ylen = coorarray[0].yend - coorarray[0].ystart;
     i = 0;
     unsigned int iall = 0;
     for (unsigned int y = coorarray[0].ystart; y < height && i < 9;)
@@ -166,7 +166,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
             freeImage(&imagebis);
         }
         i++;
-        y += ytaille;
+        y += ylen;
         for (; i < 9 && y < height
              && image->pixels[coorarray[0].xstart][y].r == 255;
              y++)

@@ -13,7 +13,6 @@ int isLinePartialBlack(Image *image, unsigned int y)
 
     if (nbblack == 0)
         return 1;
-    // printf("x: %d nbblack: %d:\n",y,nbblack);
     return nbblack > 20 ? 1 : 0;
 }
 
@@ -24,18 +23,13 @@ int isColumnPartialBlack(Image *image, unsigned int x)
     // displayImage(image);
     for (unsigned int y = 0; y < 28; y++)
     {
-        // printf("x : %d - y : %d, value: %d\n",x,y,image->pixels[x][y].r);
-
         if (image->pixels[x][y].r < 128)
-        {
-            // printf("oui c'est un pixel noir y = %d\n",y);
             nbblack++;
-        }
+        
     }
 
     if (nbblack == 0)
         return 1;
-    // printf("sur la colone %d il y a %d block noir\n",x,nbblack);
     return nbblack > 20 ? 1 : 0;
 }
 
@@ -66,7 +60,6 @@ void clearsquare(Image *image)
 
     int cor[56];
 
-    // printf("width : %d - height : %d\n", width, height);
     for (unsigned int i = 0; i < 56; i++)
     {
         cor[i] = -1;
@@ -87,12 +80,6 @@ void clearsquare(Image *image)
             cor[iall] = y;
         }
     }
-
-    /*printf("[");
-    for(unsigned int i = 0; i < 56; i++){
-        printf("%d,",cor[i]);
-    }
-    printf("]\n");*/
 
     iall = 0;
 
