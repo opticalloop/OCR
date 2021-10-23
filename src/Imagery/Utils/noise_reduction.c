@@ -169,8 +169,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    //saveArray(histogram, "./b1.txt", 256);
-    // printArray(histogram, 256);
+    
     int max = image->height * image->width;
 
     if (verbose)
@@ -185,13 +184,12 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 ConstrastFilter(image->pixels[i][j], histogram, max));
         }
     }
-    // saveMatrix(image->pixels, "./a1.txt", w, h);
+    
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
 
     GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b2.txt", 256);
 
     if (verbose)
         printf("    🎥 Applying Median Filter\n");
@@ -206,10 +204,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     }
     ApplyMaskToImage(image, mask, w, h);
     SaveTmpPic(image, pathToSave, "2_median");
-    // saveMatrix(image->pixels, "./a2.txt", w, h);
-
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b3.txt", 256);
 
     updateNeigbourgs(image);
 
@@ -223,21 +217,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 AverageFilter(mask[i][j].matrix, binomialFilter));
 
     SaveTmpPic(image, pathToSave, "3_average");
-    // saveMatrix(image->pixels, "./a3.txt", w, h);
-
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b4.txt", 256);
-    // printArray(histogram, 256);
 
     if (verbose)
         printf("    💻 Applying Otsu Filter\n");
 
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
-    // saveMatrix(image->pixels, "./a4.txt", w, h);
-
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b4.txt", 256);
+    
     NegativePictureIfNormal(image);
     SaveTmpPic(image, pathToSave, "5_inversed");
 
