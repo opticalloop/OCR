@@ -84,41 +84,6 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
         }
     }
 
-    // for (int i = 0; i < 12 && ch != EOF; i++)
-    // {
-    //     for (int j = 0; j < 12 && ch != EOF; j++)
-    //     {
-    //         ch = fgetc(fp);
-    //         if (ch == '\n'
-    //         {
-    //             break;
-    //         }
-    //         // printf("%d : %c\n", j, ch);
-    //         if (ch == '\n' || ch == '\0' || ch == ' ' || ch == EOF)
-    //         {
-    //             if (i == 3 || i == 7)
-    //             {
-    //                 xIndex--; // Dont move, it's an empty line
-    //                 break;
-    //             }
-    //             continue;
-    //         }
-
-    //         if (ch != '.' && ch != EOF)
-    //         {
-    //             if (ch >= '0' && ch <= '9')
-    //             {
-    //                 strncat(tempStr, &ch, 1);
-    //                 printf("x : %u, y : %u\n", xIndex, yIndex);
-    //                 grid[xIndex][yIndex] = atoi(tempStr);
-    //                 memset(tempStr, 0, sizeof(tempStr));
-    //             }
-    //         }
-    //         yIndex++;
-    //     }
-    //     yIndex = 0;
-    //     xIndex++;
-    // // }
     fclose(fp);
 }
 

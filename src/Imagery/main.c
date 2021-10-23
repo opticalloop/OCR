@@ -157,7 +157,9 @@ int main(int argc, char *argv[])
 
     if (_resize)
     {
-        resize(&image, resize_width, resize_height);
+        Image resized_image = resize(&image, resize_width, resize_height);
+        saveImage(&resized_image, output_path);
+        return EXIT_SUCCESS;
     }
 
     if (segment)
