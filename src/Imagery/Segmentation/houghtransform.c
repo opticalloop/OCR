@@ -2,89 +2,105 @@
 
 void detection(Image *image)
 {
-    Graph *accumulator = houghtransform(image, 1.0);
-    //printGraph(accumulator);
-    unsigned int **imageDrawn = lineSimplication(accumulator, image);
-    //matriceToBmp(imageDrawn, image->width, image->height);
-    //printMatrice(imageDrawn, image->height, image->width);
-    freeGraph(accumulator, accumulator->generalY);
-    freeMatrice(imageDrawn, image->height);
+    // Initialize variables of the image
+    const unsigned int width = image->width, height = image->height;
+    
+    // Call major fonction
+    unsigned int **copyImage = houghtransform(image);
+    
+
+    // Free memory
+    freeMatrice(copyImage, height);
 }
 
-Graph *houghtransform(Image *image, double delta)
+unsigned int **houghtransform(Image *image)
 {
-    // Initialisation of accumaltor graph
-    printf("Starting to detect edges :\n-------------------------\n");
-    Graph acc;
-    acc.negativeRho = NULL;
-    acc.positiveRho = NULL;
-    Graph *accumulator = &acc;
-    initGraph(accumulator, image);
+    // Save the image dimensions
+    const double width = image->width, height = image->height;
+    // Calculate the diagonal of the image
+    const double diagonal = sqrt(width * width + height * height);
 
-    for (size_t y = 0; y < image->height; y++)
+    // Initialize the constant values for theta and rho
+    const double maxTheta = 180.0, minTheta = 0.0;
+    const double maxRho = diagonal, minRho = -diagonal;
+    const double nbRho = 2*diagonal, nbTheta = nbRho;
+
+    // Create an array of theta
+    double step = (maxTheta - minTheta)/nbTheta;
+    double *arrThetas = calloc(nbTheta + 1, sizeof(double));
+    int index = 0;
+    for(double val = minTheta; val <= maxTheta && index < nbTheta;
+        val+=step, index++)
     {
-        for (size_t x = 0; x < image->width; x++)
+        arrThetas[index] = val;
+    }
+
+    // Create a save of cos and sin value for each theta, to optimize 
+    // performance.
+    double *saveCos = calloc(nbTheta + 1, sizeof(double));
+    double *saveSin = calloc(nbTheta + 1, sizeof(double));
+    for(int theta = 0; theta < nbTheta; theta++){
+        // Convert each value of theta's array into radians
+        arrThetas[theta] = degreesToRadians(arrThetas[theta]);
+
+        // Save each cos(theta) and sin(theta) into their respective arrays
+        saveCos[theta] = cos(arrThetas[theta]);
+        saveSin[theta] = sin(arrThetas[theta]);
+    }
+
+    unsigned int **accumulator = initMatrice(nbTheta+1, nbRho+1);
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
         {
             if (image->pixels[x][y].r)
             {
-                for (double theta = 0.0; theta <= 180.0; theta += delta)
-                {
-                    long rho = (long)(x * cos(theta)) + (long)(y * sin(theta));
-                    addGraph(accumulator, rho, theta);
+                for(int theta = 0; theta <= nbTheta; theta++){
+                    double rho = x * saveCos[theta] + y * saveSin[theta];
+                    int croppedRho = rho + diagonal;
+                    accumulator[croppedRho][theta]++;
                 }
             }
         }
     }
-    return accumulator;
-}
-
-unsigned int **lineSimplication(Graph *accumulator, Image *image)
-{
-    printf("Drawing lines :\n-------------------------\n");
-    const unsigned int accY = accumulator->generalY;
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
-    searchGraph(accumulator, -1413, 0);
-    unsigned int **imageDrawn = initMatrice(width, height);
-    printMatrice(imageDrawn, height, width);
-    searchGraph(accumulator, -1413, 0);
-    
-    int limAcc = accY;
-    for (long y = -limAcc + 1; y < limAcc; y++)
+    // Initialize the matrice that while the copy of the image with the edges
+    unsigned int **copyImage = initMatrice(width,height);
+    for (int theta = minTheta; theta < maxTheta; theta++)
     {
-        for (size_t x = 0; x < 180; x++)
+        for (int rho = minRho; rho < maxRho; rho++)
         {
-            if (searchGraph(accumulator, y, x) != 0)
+            if (accumulator[rho][theta] >= 220)
             {
-                printf("draw with >>> theta = %zu and rho = %li\n", x, y);
-                drawLineRho(image, imageDrawn, y, x, 1.0);
+                int c = saveCos[theta], s = saveSin[theta];
+                Dot center, first, second;
+                // Calculate center point
+                center.X = (c * rho) + width / 2;
+                center.Y = (s * rho) + height / 2;
+
+                //Calculate one point of the edge
+                first.X = (int) (center.X + 1000 * (-s));
+                first.Y = (int) (center.Y + 1000 * c);
+                //Calculate a second point of the edge
+                second.X = (int) (center.X - 1000 * (-s));
+                second.Y = (int) (center.Y - 1000 * c);
+
+                // CALL DRAW LINE
             }
         }
     }
-    return imageDrawn;
+
+    // Free cos and sin arrays
+    free(saveCos);
+    free(saveSin);
+    freeMatrice(accumulator, nbTheta+1);
+
+    // Return my accumaltor
+    return copyImage;
 }
 
-void drawLineRho(Image *image, unsigned int **toDraw, double rho,
-              unsigned int theta, double delta)
-{
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
-    for (double x = 0; x < width; x += delta)
-    {
-        for (double y = 0; y < height; y += delta)
-        {
-            // if (image->pixels[(unsigned int)x][(unsigned int)y].r &&
-            // (x*cos(theta)+y*sin(theta)) == rho){
-            //     toDraw[(unsigned int)y][(unsigned int)x]++;
-            // }
-            int tmpRho = x * cos(theta) + y * sin(theta);
-            if ((double)(tmpRho) == rho)
-            {
-                printf("point made in : x - %u, y - %u\n", (unsigned int)x, (unsigned int)y);
-                toDraw[(unsigned int)y][(unsigned int)x]++;
-            }
-        }
-    }
+void drawLine(unsigned int **matrice, Dot *d1, Dot *d2){
+
 }
 
 void matriceToBmp(unsigned int **matrice, unsigned int width,
@@ -98,9 +114,9 @@ void matriceToBmp(unsigned int **matrice, unsigned int width,
     image.surface = NULL;
     image.pixels = NULL;
     newImage(&image);
-    for (size_t y = 0; y < width; y++)
+    for (size_t y = 0; y < height; y++)
     {
-        for (size_t x = 0; x < height; x++)
+        for (size_t x = 0; x < width; x++)
         {
             image.pixels[x][y].r = matrice[y][x] ? 255 : 0;
             image.pixels[x][y].g = 0;

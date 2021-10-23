@@ -1,18 +1,19 @@
 #include "Imagery/Segmentation/struct.h"
+#include <assert.h>
 
 static void init(Graph *graph, unsigned int x, int y)
 {
     if (y < 0)
     {
         y = -y;
-        graph->negativeRho = malloc(sizeof(unsigned int *) * (y + 1));
+        graph->negativeRho = calloc(y, sizeof(unsigned int *));
         if (graph->negativeRho == NULL)
         {
             errx(1, "Memory error");
         }
-        for (size_t j = 0; j < y; j++)
+        for (size_t j = 0; (int)j < y; j++)
         {
-            graph->negativeRho[j] = calloc(x + 1, sizeof(unsigned int));
+            graph->negativeRho[j] = calloc(x, sizeof(unsigned int));
             if (graph->negativeRho[j] == NULL)
             {
                 errx(1, "Memory error");
@@ -21,14 +22,14 @@ static void init(Graph *graph, unsigned int x, int y)
     }
     else
     {
-        graph->positiveRho = malloc(sizeof(unsigned int *) * (y + 1));
+        graph->positiveRho = calloc(y, sizeof(unsigned int *));
         if (graph->positiveRho == NULL)
         {
             errx(1, "Memory error");
         }
-        for (size_t j = 0; j < y; j++)
+        for (size_t j = 0; (int)j < y; j++)
         {
-            graph->positiveRho[j] = calloc(x + 1, sizeof(unsigned int));
+            graph->positiveRho[j] = calloc(x, sizeof(unsigned int));
             if (graph->positiveRho[j] == NULL)
             {
                 errx(1, "Memory error");
@@ -52,27 +53,23 @@ void freeGraph(Graph *graph, unsigned int generalY)
     for (size_t y = 0; y < generalY; y++)
     {
         free(graph->positiveRho[y]);
-    }
-    free(graph->positiveRho);
-
-    for (size_t y = 0; y < generalY; y++)
-    {
         free(graph->negativeRho[y]);
     }
+    free(graph->positiveRho);
     free(graph->negativeRho);
 }
 
-unsigned int** initMatrice(unsigned int x, unsigned int y)
+unsigned int **initMatrice(unsigned int x, unsigned int y)
 {
-    unsigned int **matrice;
-    matrice = malloc(sizeof(unsigned int *) * (y + 1));
+    unsigned int **matrice = NULL;
+    matrice = calloc(y + 1, sizeof(unsigned int *));
     if (matrice == NULL)
     {
         errx(1, "Memory error");
     }
-    for (size_t j = 0; j < y; j++)
+    for (size_t j = 0; j < y ; j++)
     {
-        matrice[j] = calloc(x + 1, sizeof(unsigned int));
+        matrice[j] = calloc(x +1, sizeof(unsigned int));
         if (matrice[j] == NULL)
         {
             errx(1, "Memory error");
@@ -117,7 +114,6 @@ void printGraph(Graph *graph)
         size_t i = 0;
         for (; i < 179; i++)
         {
-            // printf("i : %zu, j : %lu\n", i, j);
             printf("%u,", graph->positiveRho[j][i]);
         }
         printf("%u]\n", graph->positiveRho[j][i]);
@@ -133,10 +129,11 @@ void printGraph(Graph *graph)
         printf("%u]\n", graph->negativeRho[j][i]);
     }
 }
+
 void printMatrice(unsigned int **matrice, unsigned int height,
                   unsigned int width)
 {
-    for (long j = height-1; j >= 0; j--)
+    for (long j = height - 1; j >= 0; j--)
     {
         printf("[");
         size_t i = 0;
@@ -149,16 +146,21 @@ void printMatrice(unsigned int **matrice, unsigned int height,
 }
 
 unsigned int searchGraph(Graph *graph, long rho, size_t theta)
-{   
+{
     if (rho < 0)
-    {   
+    {
         rho = -rho;
+        // assert(graph->negativeRho);
+        // printf("%p\n", (void*)graph->negativeRho);
+        // assert(graph->negativeRho[rho]);
         unsigned int negative = graph->negativeRho[rho][theta];
-        printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho, theta, negative);
+        // printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho, theta,
+            //    negative);
         return negative;
     }
     unsigned int positive = graph->positiveRho[rho][theta];
-    printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho, theta, positive);
+    // printf("searchgraph -- rho  = %li, theta = %zu, val : %u\n", rho, theta,
+    //    positive);
     return positive;
 }
 
@@ -173,4 +175,34 @@ void addGraph(Graph *graph, long rho, size_t theta)
     {
         graph->positiveRho[rho][theta]++;
     }
+}
+
+unsigned int graphAverage(Graph *graph){
+    unsigned long total_sum = 0;
+    unsigned int nb = 0;
+    const unsigned int accY = graph->generalY;
+    for (long j = accY - 1; j >= 0; j--)
+    {
+        for (size_t i = 0; i < 180; i++)
+        {
+            unsigned int val = graph->positiveRho[j][i];
+            total_sum += val;
+            nb++;
+        }
+    }
+    for (size_t j = 1; j < accY; j++)
+    {
+        for (size_t i = 0; i < 180; i++)
+        {
+            unsigned int val = graph->negativeRho[j][i];
+            total_sum += val;
+            nb++;
+        }
+    }
+    printf("total_sum : %lu; nb : %u\n", total_sum, nb);
+    if (nb)
+    {
+        return total_sum/nb;
+    }
+    return 0;
 }
