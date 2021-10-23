@@ -17,7 +17,7 @@ typedef struct
     unsigned int ystart;
     unsigned int xend;
     unsigned int yend;
-} coordinates;
+} Coordinates;
 
 /*
  *  Summary:

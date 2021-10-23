@@ -75,7 +75,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
     printf("width: %d, height: %d\n", width, width);
     unsigned int xstart = 0;
     unsigned int ystart = 0;
-    coordinates coorarray[9];
+    Coordinates coorarray[9];
     unsigned int i = 0;
 
     char directory[200];
@@ -106,7 +106,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                         ;
                     for (; y < height && image->pixels[xstart][y].r == 255; y++)
                         ;
-                    coordinates coord = {
+                    Coordinates coord = {
                         .xstart = xstart, .ystart = ystart, .xend = x, .yend = y
                     };
                     coorarray[i] = coord;
