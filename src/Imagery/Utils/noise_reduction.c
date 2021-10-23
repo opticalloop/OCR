@@ -133,10 +133,10 @@ static void saveMatrix(Pixel **pixels, char path[], unsigned int w,
         for (unsigned int j = 0; j < h; j++)
         {
             char str[20];
-            sprintf(str, "%u", pixels[i][j].b);
+            sprintf(str, "%u ", pixels[i][j].b);
             fputs(str, fp);
-            fputs("\n", fp);
         }
+        fputs("\n", fp);
     }
 
     fclose(fp);
