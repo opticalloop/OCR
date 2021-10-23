@@ -177,10 +177,14 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
         printf("    📸 Applying constrast Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
+    {
         for (unsigned int j = 0; j < h; j++)
+        {
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
                 ConstrastFilter(image->pixels[i][j], histogram, max));
+        }
+    }
     saveMatrix(image->pixels, "./a1.txt", w, h);
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
@@ -204,8 +208,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     SaveTmpPic(image, pathToSave, "2_median");
     saveMatrix(image->pixels, "./a2.txt", w, h);
 
-    GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b3.txt", 256);
+    // GetHistogram(histogram, image->pixels, w, h);
+    // saveArray(histogram, "./b3.txt", 256);
 
     updateNeigbourgs(image);
 
@@ -221,8 +225,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     SaveTmpPic(image, pathToSave, "3_average");
     saveMatrix(image->pixels, "./a3.txt", w, h);
 
-    GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b4.txt", 256);
+    // GetHistogram(histogram, image->pixels, w, h);
+    // saveArray(histogram, "./b4.txt", 256);
     // printArray(histogram, 256);
 
     if (verbose)
@@ -232,8 +236,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     SaveTmpPic(image, pathToSave, "4_otsu");
     saveMatrix(image->pixels, "./a4.txt", w, h);
 
-    GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b4.txt", 256);
+    // GetHistogram(histogram, image->pixels, w, h);
+    // saveArray(histogram, "./b4.txt", 256);
     NegativePictureIfNormal(image);
     SaveTmpPic(image, pathToSave, "5_inversed");
 
@@ -278,9 +282,11 @@ static unsigned int clamp(unsigned int value, unsigned int min,
 
 unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
 {
-    unsigned int fact = histogram[pixel.b] / max;
+    float fact = histogram[pixel.b] / ((float)max);
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    return clamp(factor * (pixel.b - 128) + 128, 0, 255);
+    unsigned int v = clamp(factor * (pixel.b - 128) + 128, 0, 255);
+
+    return v;
 }
 
 void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
