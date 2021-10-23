@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
     // rotate(image, 180);
 
     grayscale(image);
-
-    char s[1000] = "mkdir ";
+    // TODO : Remove the tmp directory
+    char s[1000] = "mkdir "; // create tmp directory for presentation
     strcat(s, argv[3]);
 
     if (system(s))
