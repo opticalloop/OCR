@@ -8,7 +8,8 @@ void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
     const unsigned int xincrem = width / 9;
     const unsigned int yincrem = height / 9;
 
-    //printf("width: %d, height: %d, xincrem: %d, yincrem: %d\n", width, height,
+    // printf("width: %d, height: %d, xincrem: %d, yincrem: %d\n", width,
+    // height,
     //       xincrem, yincrem);
 
     char directory[200];
@@ -38,7 +39,7 @@ void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                 SDL_Surface *surface =
                     SDL_CreateRGBSurface(0, block.w, block.h, 24, 0, 0, 0, 0);
 
-                //printf("xstart: %d, ystart: %d, width: %d, height: %d\n",
+                // printf("xstart: %d, ystart: %d, width: %d, height: %d\n",
                 //       block.x, block.y, block.w, block.h);
 
                 SDL_BlitSurface(image->surface, &block, surface, NULL);

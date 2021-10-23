@@ -1,6 +1,8 @@
 #ifndef CLEARSQUARE_H
 #define CLEARSQUARE_H
 
+#include "Imagery/Color_Treatment/blackandwhite.h"
+#include "Imagery/Segmentation/split.h"
 #include "Imagery/Utils/image.h"
 
 /*

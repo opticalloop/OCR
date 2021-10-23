@@ -8,6 +8,7 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Resize/resize.h"
+#include "Imagery/Segmentation/clearsquare.h"
 #include "Imagery/Segmentation/split.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/op.h"
