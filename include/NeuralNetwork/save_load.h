@@ -29,6 +29,6 @@ void saveWeights(Network *network, char *path);
  *      directly change the network in paramters so void
  */
 
-void launchWeights(Network *network, char *path);
+void launchWeights(Network *network, char *path, int verbose);
 
 #endif

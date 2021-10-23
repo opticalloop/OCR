@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Utils/noise_reduction.h"
 #include "NeuralNetwork/save_load.h"
 #include "NeuralNetwork/training.h"
