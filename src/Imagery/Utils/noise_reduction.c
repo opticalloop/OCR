@@ -137,7 +137,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b1.txt", 256);
     // printArray(histogram, 256);
     int max = image->height * image->width;
 
@@ -156,8 +155,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
-
-    GetHistogram(histogram, image->pixels, w, h);
 
     if (verbose)
         printf("    🎥 Applying Median Filter\n");
