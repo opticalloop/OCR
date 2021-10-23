@@ -12,8 +12,8 @@
 
 typedef struct
 {
-    unsigned int X;
-    unsigned int Y;
+    int X;
+    int Y;
 } Dot;
 
 typedef struct

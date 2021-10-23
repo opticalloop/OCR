@@ -24,13 +24,14 @@ int main(int argc, char *argv[])
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
+    blackandwhite(image);
     reverse_color(image);
     detection(image);
     // displayImage(image);
     // rotate(image, 180);
 
     // grayscale(image);
-    // blackandwhite(image);
+    
     // autoRotate(image, 0.01);
 
     // resizeImage(image, 1280, 720);

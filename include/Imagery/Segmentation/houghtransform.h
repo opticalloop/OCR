@@ -7,6 +7,8 @@
 void detection(Image *image);
 unsigned int **houghtransform(Image *image);
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width, double height);
+void accToBmp(unsigned int **matrice, unsigned int width,
+                  unsigned int height);
 void matriceToBmp(unsigned int **matrice, unsigned int width,
                   unsigned int height);
 double degrees_ToRadians(double theta);
