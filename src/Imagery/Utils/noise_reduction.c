@@ -109,7 +109,7 @@ static void SaveTmpPic(Image *image, char pathToSave[], char name[])
 {
     char str[200];
     snprintf(str, sizeof(str), "%s/%s.bmp", pathToSave, name);
-    printf("Saved picture : %s\n", str);
+    printf("<-- 📂 Saved picture : %s\n", str);
     saveImage(image, str);
 }
 static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
@@ -123,23 +123,25 @@ static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
         }
     }
 }
-void Preprocessing(Image *image, char pathToSave[])
+void Preprocessing(Image *image, char pathToSave[], int verbose)
 {
     unsigned int w = image->width;
     unsigned int h = image->height;
-    printf("--------------------------\n");
-    printf("Applying preprocessing filters\n");
-
-    printf("Calculating Histogram\n");
-
+    if (verbose)
+    {
+        printf("    🎨 Applying preprocessing filters\n");
+        printf("    📈 Calculating Histogram\n");
+    }
     float *binomialFilter = BinomialFilter();
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    printArray(histogram, 256);
+    // printArray(histogram, 256);
     int max = image->height * image->width;
 
-    printf("Applying constrast Filter\n");
+    if (verbose)
+        printf("    📸 Applying constrast Filter\n");
+
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
             updatePixelToSameValue(
@@ -149,7 +151,10 @@ void Preprocessing(Image *image, char pathToSave[])
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
-    printf("Applying Median Filter\n");
+
+    if (verbose)
+        printf("    🎥 Applying Median Filter\n");
+
     for (unsigned int i = 0; i < w; i++)
     {
         for (unsigned int j = 0; j < h; j++)
@@ -161,7 +166,10 @@ void Preprocessing(Image *image, char pathToSave[])
     ApplyMaskToImage(image, mask, w, h);
     SaveTmpPic(image, pathToSave, "2_median");
     updateNeigbourgs(image);
-    printf("Applying Average Filter\n");
+
+    if (verbose)
+        printf("    🎬 Applying Average Filter\n");
+
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
             updatePixelToSameValue(
@@ -171,8 +179,11 @@ void Preprocessing(Image *image, char pathToSave[])
     SaveTmpPic(image, pathToSave, "3_average");
 
     GetHistogram(histogram, image->pixels, w, h);
-    printArray(histogram, 256);
-    printf("Applying Otsu Filter\n");
+    // printArray(histogram, 256);
+
+    if (verbose)
+        printf("    💻 Applying Otsu Filter\n");
+
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
     NegativePictureIfNormal(image);
@@ -314,7 +325,7 @@ void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
 {
     double threshold = Thresholding(histogram);
 
-    printf("\tthreshold value : %f\n", threshold);
+    printf("\t 📊 Threshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
     {
         for (unsigned int j = 0; j < h; j++)

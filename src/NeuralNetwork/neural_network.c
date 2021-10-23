@@ -5,10 +5,11 @@
 Neuron newNeuron(unsigned int nbWeights)
 {
     Neuron neuron = {
-        nbWeights, NULL,
-        0, // Value
-        0, // Bias
-        0, // Delta
+        .nbWeights = nbWeights,
+        .weights = NULL,
+        .value = 0,
+        .bias = 0,
+        .delta = 0,
     };
 
     // Allocate memory for weights
@@ -46,7 +47,7 @@ void freeNeuron(Neuron *neuron)
 
 Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 {
-    Layer layer = { size, NULL };
+    Layer layer = { .nbNeurons = size, .neurons = NULL };
 
     // Allocate memory for neurons, calloc already put the + 1 for the \0
     layer.neurons = malloc((size + 1) * sizeof(struct Neuron));

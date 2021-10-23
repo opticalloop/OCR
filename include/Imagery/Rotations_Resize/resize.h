@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "Imagery/Rotations_Resize/bilinear_interpolation.h"
 #include "Imagery/Utils/image.h"
 
 /*

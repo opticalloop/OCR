@@ -6,6 +6,8 @@
 #include <stdlib.h>
 
 #include "Imagery/Color_Treatment/grayscale.h"
+#include "Imagery/Rotations_Resize/resize.h"
+#include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/noise_reduction.h"
 #include "NeuralNetwork/save_load.h"
 #include "NeuralNetwork/training.h"
