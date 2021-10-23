@@ -123,39 +123,7 @@ static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
         }
     }
 }
-static void saveMatrix(Pixel **pixels, char path[], unsigned int w,
-                       unsigned int h)
-{
-    FILE *fp;
-    fp = fopen(path, "w+");
-    for (unsigned int i = 0; i < w; i++)
-    {
-        for (unsigned int j = 0; j < h; j++)
-        {
-            char str[20];
-            sprintf(str, "%u ", pixels[i][j].b);
-            fputs(str, fp);
-        }
-        fputs("\n", fp);
-    }
 
-    fclose(fp);
-}
-static void saveArray(unsigned int *t, char path[], unsigned int n)
-{
-    FILE *fp;
-    fp = fopen(path, "w+");
-
-    for (unsigned int j = 0; j < n; j++)
-    {
-        char str[20];
-        sprintf(str, "%u", t[j]);
-        fputs(str, fp);
-        fputs("\n", fp);
-    }
-
-    fclose(fp);
-}
 void Preprocessing(Image *image, char pathToSave[], int verbose)
 {
     unsigned int w = image->width;
@@ -169,7 +137,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b1.txt", 256);
     // printArray(histogram, 256);
     int max = image->height * image->width;
 
@@ -185,13 +152,9 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 ConstrastFilter(image->pixels[i][j], histogram, max));
         }
     }
-    saveMatrix(image->pixels, "./a1.txt", w, h);
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
-
-    GetHistogram(histogram, image->pixels, w, h);
-    saveArray(histogram, "./b2.txt", 256);
 
     if (verbose)
         printf("    🎥 Applying Median Filter\n");
@@ -206,10 +169,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     }
     ApplyMaskToImage(image, mask, w, h);
     SaveTmpPic(image, pathToSave, "2_median");
-    saveMatrix(image->pixels, "./a2.txt", w, h);
-
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b3.txt", 256);
 
     updateNeigbourgs(image);
 
@@ -223,21 +182,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 AverageFilter(mask[i][j].matrix, binomialFilter));
 
     SaveTmpPic(image, pathToSave, "3_average");
-    saveMatrix(image->pixels, "./a3.txt", w, h);
-
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b4.txt", 256);
-    // printArray(histogram, 256);
 
     if (verbose)
         printf("    💻 Applying Otsu Filter\n");
 
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
-    saveMatrix(image->pixels, "./a4.txt", w, h);
 
-    // GetHistogram(histogram, image->pixels, w, h);
-    // saveArray(histogram, "./b4.txt", 256);
     NegativePictureIfNormal(image);
     SaveTmpPic(image, pathToSave, "5_inversed");
 
@@ -284,9 +235,8 @@ unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
 {
     float fact = histogram[pixel.b] / ((float)max);
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    unsigned int v = clamp(factor * (pixel.b - 128) + 128, 0, 255);
 
-    return v;
+    return clamp(factor * (pixel.b - 128) + 128, 0, 255);
 }
 
 void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
