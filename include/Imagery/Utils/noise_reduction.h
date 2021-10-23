@@ -22,7 +22,7 @@
  * Return:
  *      void
  */
-void Preprocessing(Image *image);
+void Preprocessing(Image *image, char pathToSave[]);
 
 /*
  * Summary:

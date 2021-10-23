@@ -58,3 +58,5 @@ out.bmp
 
 Imagery/*.bmp
 Digits-Only/
+
+src/Imagery/img_0*/
