@@ -113,7 +113,7 @@ static void SaveTmpPic(Image *image, char pathToSave[], char name[])
         pathToSave = "Image";
     }
     snprintf(str, sizeof(str), "%s/%s.bmp", pathToSave, name);
-    printf("<-- 📂 Saved picture : %s\n", str);
+    printf("<--     📂 Saved picture : %s\n", str);
     saveImage(image, str);
 }
 static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
@@ -166,8 +166,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     unsigned int h = image->height;
     if (verbose)
     {
-        printf("    🎨 Applying preprocessing filters\n");
-        printf("    📈 Calculating Histogram\n");
+        printf("    🎨 1. Applying preprocessing filters\n");
+        printf("    📈 1.1 Calculating Histogram\n");
     }
     float *binomialFilter = BinomialFilter();
 
@@ -177,7 +177,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     int max = image->height * image->width;
 
     if (verbose)
-        printf("    📸 Applying constrast Filter\n");
+        printf("    📸 1.2 Applying constrast Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
     {
@@ -185,7 +185,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
         {
             updatePixelToSameValue(
                 &(image->pixels[i][j]),
-                ConstrastFilter(image->pixels[i][j], histogram, max));
+                ConstrastFilter(&(image->pixels[i][j]), histogram, max));
         }
     }
 
@@ -196,7 +196,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     GetHistogram(histogram, image->pixels, w, h);
 
     if (verbose)
-        printf("    🎥 Applying Median Filter\n");
+        printf("    🎥 1.3 Applying Median Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
     {
@@ -212,7 +212,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     updateNeigbourgs(image);
 
     if (verbose)
-        printf("    🎬 Applying Average Filter\n");
+        printf("    🎬 1.4 Applying Average Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
@@ -223,7 +223,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
     SaveTmpPic(image, pathToSave, "3_average");
 
     if (verbose)
-        printf("    💻 Applying Otsu Filter\n");
+        printf("    💻 1.5 Applying Otsu Filter\n");
 
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
@@ -270,11 +270,11 @@ static unsigned int clamp(unsigned int value, unsigned int min,
     return value < min ? min : value > max ? max : value;
 }
 
-unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max)
+unsigned int ConstrastFilter(Pixel *pixel, unsigned int *histogram, int max)
 {
-    float fact = histogram[pixel.b] / ((float)max);
+    float fact = histogram[pixel->b] / ((float)max);
     float factor = (259. * (fact + 255)) / (255 * (259 - fact));
-    unsigned int v = clamp(factor * (pixel.b - 128) + 128, 0, 255);
+    unsigned int v = clamp(factor * (pixel->b - 128) + 128, 0, 255);
 
     return v;
 }

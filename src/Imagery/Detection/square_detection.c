@@ -7,7 +7,6 @@ LineList simplifyLines(LineList *linelist)
 {
     const unsigned int len = linelist->len;
     Line *allLines = linelist->lines;
-    printf("Total number of lines : %d\n", len);
     if (len <= 0)
     {
         errx(1, "Got no line\n");
@@ -55,7 +54,6 @@ LineList simplifyLines(LineList *linelist)
             }
         }
     }
-    printf("Got nb resulting lines : %d\n", lastLinesCount);
     Line *resultingLines = malloc(lastLinesCount * sizeof(Line) + 1);
     int index = 0;
     for (unsigned int j = 0; j < len; j++)
@@ -270,6 +268,9 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image)
                                     squareList.squares[nbSquares] = square;
                                     drawSquare(&square, image, width, height,
                                                2);
+                                    if (0)
+                                        freeImage(image);
+                                    
                                     nbSquares++;
                                 }
                             }
@@ -280,7 +281,6 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image)
         }
     }
     squareList.len = nbSquares;
-    printf("Got %d squares\n", nbSquares);
     return squareList;
 }
 
@@ -380,7 +380,6 @@ int getFactor(Square *square)
     {
         shortestLine = l4;
     }
-    printf("Factor : %d\n", biggestLine - shortestLine);
     return biggestLine - shortestLine;
 }
 
@@ -406,12 +405,12 @@ void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness)
 {
     // printf("Drawing square\n");
-    int *a = draw_line(image, width, height, &(square->left), 50, thickness);
+    int *a = draw_line(image, width, height, &(square->left), 50, thickness, 1);
     free(a);
-    int *b = draw_line(image, width, height, &(square->bottom), 50, thickness);
+    int *b = draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
     free(b);
-    int *c = draw_line(image, width, height, &(square->top), 50, thickness);
+    int *c = draw_line(image, width, height, &(square->top), 50, thickness, 1);
     free(c);
-    int *d = draw_line(image, width, height, &(square->right), 50, thickness);
+    int *d = draw_line(image, width, height, &(square->right), 50, thickness, 1);
     free(d);
 }

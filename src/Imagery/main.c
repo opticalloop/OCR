@@ -149,53 +149,57 @@ int main(int argc, char *argv[])
         Image *image = &_image;
         newImage(image);
         grayscale(image);
+
+        if (!strcmp(p_output_folder, ""))
+        {
+            p_output_folder = "detect_output";
+        }
+
+        // Create directory
+        char s[1000] = "mkdir ";
+        strcat(s, p_output_folder);
+        if (system(s))
+        {
+        }
+
         Preprocessing(image, p_output_folder, verbose);
 
-        Image _drawImage;
-        _drawImage.path = argv[1];
-        _drawImage.surface = NULL;
-        Image *drawImage = &_drawImage;
+        updateSurface(image);
 
-        newImage(drawImage);
+        Image drawImage;
+        drawImage.path = argv[1];
+        drawImage.surface = NULL;
+        newImage(&drawImage);
 
-        Image _simpleImage;
-        _simpleImage.path = argv[1];
-        _simpleImage.surface = NULL;
-        Image *simpleImage = &_simpleImage;
-        newImage(simpleImage);
+        Image simpleImage;
+        simpleImage.path = argv[1];
+        simpleImage.surface = NULL;
+        newImage(&simpleImage);
 
-        Image _squareImage;
-        _squareImage.path = argv[1];
-        _squareImage.surface = NULL;
-        Image *squareImage = &_squareImage;
-        newImage(squareImage);
+        Image squareImage;
+        squareImage.path = argv[1];
+        squareImage.surface = NULL;
+        newImage(&squareImage);
 
-        Image _lastSquare;
-        _lastSquare.path = argv[1];
-        _lastSquare.surface = NULL;
-        Image *lastSquare = &_lastSquare;
-        newImage(lastSquare);
+        Image lastSquare;
+        lastSquare.path = argv[1];
+        lastSquare.surface = NULL;
+        newImage(&lastSquare);
 
-        detection(image, drawImage, simpleImage, squareImage, lastSquare);
-
+        // All image free in function
+        SDL_Surface *surface = detection(image, &drawImage, &simpleImage, &squareImage, &lastSquare, verbose);
         saveImage(image, argv[2]);
-        saveImage(drawImage, "1.0_all_lines.bmp");
-        saveImage(simpleImage, "1.1_simplified_lines.bmp");
-        saveImage(squareImage, "1.2_squares_only.bmp");
-        saveImage(lastSquare, "1.3_last_square.bmp");
-
-        freeImage(lastSquare);
-        freeImage(squareImage);
-        freeImage(simpleImage);
-        freeImage(drawImage);
+        SDL_FreeSurface(surface);
         freeImage(image);
 
         return 0;
     }
 
-    Image image;
-    image.path = input_path;
-    newImage(&image);
+    Image img;
+    img.path = input_path;
+    img.surface = NULL;
+    newImage(&img);
+    printf("egregtrvegat'r\n");
 
     if (preprocessing)
     {
@@ -207,18 +211,18 @@ int main(int argc, char *argv[])
         }
 
         // Preprocessing
-        grayscale(&image);
-        Preprocessing(&image, p_output_folder, verbose);
+        grayscale(&img);
+        Preprocessing(&img, p_output_folder, verbose);
     }
 
     if (_rotate)
     {
-        rotate(&image, degree);
+        rotate(&img, degree);
     }
 
     if (_resize)
     {
-        Image resized_image = resize(&image, resize_width, resize_height);
+        Image resized_image = resize(&img, resize_width, resize_height);
         saveImage(&resized_image, output_path);
         return EXIT_SUCCESS;
     }
@@ -226,13 +230,13 @@ int main(int argc, char *argv[])
     if (segment)
     {
         SDL_Surface *seg81[81];
-        split(&image, seg81, 1, s_output_folder);
-        updateSurface(&image);
+        split(&img, seg81, 1, s_output_folder);
+        updateSurface(&img);
         freeList(seg81, 81);
     }
 
-    saveImage(&image, output_path);
-    freeImage(&image);
+    saveImage(&img, output_path);
+    freeImage(&img);
 
     return EXIT_SUCCESS;
 }
