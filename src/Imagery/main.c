@@ -8,9 +8,9 @@
 #include "Imagery/Detection/houghtransform.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
+#include "Imagery/Segmentation/split.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
-#include "Imagery/segmentation/split.h"
 
 static void printHelp(void)
 {
@@ -164,30 +164,13 @@ int main(int argc, char *argv[])
 
         Preprocessing(image, p_output_folder, verbose);
 
-        updateSurface(image);
-
         Image drawImage;
         drawImage.path = argv[1];
         drawImage.surface = NULL;
         newImage(&drawImage);
 
-        Image simpleImage;
-        simpleImage.path = argv[1];
-        simpleImage.surface = NULL;
-        newImage(&simpleImage);
-
-        Image squareImage;
-        squareImage.path = argv[1];
-        squareImage.surface = NULL;
-        newImage(&squareImage);
-
-        Image lastSquare;
-        lastSquare.path = argv[1];
-        lastSquare.surface = NULL;
-        newImage(&lastSquare);
-
         // All image free in function
-        SDL_Surface *surface = detection(image, &drawImage, &simpleImage, &squareImage, &lastSquare, verbose);
+        SDL_Surface *surface = detection(image, &drawImage, verbose);
         saveImage(image, argv[2]);
         SDL_FreeSurface(surface);
         freeImage(image);

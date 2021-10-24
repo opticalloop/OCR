@@ -2,8 +2,7 @@
 
 #define THRESHOLD 0.3
 
-SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
-               Image *squareImage, Image *lastSquareImg, int verbose)
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose)
 {
     // Initialize variables of the image
     if (verbose)
@@ -17,7 +16,6 @@ SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
     saveImage(drawImage, "Hough_all_lines.bmp");
     freeImage(drawImage);
 
-
     if (verbose)
         printf("    📈 2.5 Simplyfing lines found\n");
 
@@ -25,6 +23,11 @@ SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
     double angle = resultingList.maxTheta * 180.0 / M_PI;
 
     // Draw simplifieds lines
+    Image _simplifiedImage;
+    _simplifiedImage.path = image->path;
+    _simplifiedImage.surface = NULL;
+    Image *simplifiedImage = &_simplifiedImage;
+    newImage(simplifiedImage);
     const unsigned int w = simplifiedImage->width;
     const unsigned int h = simplifiedImage->height;
 
@@ -39,16 +42,22 @@ SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
         printf("<--     📂 Saved picture : %s\n", "Hough_simplified_lines.bmp");
     saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
     freeImage(simplifiedImage);
-     
+
     int angleRounded = (int)angle % 90;
     if (angleRounded >= 88 && angleRounded <= 91)
-    {   
+    {
         if (verbose)
             printf("    📐 2.6 Do not need to rotate image\n");
     }
     else if (verbose)
-            printf("    📐 2.6 Angle found : %d\n",  angleRounded);
+        printf("    📐 2.6 Angle found : %d\n", angleRounded);
 
+    // Draw simplifieds lines
+    Image _squareImage;
+    _squareImage.path = image->path;
+    _squareImage.surface = NULL;
+    Image *squareImage = &_squareImage;
+    newImage(squareImage);
     SquareList squares = findSquare(&resultingList, w, h, squareImage);
     if (verbose)
         printf("<--     📂 Saved picture : %s\n", "Hough_squares_only.bmp");
@@ -56,19 +65,24 @@ SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
     freeImage(squareImage);
 
     if (verbose)
-            printf("    📉 2.8 Finding the predominating square\n");
+        printf("    📉 2.8 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares);
 
+    Image _lastSquareImg;
+    _lastSquareImg.path = image->path;
+    _lastSquareImg.surface = NULL;
+    Image *lastSquareImg = &_lastSquareImg;
+    newImage(lastSquareImg);
     char str[1000] = "2.8.1_last_square.bmp";
     drawSquare(&lastSquare, lastSquareImg, w, h, 2);
     if (verbose)
-            printf("<--   🎨 2.8.1 Saving image last square image to %s\n", str);
+        printf("<--   🎨 2.8.1 Saving image last square image to %s\n", str);
     saveImage(lastSquareImg, str);
     freeImage(lastSquareImg);
 
     if (verbose)
-            printf("    📋 2.9 Computing cropped image\n");
-    
+        printf("    📋 2.9 Computing cropped image\n");
+
     // Get square dimension
     int l1 = getLineLength(&(lastSquare.top));
 
@@ -244,7 +258,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose)
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
     int boolIsIncreasing = 1;
-    
+
     if (verbose)
         printf("    📜 2.4 Drawing on image : %d\n", lineThreshold);
 
@@ -403,7 +417,8 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
 
                 if (thickness == 2)
                 {
-                    if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1) && (y0 + 1) < h)
+                    if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
+                        && (y0 + 1) < h)
                     {
                         image->pixels[x0 + 1][y0 + 1].r = 255 - color;
                         image->pixels[x0 + 1][y0 + 1].g = 255 + color;
