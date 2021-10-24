@@ -8,8 +8,7 @@
 
 LineList simplifyLines(LineList *linelist);
 
-Square getSquare(LineList *lineList, Line *line, int index, int width,
-                 int height);
+Square getSquare(LineList *lineList, Line *line, int index);
 
 Dot getIntersection(Line *line1, Line *line2, int width, int height);
 

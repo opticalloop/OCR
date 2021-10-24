@@ -1,24 +1,24 @@
 
 #include "Imagery/Utils/noise_reduction.h"
 
-static void printArray(unsigned int *array, unsigned int n)
-{
-    printf("{ ");
-    for (unsigned int i = 0; i < n - 1; ++i)
-    {
-        printf("%u, ", array[i]);
-    }
-    printf("%u }\n", array[n - 1]);
-}
-static void printArrayPixel(Pixel *array, unsigned int n)
-{
-    printf("{ ");
-    for (unsigned int i = 0; i < n - 1; ++i)
-    {
-        printf("%d, ", array[i].b);
-    }
-    printf("%d }\n", array[n - 1].b);
-}
+// static void printArray(unsigned int *array, unsigned int n)
+// {
+//     printf("{ ");
+//     for (unsigned int i = 0; i < n - 1; ++i)
+//     {
+//         printf("%u, ", array[i]);
+//     }
+//     printf("%u }\n", array[n - 1]);
+// }
+// static void printArrayPixel(Pixel *array, unsigned int n)
+// {
+//     printf("{ ");
+//     for (unsigned int i = 0; i < n - 1; ++i)
+//     {
+//         printf("%d, ", array[i].b);
+//     }
+//     printf("%d }\n", array[n - 1].b);
+// }
 
 static float *BinomialFilter()
 {
@@ -44,23 +44,23 @@ static float *BinomialFilter()
  * return :
  *  check if the picture look like a B&W  (under 5% of grayscale)
  */
-static int IsBlackAndWhite(Image *image, unsigned int *histogram,
-                           unsigned int max)
-{
-    unsigned int w = image->width;
-    unsigned int h = image->height;
-    for (unsigned int i = 0; i < w; i++)
-    {
-        for (unsigned int j = 0; j < h; j++)
-        {
-            unsigned int value = image->pixels[i][j].b;
-            if (value > 10 && value < 245
-                && (float)(histogram[value] / max) > 0.05)
-                return 0;
-        }
-    }
-    return 1;
-}
+// static int IsBlackAndWhite(Image *image, unsigned int *histogram,
+//                            unsigned int max)
+// {
+//     unsigned int w = image->width;
+//     unsigned int h = image->height;
+//     for (unsigned int i = 0; i < w; i++)
+//     {
+//         for (unsigned int j = 0; j < h; j++)
+//         {
+//             unsigned int value = image->pixels[i][j].b;
+//             if (value > 10 && value < 245
+//                 && (float)(histogram[value] / max) > 0.05)
+//                 return 0;
+//         }
+//     }
+//     return 1;
+// }
 /*
  * Summary
  * Params :
@@ -108,6 +108,10 @@ void NegativePictureIfNormal(Image *image)
 static void SaveTmpPic(Image *image, char pathToSave[], char name[])
 {
     char str[200];
+    if (!strcmp(pathToSave, ""))
+    {
+        pathToSave = "Image";
+    }
     snprintf(str, sizeof(str), "%s/%s.bmp", pathToSave, name);
     printf("<-- 📂 Saved picture : %s\n", str);
     saveImage(image, str);
@@ -123,39 +127,39 @@ static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
         }
     }
 }
-static void saveMatrix(Pixel **pixels, char path[], unsigned int w,
-                       unsigned int h)
-{
-    FILE *fp;
-    fp = fopen(path, "w+");
-    for (unsigned int i = 0; i < w; i++)
-    {
-        for (unsigned int j = 0; j < h; j++)
-        {
-            char str[20];
-            sprintf(str, "%u ", pixels[i][j].b);
-            fputs(str, fp);
-        }
-        fputs("\n", fp);
-    }
+// static void saveMatrix(Pixel **pixels, char path[], unsigned int w,
+//                        unsigned int h)
+// {
+//     FILE *fp;
+//     fp = fopen(path, "w+");
+//     for (unsigned int i = 0; i < w; i++)
+//     {
+//         for (unsigned int j = 0; j < h; j++)
+//         {
+//             char str[20];
+//             sprintf(str, "%u ", pixels[i][j].b);
+//             fputs(str, fp);
+//         }
+//         fputs("\n", fp);
+//     }
 
-    fclose(fp);
-}
-static void saveArray(unsigned int *t, char path[], unsigned int n)
-{
-    FILE *fp;
-    fp = fopen(path, "w+");
+//     fclose(fp);
+// }
+// static void saveArray(unsigned int *t, char path[], unsigned int n)
+// {
+//     FILE *fp;
+//     fp = fopen(path, "w+");
 
-    for (unsigned int j = 0; j < n; j++)
-    {
-        char str[20];
-        sprintf(str, "%u", t[j]);
-        fputs(str, fp);
-        fputs("\n", fp);
-    }
+//     for (unsigned int j = 0; j < n; j++)
+//     {
+//         char str[20];
+//         sprintf(str, "%u", t[j]);
+//         fputs(str, fp);
+//         fputs("\n", fp);
+//     }
 
-    fclose(fp);
-}
+//     fclose(fp);
+// }
 void Preprocessing(Image *image, char pathToSave[], int verbose)
 {
     unsigned int w = image->width;
@@ -169,7 +173,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    
+
     int max = image->height * image->width;
 
     if (verbose)
@@ -184,7 +188,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 ConstrastFilter(image->pixels[i][j], histogram, max));
         }
     }
-    
+
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
@@ -223,7 +227,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
-    
+
     NegativePictureIfNormal(image);
     SaveTmpPic(image, pathToSave, "5_inversed");
 

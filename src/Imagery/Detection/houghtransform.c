@@ -27,7 +27,8 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage,
     const unsigned int w = simplifiedImage->width;
     const unsigned int h = simplifiedImage->height;
     printf("Resulting line numbers : %d\n", resultingList.len);
-    for (unsigned int i = 0; i < resultingList.len; i++)
+    const unsigned int len = resultingList.len;
+    for (unsigned int i = 0; i < len; i++)
     {
         Line line = resultingList.lines[i];
         int *c = draw_line(simplifiedImage, w, h, &line, 200, 2);
@@ -364,8 +365,8 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            image->pixels[x0][y0].r = abs(255 - color);
-            image->pixels[x0][y0].g = abs(255 + color);
+            image->pixels[x0][y0].r = 255 - color;
+            image->pixels[x0][y0].g = 255 + color;
             image->pixels[x0][y0].b = color;
 
             if (thickness == 2)
@@ -373,15 +374,15 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
                 if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
                     && (y0 + 1) < h)
                 {
-                    image->pixels[x0 + 1][y0 + 1].r = abs(255 - color);
-                    image->pixels[x0 + 1][y0 + 1].g = abs(255 + color);
+                    image->pixels[x0 + 1][y0 + 1].r = 255 - color;
+                    image->pixels[x0 + 1][y0 + 1].g = 255 + color;
                     image->pixels[x0 + 1][y0 + 1].b = color;
                 }
                 if (0 <= (x0 - 1) && (x0 - 1) < w && 0 <= (y0 - 1)
                     && (y0 - 1) < h)
                 {
-                    image->pixels[x0 - 1][y0 - 1].r = abs(255 - color);
-                    image->pixels[x0 - 1][y0 - 1].g = abs(255 + color);
+                    image->pixels[x0 - 1][y0 - 1].r = 255 - color;
+                    image->pixels[x0 - 1][y0 - 1].g = 255 + color;
                     image->pixels[x0 - 1][y0 - 1].b = color;
                 }
             }

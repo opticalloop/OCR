@@ -10,8 +10,7 @@ LineList simplifyLines(LineList *linelist)
     printf("Total number of lines : %d\n", len);
     if (len <= 0)
     {
-        printf("Got no line\n");
-        return;
+        errx(1, "Got no line\n");
     }
     int lastLinesCount = 0;
 
@@ -37,7 +36,8 @@ LineList simplifyLines(LineList *linelist)
                             < MIN_EQUAL
                         && abs(referenceLine.yEnd - currentLine.yEnd)
                             < MIN_EQUAL
-                        && abs(referenceLine.theta - currentLine.theta)
+                        && abs((int)referenceLine.theta
+                               - (int)currentLine.theta)
                             < MIN_THETA)
                     {
                         allLines[i].xStart =
@@ -58,7 +58,7 @@ LineList simplifyLines(LineList *linelist)
     printf("Got nb resulting lines : %d\n", lastLinesCount);
     Line *resultingLines = malloc(lastLinesCount * sizeof(Line) + 1);
     int index = 0;
-    for (int j = 0; j < len; j++)
+    for (unsigned int j = 0; j < len; j++)
     {
         if (allLines[j].xStart != -1)
         {
@@ -76,8 +76,7 @@ LineList simplifyLines(LineList *linelist)
     return lines;
 }
 
-Square getSquare(LineList *lineList, Line *line, int index, int width,
-                 int height)
+Square getSquare(LineList *lineList, Line *line, int index)
 {
     const unsigned int len = lineList->len;
     Square square;
@@ -90,27 +89,23 @@ Square getSquare(LineList *lineList, Line *line, int index, int width,
         Line temp = lineList->lines[j];
         // Degree
         double tempAngle = temp.theta * 180.0 / M_PI;
-        double angleDiff = abs(actualAngle - tempAngle);
-        // printf("Actual angle : %f, Temp angle : %f\n", actualAngle,
-        // tempAngle); printf("Angle diff : %f\n", angleDiff);
+        double angleDiff = actualAngle - tempAngle;
+        angleDiff *= angleDiff < 0 ? -1 : 1;
+
         if (angleDiff >= 80 && angleDiff <= 100)
         {
             switch (i)
             {
             case 0:
-                // printf("Top\n");
                 square.top = actual;
                 break;
             case 1:
-                // printf("Bottom\n");
                 square.bottom = actual;
                 break;
             case 2:
-                // printf("Left\n");
                 square.left = actual;
                 break;
             case 3:
-                // printf("Right\n");
                 square.right = actual;
                 return square;
                 break;
@@ -391,9 +386,10 @@ int getFactor(Square *square)
 
 Square sortSquares(SquareList *squareList)
 {
+    const unsigned int len = squareList->len;
     Square temp = squareList->squares[0];
     int tempFactor = getFactor(&temp);
-    for (unsigned int i = 1; i < squareList->len; i++)
+    for (unsigned int i = 1; i < len; i++)
     {
         Square square = squareList->squares[i];
         int factor = getFactor(&square);

@@ -5,20 +5,21 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Color_Treatment/grayscale.h"
-#include "Imagery/Resize/resize.h"
-#include "Imagery/Rotations/rotations.h"
-#include "Imagery/Segmentation/houghtransform.h"
+#include "Imagery/Detection/houghtransform.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
+#include "Imagery/segmentation/split.h"
 
 static void printHelp(void)
 {
     printf(
         "Usage : ./main <input_image> <output_image> [options]\n"
         "Options :\n"
-        "      	 -v --verbose : print the details\n"
+        "         -d --detect : perform hough transform detection on the "
+        "image\n"
+        "      	  -v --verbose : print the details\n"
         "         -p --preprocessing <output_folder> : preprocess the image "
         "with all filters, save the details in output folder\n"
         "         -r --rotate <degree> : rotate image by degree in parameter\n"
@@ -52,55 +53,6 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
-    Image _image;
-    _image.path = argv[1];
-    _image.surface = NULL;
-    Image *image = &_image;
-    newImage(image);
-    // blackandwhite(image);
-    // reverse_color(image);
-
-    Image _drawImage;
-    _drawImage.path = argv[1];
-    _drawImage.surface = NULL;
-    Image *drawImage = &_drawImage;
-
-    newImage(drawImage);
-
-    Image _simpleImage;
-    _simpleImage.path = argv[1];
-    _simpleImage.surface = NULL;
-    Image *simpleImage = &_simpleImage;
-    newImage(simpleImage);
-
-    Image _squareImage;
-    _squareImage.path = argv[1];
-    _squareImage.surface = NULL;
-    Image *squareImage = &_squareImage;
-    newImage(squareImage);
-
-    Image _lastSquare;
-    _lastSquare.path = argv[1];
-    _lastSquare.surface = NULL;
-    Image *lastSquare = &_lastSquare;
-    newImage(lastSquare);
-
-    detection(image, drawImage, simpleImage, squareImage, lastSquare);
-
-    saveImage(image, argv[2]);
-    saveImage(drawImage, "1.0_all_lines.bmp");
-    saveImage(simpleImage, "1.1_simplified_lines.bmp");
-    saveImage(squareImage, "1.2_squares_only.bmp");
-    saveImage(lastSquare, "1.3_last_square.bmp");
-
-    freeImage(lastSquare);
-    freeImage(squareImage);
-    freeImage(simpleImage);
-    freeImage(drawImage);
-    freeImage(image);
-
-    return 0;
-}
     char *input_path = argv[1];
     char *output_path = argv[2];
 
@@ -111,6 +63,8 @@ int main(int argc, char *argv[])
 
     int _rotate = 0;
     double degree = 0;
+
+    int detect = 0;
 
     int _resize = 0;
     int resize_width = 0;
@@ -125,6 +79,10 @@ int main(int argc, char *argv[])
         {
             printHelp();
             return EXIT_SUCCESS;
+        }
+        else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--detect"))
+        {
+            detect = 1;
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
@@ -183,6 +141,58 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (detect)
+    {
+        Image _image;
+        _image.path = argv[1];
+        _image.surface = NULL;
+        Image *image = &_image;
+        newImage(image);
+        grayscale(image);
+        Preprocessing(image, p_output_folder, verbose);
+
+        Image _drawImage;
+        _drawImage.path = argv[1];
+        _drawImage.surface = NULL;
+        Image *drawImage = &_drawImage;
+
+        newImage(drawImage);
+
+        Image _simpleImage;
+        _simpleImage.path = argv[1];
+        _simpleImage.surface = NULL;
+        Image *simpleImage = &_simpleImage;
+        newImage(simpleImage);
+
+        Image _squareImage;
+        _squareImage.path = argv[1];
+        _squareImage.surface = NULL;
+        Image *squareImage = &_squareImage;
+        newImage(squareImage);
+
+        Image _lastSquare;
+        _lastSquare.path = argv[1];
+        _lastSquare.surface = NULL;
+        Image *lastSquare = &_lastSquare;
+        newImage(lastSquare);
+
+        detection(image, drawImage, simpleImage, squareImage, lastSquare);
+
+        saveImage(image, argv[2]);
+        saveImage(drawImage, "1.0_all_lines.bmp");
+        saveImage(simpleImage, "1.1_simplified_lines.bmp");
+        saveImage(squareImage, "1.2_squares_only.bmp");
+        saveImage(lastSquare, "1.3_last_square.bmp");
+
+        freeImage(lastSquare);
+        freeImage(squareImage);
+        freeImage(simpleImage);
+        freeImage(drawImage);
+        freeImage(image);
+
+        return 0;
+    }
+
     Image image;
     image.path = input_path;
     newImage(&image);
@@ -216,7 +226,7 @@ int main(int argc, char *argv[])
     if (segment)
     {
         SDL_Surface *seg81[81];
-        split(image, seg81, 1, s_output_folder);
+        split(&image, seg81, 1, s_output_folder);
         updateSurface(&image);
         freeList(seg81, 81);
     }
