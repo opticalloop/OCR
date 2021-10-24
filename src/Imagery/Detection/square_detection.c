@@ -158,7 +158,7 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
 }
 
 // Stop at 4
-SquareList findSquare(LineList *lineList, int width, int height, Image *image)
+SquareList findSquare(LineList *lineList, int width, int height, Image *image, int draw)
 {
     SquareList squareList;
     squareList.squares = malloc(sizeof(Square));
@@ -266,11 +266,11 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image)
                                         squareList.squares,
                                         (nbSquares + 1) * sizeof(Square));
                                     squareList.squares[nbSquares] = square;
-                                    drawSquare(&square, image, width, height,
-                                               2);
-                                    if (0)
-                                        freeImage(image);
-
+                                    if (draw)
+                                    {
+                                        drawSquare(&square, image, width, height,
+                                                   2);
+                                    }
                                     nbSquares++;
                                 }
                             }

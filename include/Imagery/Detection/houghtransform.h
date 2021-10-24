@@ -7,9 +7,9 @@
 #include "Imagery/Detection/struct.h"
 #include "Imagery/Utils/image.h"
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose);
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save);
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose);
+LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw);
 
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
                      double height);

@@ -2,46 +2,57 @@
 
 #define THRESHOLD 0.3
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose)
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 {
+    // Directly free
+    if (!save)
+    {
+        freeImage(drawImage);
+    }
+
     // Initialize variables of the image
     if (verbose)
         printf("\n    🔍 2. Hough Transform\n");
 
     // Call major fonction
-    LineList list = houghtransform(image, drawImage, verbose);
+    LineList list = houghtransform(image, drawImage, verbose, save);
 
-    if (verbose)
-        printf("<--     📂 Saved picture : %s\n", "Hough_all_lines.bmp");
-    saveImage(drawImage, "Hough_all_lines.bmp");
-    freeImage(drawImage);
-
+    if (save)
+    {
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n", "2.1_Hough_all_lines.bmp");
+        saveImage(drawImage, "Hough_all_lines.bmp");
+        freeImage(drawImage);
+    }
     if (verbose)
         printf("    📈 2.5 Simplyfing lines found\n");
 
     LineList resultingList = simplifyLines(&list);
     double angle = resultingList.maxTheta * 180.0 / M_PI;
 
-    // Draw simplifieds lines
-    Image _simplifiedImage;
-    _simplifiedImage.path = image->path;
-    _simplifiedImage.surface = NULL;
-    Image *simplifiedImage = &_simplifiedImage;
-    newImage(simplifiedImage);
-    const unsigned int w = simplifiedImage->width;
-    const unsigned int h = simplifiedImage->height;
-
-    const unsigned int len = resultingList.len;
-    for (unsigned int i = 0; i < len; i++)
+    if (save)
     {
-        Line line = resultingList.lines[i];
-        int *c = draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
-        free(c);
+        // Draw simplifieds lines
+        Image _simplifiedImage;
+        _simplifiedImage.path = image->path;
+        _simplifiedImage.surface = NULL;
+        Image *simplifiedImage = &_simplifiedImage;
+        newImage(simplifiedImage);
+        const unsigned int w = simplifiedImage->width;
+        const unsigned int h = simplifiedImage->height;
+
+        const unsigned int len = resultingList.len;
+        for (unsigned int i = 0; i < len; i++)
+        {
+            Line line = resultingList.lines[i];
+            int *c = draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
+            free(c);
+        }
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n", "2.2_Hough_simplified_lines.bmp");
+        saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
+        freeImage(simplifiedImage);
     }
-    if (verbose)
-        printf("<--     📂 Saved picture : %s\n", "Hough_simplified_lines.bmp");
-    saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
-    freeImage(simplifiedImage);
 
     int angleRounded = (int)angle % 90;
     if (angleRounded >= 88 && angleRounded <= 91)
@@ -52,33 +63,44 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose)
     else if (verbose)
         printf("    📐 2.6 Angle found : %d\n", angleRounded);
 
-    // Draw simplifieds lines
     Image _squareImage;
     _squareImage.path = image->path;
     _squareImage.surface = NULL;
     Image *squareImage = &_squareImage;
-    newImage(squareImage);
-    SquareList squares = findSquare(&resultingList, w, h, squareImage);
-    if (verbose)
-        printf("<--     📂 Saved picture : %s\n", "Hough_squares_only.bmp");
-    saveImage(squareImage, "Hough_squares_only.bmp");
-    freeImage(squareImage);
+    if (save)
+    {
+        // Draw simplifieds lines
+        newImage(squareImage);
+    }
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;   
+    SquareList squares = findSquare(&resultingList, w, h, squareImage, save);
+    if (save)
+    {    
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n", "2.3_Hough_squares_only.bmp");
+        saveImage(squareImage, "Hough_squares_only.bmp");
+        freeImage(squareImage);
+    }
 
     if (verbose)
         printf("    📉 2.8 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares);
 
-    Image _lastSquareImg;
-    _lastSquareImg.path = image->path;
-    _lastSquareImg.surface = NULL;
-    Image *lastSquareImg = &_lastSquareImg;
-    newImage(lastSquareImg);
-    char str[1000] = "2.8.1_last_square.bmp";
-    drawSquare(&lastSquare, lastSquareImg, w, h, 2);
-    if (verbose)
-        printf("<--   🎨 2.8.1 Saving image last square image to %s\n", str);
-    saveImage(lastSquareImg, str);
-    freeImage(lastSquareImg);
+    if (save)
+    {
+        Image _lastSquareImg;
+        _lastSquareImg.path = image->path;
+        _lastSquareImg.surface = NULL;
+        Image *lastSquareImg = &_lastSquareImg;
+        newImage(lastSquareImg);
+        char str[1000] = "2.4__last_square.bmp";
+        drawSquare(&lastSquare, lastSquareImg, w, h, 2);
+        if (verbose)
+            printf("<--   📂 Saved picture : %s\n", str);
+        saveImage(lastSquareImg, str);
+        freeImage(lastSquareImg);
+    }
 
     if (verbose)
         printf("    📋 2.9 Computing cropped image\n");
@@ -151,7 +173,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose)
     rect.y = lastSquare.left.yStart;
     rect.w = biggestLine;
     rect.h = secondBiggestLine;
-    ;
+    
     SDL_BlitSurface(image->surface, &rect, surface, NULL);
 
     // Free squares
@@ -162,7 +184,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose)
     return surface;
 }
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose)
+LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
 {
     // Save the image dimensions
     const double width = image->width, height = image->height;
@@ -318,7 +340,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose)
 
                 // Draw Lines on the copyImage matrice
                 int *coordinates =
-                    draw_line(drawImage, width, height, &line, 200, 1, 1);
+                    draw_line(drawImage, width, height, &line, 200, 1, draw);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));

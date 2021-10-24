@@ -110,7 +110,7 @@ static void SaveTmpPic(Image *image, char pathToSave[], char name[])
     char str[200];
     if (!strcmp(pathToSave, ""))
     {
-        pathToSave = "Image";
+        pathToSave = "Output";
     }
     snprintf(str, sizeof(str), "%s/%s.bmp", pathToSave, name);
     printf("<--     📂 Saved picture : %s\n", str);

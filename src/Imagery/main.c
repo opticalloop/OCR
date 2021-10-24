@@ -19,6 +19,7 @@ static void printHelp(void)
         "Options :\n"
         "         -d --detect : perform hough transform detection on the "
         "image\n"
+        "         -S : save details image (slowly)\n"
         "      	  -v --verbose : print the details\n"
         "         -p --preprocessing <output_folder> : preprocess the image "
         "with all filters, save the details in output folder\n"
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
     int resize_width = 0;
     int resize_height = 0;
 
+    int save = 0;
     int segment = 0;
     char *s_output_folder = "";
 
@@ -83,6 +85,10 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--detect"))
         {
             detect = 1;
+        }
+        else if (!strcmp(argv[i], "-S"))
+        {
+            save = 1;
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
@@ -170,7 +176,7 @@ int main(int argc, char *argv[])
         newImage(&drawImage);
 
         // All image free in function
-        SDL_Surface *surface = detection(image, &drawImage, verbose);
+        SDL_Surface *surface = detection(image, &drawImage, verbose, save);
         saveImage(image, argv[2]);
         SDL_FreeSurface(surface);
         freeImage(image);
@@ -182,7 +188,6 @@ int main(int argc, char *argv[])
     img.path = input_path;
     img.surface = NULL;
     newImage(&img);
-    printf("egregtrvegat'r\n");
 
     if (preprocessing)
     {
