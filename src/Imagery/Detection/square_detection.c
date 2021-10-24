@@ -270,7 +270,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image)
                                                2);
                                     if (0)
                                         freeImage(image);
-                                    
+
                                     nbSquares++;
                                 }
                             }
@@ -407,10 +407,12 @@ void drawSquare(Square *square, Image *image, int width, int height,
     // printf("Drawing square\n");
     int *a = draw_line(image, width, height, &(square->left), 50, thickness, 1);
     free(a);
-    int *b = draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
+    int *b =
+        draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
     free(b);
     int *c = draw_line(image, width, height, &(square->top), 50, thickness, 1);
     free(c);
-    int *d = draw_line(image, width, height, &(square->right), 50, thickness, 1);
+    int *d =
+        draw_line(image, width, height, &(square->right), 50, thickness, 1);
     free(d);
 }

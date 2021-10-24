@@ -7,8 +7,7 @@
 #include "Imagery/Detection/struct.h"
 #include "Imagery/Utils/image.h"
 
-SDL_Surface* detection(Image *image, Image *drawImage, Image *simplifiedImage,
-               Image *squareImage, Image *lastSquare, int verbose);
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose);
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose);
 
