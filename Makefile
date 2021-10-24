@@ -1,6 +1,6 @@
 CC = gcc -Iinclude/
 
-CPPFLAGS = `pkg-config --cflags sdl` -MMD 
+CPPFLAGS = `pkg-config --cflags sdl` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
 LDLFLAGS = -lm
 LDLIBS = `pkg-config --libs sdl SDL_image`
@@ -48,9 +48,9 @@ format:
 
 # Clean all trash files
 clean:
-	make -C $(SOURCE_DIR)/GUI clean
 	make -C $(SOURCE_DIR)/Imagery clean
 	make -C $(SOURCE_DIR)/NeuralNetwork clean
 	make -C $(SOURCE_DIR)/Sudoku_Solver clean
+	make -C Tests clean
 	rm -rf $(BUILD)
 	${RM} ${OBJ} ${DEP} main

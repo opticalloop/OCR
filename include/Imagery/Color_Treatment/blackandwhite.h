@@ -6,6 +6,17 @@
 
 #include "Imagery/Utils/image.h"
 
+/*
+ * Summary:
+ *       Transform a colored image to an black and white image
+ *
+ * Params :
+ *       *image: the image to be transformed
+ *
+ *  Return:
+ *       Noting the black and white is applied to the image directly
+ */
+
 void blackandwhite(Image *image);
 
 #endif

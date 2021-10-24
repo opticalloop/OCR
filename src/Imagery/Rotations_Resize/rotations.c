@@ -1,8 +1,4 @@
-#include "Imagery/Rotations/rotations.h"
-
-#include <err.h>
-#include <math.h>
-#include <stdio.h>
+#include "Imagery/Rotations_Resize/rotations.h"
 
 void rotate(Image *image, double angleDegree)
 {
@@ -12,7 +8,7 @@ void rotate(Image *image, double angleDegree)
     const double middleX = ((double)width / 2.0);
     const double middleY = ((double)height / 2.0);
 
-    const double angle = (angleDegree / 360.0) * 2.0 * M_PI;
+    const double angle = angleDegree * M_PI / 180.0;
 
     // Create two dimensional array of pixels
     Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
@@ -38,48 +34,57 @@ void rotate(Image *image, double angleDegree)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            _pixels[x][y].r = 255;
-            _pixels[x][y].g = 255;
-            _pixels[x][y].b = 255;
+            // Consider that the image is in grayscale
+            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
+            updatePixelToSameValue(&(image->pixels[x][y]), 0);
         }
     }
 
-    Pixel pixel;
-
-    int newX;
-    int newY;
+    double newX;
+    double newY;
+    // Four pixels around
+    unsigned int top;
+    unsigned int bottom;
+    unsigned int left;
+    unsigned int right;
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
             // Calculate new position
-            newX = (int)((double)(cos(angle) * ((double)x - middleX)
-                                  - sin(angle) * ((double)y - middleY))
-                         + middleX);
-            newY = (int)((double)(cos(angle) * ((double)y - middleY)
-                                  + sin(angle) * ((double)x - middleX))
-                         + middleY);
+            newX = ((double)(cos(angle) * ((double)x - middleX)
+                             - sin(angle) * ((double)y - middleY))
+                    + middleX);
+            newY = ((double)(cos(angle) * ((double)y - middleY)
+                             + sin(angle) * ((double)x - middleX))
+                    + middleY);
 
-            // Assign it into new image and make sure he is in the image
-            if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+            // Get the four locations around pixels
+            // floor() : Round at inferior
+            top = floor(newY);
+            bottom = top + 1;
+            left = floor(newX);
+            right = left + 1;
+
+            // Check if any of the four locations are invalid. If so,
+            // skip interpolating this pixel
+            // Unsigned int : always > 0, so dont need to check if top and left
+            // are superior to 0
+            if (top < height && bottom < height && left < width
+                && right < width)
             {
-                // Get the pixel on the copied image
-                pixel = image->pixels[x][y];
-
-                // Assign the pixel
-                _pixels[newX][newY].r = pixel.r;
-                _pixels[newX][newY].g = pixel.g;
-                _pixels[newX][newY].b = pixel.b;
+                unsigned int interpolated = bilinearly_interpolate(
+                    top, bottom, left, right, newX, newY, _pixels);
+                updatePixelToSameValue(&(image->pixels[x][y]), interpolated);
             }
         }
     }
 
     for (unsigned int i = 0; i < width; i++)
     {
-        free(image->pixels[i]);
+        free(_pixels[i]);
     }
-    free(image->pixels);
-    image->pixels = _pixels;
+    free(_pixels);
 }
 
 double detectDiffAngle(Image *image, float precision)
@@ -110,7 +115,6 @@ double detectDiffAngle(Image *image, float precision)
             errx(EXIT_FAILURE, "Error");
         }
     }
-    accumulator[i] = NULL;
 
     double maxAngle = 0.0;
     double tempMaxAngle = 0.0;
@@ -125,7 +129,7 @@ double detectDiffAngle(Image *image, float precision)
             }
 
             // From 0 to 180
-            double angle = -M_PI / 2;
+            double angle = 0;
             for (; angle <= M_PI / 2; angle += precision)
             {
                 int diff = (int)((x * sin(angle) + y * cos(angle)));
@@ -154,11 +158,16 @@ double detectDiffAngle(Image *image, float precision)
     return maxAngle;
 }
 
-void autoRotate(Image *image, float precision)
+void autoRotate2(Image *image, float precision)
 {
     double angle = detectDiffAngle(image, precision);
     angle *= (180 / M_PI);
     printf("Max angle %f\n", angle);
+
+    if (fabs(angle) <= 0.1)
+    {
+        return;
+    }
 
     rotate(image, angle);
 }

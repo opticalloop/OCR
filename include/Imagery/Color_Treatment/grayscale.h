@@ -6,6 +6,17 @@
 
 #include "Imagery/Utils/image.h"
 
+/*
+ * Summary:
+ *       Transform a colored image to an grayscale image
+ *
+ * Params :
+ *       *image: the image to be transformed
+ *
+ *  Return:
+ *       Noting, the grayscale is applied to the image directly
+ */
+
 void grayscale(Image *image);
 
 #endif

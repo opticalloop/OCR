@@ -3,6 +3,7 @@
 #include <err.h>
 #include <stdlib.h>
 #include <string.h>
+
 static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
                        unsigned int w, unsigned int h)
 {
@@ -55,10 +56,11 @@ void newImage(Image *image)
     {
         surface = image->surface;
     }
+
     else
     {
         surface = !strcmp(image->path, "") ? SDL_CreateRGBSurface(
-                      0, image->width, image->height, 24, 0, 0, 0, 0)
+                      0, image->width, image->height, 32, 0, 0, 0, 0)
                                            : load_image(image->path);
     }
 
@@ -68,7 +70,7 @@ void newImage(Image *image)
     image->width = width;
     image->height = height;
 
-    image->pixels = malloc((width + 1) * sizeof(Pixel *));
+    image->pixels = calloc(width, sizeof(Pixel *));
 
     if (image->pixels == NULL)
     {
@@ -79,15 +81,13 @@ void newImage(Image *image)
     unsigned int x;
     for (x = 0; x < width; x++)
     {
-        image->pixels[x] = malloc((height + 1) * sizeof(Pixel));
+        image->pixels[x] = calloc(height, sizeof(Pixel));
         if (image->pixels[x] == NULL)
         {
             errx(EXIT_FAILURE,
                  "Error while allocating pixels pointers for the image");
         }
     }
-    // Make sure we don't have the '\0'
-    image->pixels[x] = NULL;
 
     SDL_Color rgb;
     Uint32 pixel;
@@ -109,6 +109,12 @@ void newImage(Image *image)
 
             image->pixels[x][y].matrix = NULL;
             image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
+            if (image->pixels[x][y].matrix == NULL)
+            {
+                errx(EXIT_FAILURE,
+                     "Error while allocating pixels pointers for the image "
+                     "(matrix creation)");
+            }
 
             averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
@@ -126,14 +132,29 @@ void newImage(Image *image)
         }
     }
 }
+
 Pixel **copyPixelsArray(Image *image)
 {
-    int w = image->width;
-    int h = image->height;
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
     Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
+    if (mask == NULL)
+    {
+        errx(EXIT_FAILURE,
+             "Error while allocating pixels pointers for the image "
+             "(copy Pixels Array) 1");
+    }
     for (unsigned int i = 0; i < w; i++)
     {
         mask[i] = (Pixel *)malloc((h + 1) * sizeof(Pixel));
+
+        if (mask[i] == NULL)
+        {
+            errx(EXIT_FAILURE,
+                 "Error while allocating pixels pointers for the image "
+                 "(copy Pixels Array) 2");
+        }
+
         for (unsigned int j = 0; j < h; j++)
         { // MEDIAN FILTER
             mask[i][j].r = image->pixels[i][j].r;
@@ -141,6 +162,13 @@ Pixel **copyPixelsArray(Image *image)
             mask[i][j].b = image->pixels[i][j].b;
             mask[i][j].matrix = NULL;
             mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
+            if (mask[i][j].matrix == NULL)
+            {
+                errx(EXIT_FAILURE,
+                     "Error while allocating pixels pointers for the image "
+                     "(matrix)");
+            }
         }
     }
     // fill the neighbours matrix
@@ -153,6 +181,7 @@ Pixel **copyPixelsArray(Image *image)
     }
     return mask;
 }
+
 void freeMatrixArray(Pixel **mask, int w, int h)
 {
     for (int i = 0; i < w; ++i)
@@ -171,7 +200,7 @@ void displayImage(Image *image)
     // Init SDL (malloc inside so need to free at the end)
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-
+    updateSurface(image);
     // Display img on screen
     display_image(image->surface);
 
@@ -209,10 +238,6 @@ void updateSurface(Image *image)
 
 void saveImage(Image *image, char *path)
 {
-    // Init SDL (malloc inside so need to free at the end)
-    if (SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-
     // Update SDL_Surface inside Image struct
     updateSurface(image);
 
@@ -220,8 +245,6 @@ void saveImage(Image *image, char *path)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-
-    SDL_Quit();
 }
 
 void updatePixelToSameValue(Pixel *pixel, unsigned int value)
@@ -241,14 +264,27 @@ Pixel InstantiatePixelZero()
     return pixel;
 }
 
+void updateNeigbourgs(Image *image)
+{
+    unsigned int h = image->height;
+    unsigned int w = image->width;
+    for (unsigned int i = 0; i < w; ++i)
+    {
+        for (unsigned int j = 0; j < h; ++j)
+        {
+            FillMatrix(image->pixels, i, j, w, h);
+        }
+    }
+}
+
 void freeImage(Image *image)
 {
-    unsigned int width = image->width;
-    unsigned int height = image->height;
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
 
     for (unsigned int x = 0; x < width; x++)
     {
-        for (unsigned int y = 0; y < height; ++y)
+        for (unsigned int y = 0; y < height; y++)
         {
             free(image->pixels[x][y].matrix);
         }

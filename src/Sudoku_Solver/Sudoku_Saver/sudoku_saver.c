@@ -1,11 +1,15 @@
 #include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 
-#include <SDL/SDL.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "Imagery/Utils/image.h"
+void copyArray(unsigned int grid[dim][dim], unsigned int destination[dim][dim])
+{
+    for (unsigned int i = 0; i < dim; i++)
+    {
+        for (unsigned int j = 0; j < dim; j++)
+        {
+            destination[i][j] = grid[i][j];
+        }
+    }
+}
 
 void basicPrint(unsigned int grid[dim][dim])
 {
@@ -30,7 +34,7 @@ void basicPrint(unsigned int grid[dim][dim])
     }
 }
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[])
+void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
 {
     FILE *fp;
 
@@ -38,47 +42,64 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[])
 
     if (fp == NULL)
     {
-        errx(EXIT_FAILURE, "Read Grid : File doesn't exist.");
+        errx(EXIT_FAILURE, "Can't read the input file : File doesn't exist.");
         return;
     }
 
-    char ch = 0;
-
-    unsigned int xIndex = 0;
-    unsigned int yIndex = 0;
-
-    for (int i = 0; i < 12 && ch != EOF; i++)
+    if (verbose)
     {
-        for (int j = 0; j < 12 && (ch = fgetc(fp)) != EOF; j++)
-        {
-            if (ch == '\n' || ch == '\0' || ch == ' ')
-            {
-                if (i == 3 || i == 7)
-                {
-                    xIndex--; // Dont move, it's an empty line
-                    break;
-                }
-                continue;
-            }
-
-            if (ch != '.')
-            {
-                grid[xIndex][yIndex] = ch - '0';
-            }
-            yIndex++;
-        }
-        yIndex = 0;
-        xIndex++;
+        printf("--> 📂 Reading %s\n", inputPath);
     }
+
+    char ch = 0;
+    unsigned int tempGrid[dim * dim];
+    unsigned int index = 0;
+
+    while ((ch = fgetc(fp)) != EOF)
+    {
+        if (ch == '.')
+        {
+            tempGrid[index] = 0;
+        }
+        else if (ch > '0' && ch <= '9')
+        {
+            tempGrid[index] = ch - '0';
+        }
+        else if (ch != '\n' && ch != '\0' && ch != ' ')
+        {
+            errx(EXIT_FAILURE, "File doesn't respect the format");
+        }
+        else
+        {
+            continue;
+        }
+        index++;
+    }
+
+    for (unsigned int i = 0; i < dim; i++)
+    {
+        for (unsigned int j = 0; j < dim; j++)
+        {
+            grid[i][j] = tempGrid[i * dim + j];
+        }
+    }
+
     fclose(fp);
 }
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[])
+void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 {
     FILE *f = fopen(outputPath, "w");
     if (f == NULL)
     {
         errx(EXIT_FAILURE, "Error opening file!\n");
+    }
+
+    if (verbose)
+    {
+        printf("<-- 📂 Saving grid to ");
+        printf("%s", outputPath);
+        printf("\n");
     }
 
     for (unsigned int i = 0; i < dim; i++)
@@ -110,15 +131,14 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[])
     fclose(f);
 }
 
-Image createSudokuImage(unsigned int grid[dim][dim])
+Image createSudokuImage(unsigned int grid[dim][dim],
+                        unsigned int copy[dim][dim])
 {
     Image image;
     image.width = 266;
     image.height = 266;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
     image.surface = NULL;
-    image.pixels = NULL;
+    image.path = ""; // To create an RGB surface
     newImage(&image);
 
     for (unsigned int x = 0; x < 266; x++)
@@ -139,47 +159,51 @@ Image createSudokuImage(unsigned int grid[dim][dim])
         }
     }
 
-    unsigned int increment = 2;
-    unsigned int posX;
-    unsigned int posY;
+    // Update surface,
+    updateSurface(&image);
+
+    // Coordonates
+    unsigned int Array[dim] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
+    unsigned int val;
+
+    // SDL_Rect to copy to the actual image
     SDL_Rect rect;
-    rect.w = 28;
-    rect.h = 28;
+    rect.w = IMAGE_SIZE;
+    rect.h = IMAGE_SIZE;
+
     for (unsigned int i = 0; i < dim; i++)
     {
         for (unsigned int j = 0; j < dim; j++)
         {
-            if (j == 3 || j == 6)
+            val = grid[i][j];
+            if (val != 0)
             {
-                increment++;
-            }
-            posX = i * 29 + increment;
-            posY = j * 29 + increment;
-            rect.x = posX;
-            rect.y = posY;
-            // printf("i : %u, j : %u, posX : %u, posY : %u \n", i, j, posX,
-            // posY); Put image at posX and posY
+                rect.x = Array[j];
+                rect.y = Array[i];
 
-            image.pixels[posX][posY].g = 0;
-            image.pixels[posX][posY].b = 0;
-            if (j == 3 || j == 6)
-            {
-                increment--;
+                // Get the image number and copy it
+                SDL_Surface *surface =
+                    getImage(val, IMAGE_DIRECTORY, copy[i][j]);
+                SDL_BlitSurface(surface, NULL, image.surface, &rect);
+                SDL_FreeSurface(surface);
             }
-        }
-        if (i == 3 || i == 6)
-        {
-            increment--;
-        }
-        if (i == 2 || i == 5)
-        {
-            increment++;
         }
     }
 
-    saveImage(&image, "out.bmp");
-
-    freeImage(&image);
-
     return image;
+}
+
+SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green)
+{
+    char str[1000];
+    if (!green)
+    {
+        snprintf(str, sizeof(str), "%s/%u.jpg", directory, val);
+    }
+    else
+    {
+        snprintf(str, sizeof(str), "%s/%u_black.jpg", directory, val);
+    }
+    SDL_Surface *surface = load_image(str);
+    return surface;
 }

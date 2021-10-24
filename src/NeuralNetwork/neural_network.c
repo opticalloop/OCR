@@ -1,30 +1,25 @@
 #include "NeuralNetwork/neural_network.h"
 
-#include <SDL/SDL.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h> // To call srand(time(NULL));
-
 // ------ Neuron ------
 
 Neuron newNeuron(unsigned int nbWeights)
 {
     Neuron neuron = {
-        nbWeights, NULL,
-        0, // Value
-        0, // Bias
-        0, // Delta
+        .nbWeights = nbWeights,
+        .weights = NULL,
+        .value = 0,
+        .bias = 0,
+        .delta = 0,
     };
 
     // Allocate memory for weights
     if (nbWeights != 0)
     {
         neuron.weights = malloc((nbWeights + 1) * sizeof(double));
-    }
-    else
-    {
-        neuron.weights = malloc(0 * sizeof(double));
+        if (neuron.weights == NULL)
+        {
+            errx(EXIT_FAILURE, "Error while allocating memory");
+        }
     }
     return neuron;
 }
@@ -36,7 +31,6 @@ void initNeuron(Neuron *neuron)
     for (unsigned int i = 0; i < nbWeights; i++)
     {
         neuron->weights[i] = (double)rand() / RAND_MAX * 2.0 - 1.0;
-        // printf("Weight initialized : %f\n", neuron->weights[i]);
     }
 
     neuron->bias = (double)rand() / RAND_MAX * 2.0 - 1.0;
@@ -53,10 +47,14 @@ void freeNeuron(Neuron *neuron)
 
 Layer newLayer(unsigned int size, unsigned int sizePreviousLayer)
 {
-    Layer layer = { size, NULL };
+    Layer layer = { .nbNeurons = size, .neurons = NULL };
 
     // Allocate memory for neurons, calloc already put the + 1 for the \0
     layer.neurons = malloc((size + 1) * sizeof(struct Neuron));
+    if (layer.neurons == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
 
     // Create all the neurons depending on the size of the previous layer
     for (unsigned int i = 0; i < size; i++)
@@ -93,9 +91,10 @@ Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
 
     // Allocate memory for all layers
     network.layers = malloc((network.nbLayers + 1) * sizeof(struct Layer));
-    ;
-
-    printf("Creating all layers\n");
+    if (network.layers == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
 
     // Create the input layer
     network.layers[0] = newLayer(sizeInput, 0);
@@ -123,8 +122,6 @@ void initNetwork(Network *network)
 
     for (unsigned int i = 0; i < nbLayers; i++)
     {
-        // printf("Initing all neurons for layer %u\n", i);
-
         Layer *layer = &(network->layers[i]);
         nbNeurons = layer->nbNeurons;
         for (unsigned int j = 0; j < nbNeurons; j++)
@@ -167,8 +164,6 @@ void frontPropagation(Network *network, double input[])
             }
             // sum += neuron->bias;
             layer->neurons[j].value = sigmoid(sum);
-            // printf("Layer : %d, value of update : %f\n", i,
-            // layer->neurons[j].value);
         }
     }
 }
@@ -185,8 +180,9 @@ void freeNetwork(Network *network)
 
 // ------ /Network ------
 
-void backPropagation(Network *network, double expected[])
+double backPropagation(Network *network, double expected[])
 {
+    double errorRate = 0.0;
     double errorTemp = 0.0;
 
     unsigned int nbLayers = network->nbLayers;
@@ -200,7 +196,7 @@ void backPropagation(Network *network, double expected[])
         Neuron *neuron = &(outputLayer->neurons[i]);
         errorTemp = expected[i] - neuron->value;
         neuron->delta = errorTemp * sigmoidPrime(neuron->value);
-        // printf("Error : %f\n", errorTemp);
+        errorRate += (errorTemp * errorTemp);
     }
 
     // For all layer except the input
@@ -222,9 +218,9 @@ void backPropagation(Network *network, double expected[])
                     layer.neurons[k].delta * layer.neurons[k].weights[j];
             }
             neuron->delta = errorTemp * sigmoidPrime(neuron->value);
-            // printf("Delta : %f\n", neuron->delta);
         }
     }
+    return errorRate;
 }
 
 void gradientDescent(Network *network)
@@ -276,4 +272,19 @@ void printWeights(Network *network)
             }
         }
     }
+}
+
+double averageErrorRate(Network *network)
+{
+    double average = 0.0;
+    for (unsigned int i = 0; i < network->nbLayers; i++)
+    {
+        for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
+        {
+            average += network->layers[i].neurons[j].delta;
+        }
+        average /= network->layers[i].nbNeurons;
+    }
+
+    return average * -1;
 }
