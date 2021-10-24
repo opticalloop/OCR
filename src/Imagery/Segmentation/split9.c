@@ -7,11 +7,7 @@ void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
 
     const unsigned int xincrem = width / 9;
     const unsigned int yincrem = height / 9;
-
-    // printf("width: %d, height: %d, xincrem: %d, yincrem: %d\n", width,
-    // height,
-    //       xincrem, yincrem);
-
+    
     char directory[200];
     snprintf(directory, sizeof(directory), "mkdir %s", imagename);
     if (!system(directory))
