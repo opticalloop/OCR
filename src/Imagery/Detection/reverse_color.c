@@ -1,4 +1,4 @@
-#include "Imagery/Segmentation/reverse_color.h"
+#include "Imagery/Detection/reverse_color.h"
 
 void reverse_color(Image *image)
 {

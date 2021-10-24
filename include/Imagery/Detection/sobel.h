@@ -3,7 +3,6 @@
 
 #include <math.h>
 
-#include "Imagery/Segmentation/trace.h"
 #include "Imagery/Utils/image.h"
 
 void SobelEdgeDetection(Image *image);

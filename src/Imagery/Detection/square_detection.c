@@ -1,4 +1,4 @@
-#include "Imagery/Segmentation/square_detection.h"
+#include "Imagery/Detection/square_detection.h"
 
 #define MIN_EQUAL 51
 #define MIN_THETA 31

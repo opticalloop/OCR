@@ -1,4 +1,4 @@
-#include "Imagery/Segmentation/sobel.h"
+#include "Imagery/Detection/sobel.h"
 
 double Convolution(Image *image, double kernel[3][3], int row, int col)
 {

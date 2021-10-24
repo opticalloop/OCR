@@ -1,4 +1,4 @@
-#include "Imagery/Segmentation/struct.h"
+#include "Imagery/Detection/struct.h"
 
 unsigned int **initMatrice(unsigned int x, unsigned int y)
 {
@@ -27,5 +27,3 @@ void freeMatrice(unsigned int **matrice, size_t height)
     }
     free(matrice);
 }
-
-/

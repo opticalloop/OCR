@@ -1,10 +1,10 @@
 #ifndef HOUGHTRANSFORM_H
 #define HOUGHTRANSFORM_H
 
-#include "Imagery/Segmentation/reverse_color.h"
-#include "Imagery/Segmentation/sobel.h"
-#include "Imagery/Segmentation/square_detection.h"
-#include "Imagery/Segmentation/struct.h"
+#include "Imagery/Detection/reverse_color.h"
+#include "Imagery/Detection/sobel.h"
+#include "Imagery/Detection/square_detection.h"
+#include "Imagery/Detection/struct.h"
 #include "Imagery/Utils/image.h"
 
 void detection(Image *image, Image *drawImage, Image *simplifiedImage,

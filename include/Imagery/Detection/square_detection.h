@@ -3,8 +3,8 @@
 
 #include <math.h>
 
-#include "Imagery/Segmentation/houghtransform.h"
-#include "Imagery/Segmentation/struct.h"
+#include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/struct.h"
 
 LineList simplifyLines(LineList *linelist);
 
