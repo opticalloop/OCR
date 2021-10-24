@@ -51,9 +51,18 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
 
 void newImage(Image *image)
 {
-    SDL_Surface *surface = !strcmp(image->path, "")
-        ? SDL_CreateRGBSurface(0, image->width, image->height, 32, 0, 0, 0, 0)
-        : load_image(image->path);
+    SDL_Surface *surface;
+    if (image->surface != NULL)
+    {
+        surface = image->surface;
+    }
+
+    else
+    {
+        surface = !strcmp(image->path, "") ? SDL_CreateRGBSurface(
+                      0, image->width, image->height, 32, 0, 0, 0, 0)
+                                           : load_image(image->path);
+    }
 
     const unsigned int width = surface->w;
     const unsigned int height = surface->h;
@@ -61,7 +70,7 @@ void newImage(Image *image)
     image->width = width;
     image->height = height;
 
-    image->pixels = malloc((width + 1) * sizeof(Pixel *));
+    image->pixels = calloc(width, sizeof(Pixel *));
 
     if (image->pixels == NULL)
     {
@@ -72,15 +81,13 @@ void newImage(Image *image)
     unsigned int x;
     for (x = 0; x < width; x++)
     {
-        image->pixels[x] = malloc((height + 1) * sizeof(Pixel));
+        image->pixels[x] = calloc(height, sizeof(Pixel));
         if (image->pixels[x] == NULL)
         {
             errx(EXIT_FAILURE,
                  "Error while allocating pixels pointers for the image");
         }
     }
-    // Make sure we don't have the '\0'
-    image->pixels[x] = NULL;
 
     SDL_Color rgb;
     Uint32 pixel;

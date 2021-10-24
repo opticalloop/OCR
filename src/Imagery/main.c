@@ -9,7 +9,6 @@
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
-#include "Imagery/segmentation/split81.h"
 
 static void printHelp(void)
 {
