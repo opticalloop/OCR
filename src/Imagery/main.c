@@ -16,10 +16,6 @@ int main(int argc, char *argv[])
     }
 
     Image _image;
-    _image.width = 0;
-    _image.height = 0;
-    _image.averageColor = 0;
-    _image.pixels = NULL;
     _image.path = argv[1];
     _image.surface = NULL;
     Image *image = &_image;
@@ -40,19 +36,28 @@ int main(int argc, char *argv[])
     Image *simpleImage = &_simpleImage;
     newImage(simpleImage);
 
-    detection(image, drawImage, simpleImage);
-    // displayImage(image);
-    // rotate(image, 180);
+    Image _squareImage;
+    _squareImage.path = argv[1];
+    _squareImage.surface = NULL;
+    Image *squareImage = &_squareImage;
+    newImage(squareImage);
 
-    // grayscale(image);
+    Image _lastSquare;
+    _lastSquare.path = argv[1];
+    _lastSquare.surface = NULL;
+    Image *lastSquare = &_lastSquare;
+    newImage(lastSquare);
 
-    // autoRotate(image, 0.01);
-
-    // resizeImage(image, 1280, 720);
+    detection(image, drawImage, simpleImage, squareImage, lastSquare);
 
     saveImage(image, argv[2]);
-    saveImage(drawImage, "drawImage.bmp");
-    saveImage(simpleImage, "simplifiedImage.bmp");
+    saveImage(drawImage, "1.0_all_lines.bmp");
+    saveImage(simpleImage, "1.1_simplified_lines.bmp");
+    saveImage(squareImage, "1.2_squares_only.bmp");
+    saveImage(lastSquare, "1.3_last_square.bmp");
+
+    freeImage(lastSquare);
+    freeImage(squareImage);
     freeImage(simpleImage);
     freeImage(drawImage);
     freeImage(image);

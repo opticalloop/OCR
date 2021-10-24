@@ -2,14 +2,13 @@
 
 #define THRESHOLD 0.3
 
-void detection(Image *image, Image *drawImage, Image *simplifiedImage)
+void detection(Image *image, Image *drawImage, Image *simplifiedImage,
+               Image *squareImage, Image *lastSquareImg)
 {
     // Initialize variables of the image
-    // const unsigned int width = image->width, height = image->height;
     printf("_________________________________\n");
+
     // Call major fonction
-    // SobelEdgeDetection(image);
-    // saveImage(image,"out.bmp");
     LineList list = houghtransform(image, drawImage);
     printf("Max theta : %f\n", list.maxTheta);
     double angle = list.maxTheta * 180.0 / M_PI;
@@ -18,26 +17,34 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage)
     LineList resultingList = simplifyLines(&list);
     angle = resultingList.maxTheta * 180.0 / M_PI;
     printf("Angle in degree after simplification: %f\n", angle);
+    int angleRounded = (int)angle % 90;
+    if (angleRounded >= 88 && angleRounded <= 91)
+    {
+        printf("Don't need to autoRotate !\n");
+    }
 
+    // Draw simplifieds lines
     const unsigned int w = simplifiedImage->width;
     const unsigned int h = simplifiedImage->height;
-
     printf("Resulting line numbers : %d\n", resultingList.len);
     for (unsigned int i = 0; i < resultingList.len; i++)
     {
         Line line = resultingList.lines[i];
-        int *c = draw_line(simplifiedImage, w, h, line.xStart, line.yStart,
-                           line.xEnd, line.yEnd);
+        int *c = draw_line(simplifiedImage, w, h, &line, 200);
         free(c);
     }
+    SquareList squares = findSquare(&resultingList, w, h, squareImage);
+
+    printf("Found %d squares\n", squares.len);
+    Square lastSquare = sortSquares(&squares);
+    printf("Drawing last square\n");
+    drawSquare(&lastSquare, lastSquareImg, w, h);
+
+    // Free squares
+    free(squares.squares);
+
     free(resultingList.lines);
-
-    // printf(">- End of detection\n");
-    // printMatrice(copyImage, height, width);
-    // matriceToBmp(copyImage, width, height);
-
-    // Free memory
-    // freeMatrice(copyImage, height);
+    printf(">- End of detection\n");
 }
 
 LineList houghtransform(Image *image, Image *drawImage)
@@ -117,6 +124,7 @@ LineList houghtransform(Image *image, Image *drawImage)
     free(saveCos);
     free(saveSin);
 
+    // 5000 * 5000, don't draw it !a
     // accToBmp(accumulator, nbTheta + 1, nbRho + 1, max);
 
     // Finding edges
@@ -183,17 +191,24 @@ LineList houghtransform(Image *image, Image *drawImage)
                 d2.X = d0.X - (int)(diagonal * (-s));
                 d2.Y = d0.Y - (int)(diagonal * c);
 
+                Line line;
+                line.xStart = d1.X;
+                line.xEnd = d2.X;
+                line.yStart = d1.Y;
+                line.yEnd = d2.Y;
+
                 // Draw Lines on the copyImage matrice
                 int *coordinates =
-                    draw_line(drawImage, width, height, d1.X, d1.Y, d2.X, d2.Y);
+                    draw_line(drawImage, width, height, &line, 200);
 
-                printf("Got xStart : %d, yStart : %d, xEnd : %d, yEnd : %d\n",
-                       coordinates[0], coordinates[1], coordinates[2],
-                       coordinates[3]);
+                // printf("Got xStart : %d, yStart : %d, xEnd : %d, yEnd :
+                // %d\n",
+                //       coordinates[0], coordinates[1], coordinates[2],
+                //      coordinates[3]);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
-                Line line;
+
                 line.xStart = coordinates[0];
                 line.yStart = coordinates[1];
                 line.xEnd = coordinates[2];
@@ -256,8 +271,15 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 }
 
 // Return the two extreme points of the lignes
-int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
+int *draw_line(Image *image, int w, int h, Line *line, unsigned int color)
 {
+    // printf("Drawing line\n");
+    int x0 = line->xStart;
+    int y0 = line->yStart;
+
+    int x1 = line->xEnd;
+    int y1 = line->yEnd;
+
     int *coordinates = malloc(sizeof(int) * 4 + 1);
     memset(coordinates, -1, sizeof(int) * 4);
 
@@ -274,15 +296,14 @@ int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            // White pixel only
             // if ((image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g ==
             // 255
-            //    && image->pixels[x0][y0].b == 255)/* || started*/)
+            //&& image->pixels[x0][y0].b == 255) || started)
             //{
-            // started = 1;
-            image->pixels[x0][y0].r = 255;
-            image->pixels[x0][y0].g = 0;
-            image->pixels[x0][y0].b = 0;
+            //    started = 1;
+            image->pixels[x0][y0].r = abs(255 - color);
+            image->pixels[x0][y0].g = abs(255 + color);
+            image->pixels[x0][y0].b = color;
 
             // Get start point
             if (coordinates[0] == -1 && coordinates[1] == -1)

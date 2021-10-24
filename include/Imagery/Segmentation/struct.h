@@ -27,11 +27,25 @@ typedef struct LineList
 
 } LineList;
 
-typedef struct
+typedef struct Dot
 {
     int X;
     int Y;
 } Dot;
+
+typedef struct Square
+{
+    Line top;
+    Line bottom;
+    Line left;
+    Line right;
+} Square;
+
+typedef struct SquareList
+{
+    Square *squares;
+    int len;
+} SquareList;
 
 // typedef struct
 // {
