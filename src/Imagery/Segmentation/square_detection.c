@@ -1,12 +1,14 @@
 #include "Imagery/Segmentation/square_detection.h"
 
-LineList simplifyLines(Line *allLines, int len)
+LineList simplifyLines(LineList *linelist)
 {
+    const unsigned int len = linelist->len;
+    Line *allLines = linelist->lines;
     printf("Total number of lines : %d\n", len);
     if (len <= 0)
     {
         printf("Got no line\n");
-        return;
+        return  ;
     }
     int lastLinesCount = 0;
 
@@ -24,10 +26,11 @@ LineList simplifyLines(Line *allLines, int len)
                 {
                     currentLine = allLines[j];
                     // Line are approximately equals
-                    if (abs(referenceLine.xStart - currentLine.xStart) < 21
-                        && abs(referenceLine.xEnd - currentLine.xEnd) < 21
-                        && abs(referenceLine.yStart - currentLine.yStart) < 21
-                        && abs(referenceLine.yEnd - currentLine.yEnd) < 21)
+                    if (abs(referenceLine.xStart - currentLine.xStart) < 31
+                        && abs(referenceLine.xEnd - currentLine.xEnd) < 31
+                        && abs(referenceLine.yStart - currentLine.yStart) < 31
+                        && abs(referenceLine.yEnd - currentLine.yEnd) < 31
+                        && abs(referenceLine.theta - currentLine.theta) < 10)
                     {
                         allLines[i].xStart =
                             (referenceLine.xStart + currentLine.xStart) / 2;
@@ -47,19 +50,20 @@ LineList simplifyLines(Line *allLines, int len)
     printf("Got nb resulting lines : %d\n", lastLinesCount);
     Line *resultingLines = malloc(lastLinesCount * sizeof(Line) + 1);
     int index = 0;
-    for (int j = 0; j < lastLinesCount; j++)
+    for (int j = 0; j < len; j++)
     {
         if (allLines[j].xStart != -1)
         {
             printf("j : %d\n", j);
-            resultingLines[j] = allLines[index];
+            resultingLines[index] = allLines[j];
             index++;
         }
     }
 
-    free(allLines);
     LineList lines;
     lines.lines = resultingLines;
     lines.len = lastLinesCount;
+    lines.maxTheta = linelist->maxTheta;
+    free(linelist->lines);
     return lines;
 }

@@ -5,6 +5,6 @@
 
 #include "Imagery/Segmentation/struct.h"
 
-LineList simplifyLines(Line *allLines, int len);
+LineList simplifyLines(LineList *linelist);
 
 #endif

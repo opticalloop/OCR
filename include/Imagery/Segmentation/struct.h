@@ -16,6 +16,7 @@ typedef struct Line
     int yStart;
     int xEnd;
     int yEnd;
+    double theta;
 } Line;
 
 typedef struct LineList

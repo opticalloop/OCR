@@ -15,7 +15,9 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage)
     double angle = list.maxTheta * 180.0 / M_PI;
     printf("Angle in degree : %f\n", angle);
 
-    LineList resultingList = simplifyLines(list.lines, list.len);
+    LineList resultingList = simplifyLines(&list);
+    angle = resultingList.maxTheta * 180.0 / M_PI;
+    printf("Angle in degree after simplification: %f\n", angle);
 
     const unsigned int w = simplifiedImage->width;
     const unsigned int h = simplifiedImage->height;
@@ -47,7 +49,7 @@ LineList houghtransform(Image *image, Image *drawImage)
     const double diagonal = sqrt(width * width + height * height);
 
     // Initialize the constant values for theta and rho
-    const double maxTheta = 180.0, minTheta = 0.0;
+    const double maxTheta = 90.0, minTheta = -90.0;
     const double maxRho = diagonal, minRho = -diagonal;
     const double nbRho = 2 * diagonal, nbTheta = nbRho;
 
@@ -196,6 +198,7 @@ LineList houghtransform(Image *image, Image *drawImage)
                 line.yStart = coordinates[1];
                 line.xEnd = coordinates[2];
                 line.yEnd = coordinates[3];
+                line.theta = t;
 
                 allLines[nbEdges] = line;
                 free(coordinates);
@@ -265,13 +268,17 @@ int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
 
     int err = dx + dy;
 
+    //int started = 0;
+
     while (1)
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            if (image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g == 255
-                && image->pixels[x0][y0].b == 255)
-            {
+            // White pixel only
+            //if ((image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g == 255
+            //    && image->pixels[x0][y0].b == 255)/* || started*/)
+            //{
+                //started = 1;
                 image->pixels[x0][y0].r = 255;
                 image->pixels[x0][y0].g = 0;
                 image->pixels[x0][y0].b = 0;
@@ -287,7 +294,7 @@ int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
                     coordinates[2] = x0;
                     coordinates[3] = y0;
                 }
-            }
+           // }
         }
 
         if (x0 == x1 && y0 == y1)
