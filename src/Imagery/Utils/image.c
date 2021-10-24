@@ -70,7 +70,7 @@ void newImage(Image *image)
     image->width = width;
     image->height = height;
 
-    image->pixels = calloc(width, sizeof(Pixel *));
+    image->pixels = calloc(width + 1, sizeof(Pixel *));
 
     if (image->pixels == NULL)
     {

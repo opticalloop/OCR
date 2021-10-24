@@ -60,3 +60,7 @@ Imagery/*.bmp
 Digits-Only/
 
 src/Imagery/img_0*/
+
+.clang-format
+.gitignore
+LICENSE

@@ -36,7 +36,7 @@ void rotate(Image *image, double angleDegree)
         {
             // Consider that the image is in grayscale
             updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
-            updatePixelToSameValue(&(image->pixels[x][y]), 0);
+            updatePixelToSameValue(&(image->pixels[x][y]), 255);
         }
     }
 

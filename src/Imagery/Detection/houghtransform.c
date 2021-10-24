@@ -49,7 +49,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
             free(c);
         }
         if (verbose)
-            printf("<--     📂 Saved picture : %s\n", "2.2_Hough_simplified_lines.bmp");
+            printf("<--     📂 Saved picture : %s\n",
+                   "2.2_Hough_simplified_lines.bmp");
         saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
         freeImage(simplifiedImage);
     }
@@ -73,12 +74,13 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         newImage(squareImage);
     }
     const unsigned int w = image->width;
-    const unsigned int h = image->height;   
+    const unsigned int h = image->height;
     SquareList squares = findSquare(&resultingList, w, h, squareImage, save);
     if (save)
-    {    
+    {
         if (verbose)
-            printf("<--     📂 Saved picture : %s\n", "2.3_Hough_squares_only.bmp");
+            printf("<--     📂 Saved picture : %s\n",
+                   "2.3_Hough_squares_only.bmp");
         saveImage(squareImage, "Hough_squares_only.bmp");
         freeImage(squareImage);
     }
@@ -173,7 +175,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     rect.y = lastSquare.left.yStart;
     rect.w = biggestLine;
     rect.h = secondBiggestLine;
-    
+
     SDL_BlitSurface(image->surface, &rect, surface, NULL);
 
     // Free squares

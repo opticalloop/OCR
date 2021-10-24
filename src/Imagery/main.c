@@ -8,7 +8,7 @@
 #include "Imagery/Detection/houghtransform.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
-#include "Imagery/Segmentation/split.h"
+#include "Imagery/Segmentation/split9.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
 
@@ -212,13 +212,14 @@ int main(int argc, char *argv[])
     {
         Image resized_image = resize(&img, resize_width, resize_height);
         saveImage(&resized_image, output_path);
+        freeImage(&resized_image);
         return EXIT_SUCCESS;
     }
 
     if (segment)
     {
         SDL_Surface *seg81[81];
-        split(&img, seg81, 1, s_output_folder);
+        split9(&img, seg81, 1, s_output_folder);
         updateSurface(&img);
         freeList(seg81, 81);
     }
