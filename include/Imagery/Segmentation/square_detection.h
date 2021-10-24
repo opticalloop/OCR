@@ -22,10 +22,13 @@ int isSquare(Square *square);
 
 int getSquarePerimeter(Square *square);
 
+double getLineLength(Line *line);
+
 int getFactor(Square *square);
 
 Square sortSquares(SquareList *squareList);
 
-void drawSquare(Square *square, Image *image, int width, int height);
+void drawSquare(Square *square, Image *image, int width, int height,
+                int thickness);
 
 #endif

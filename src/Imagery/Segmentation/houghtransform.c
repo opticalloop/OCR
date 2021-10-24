@@ -30,7 +30,7 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage,
     for (unsigned int i = 0; i < resultingList.len; i++)
     {
         Line line = resultingList.lines[i];
-        int *c = draw_line(simplifiedImage, w, h, &line, 200);
+        int *c = draw_line(simplifiedImage, w, h, &line, 200, 2);
         free(c);
     }
     SquareList squares = findSquare(&resultingList, w, h, squareImage);
@@ -38,7 +38,81 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage,
     printf("Found %d squares\n", squares.len);
     Square lastSquare = sortSquares(&squares);
     printf("Drawing last square\n");
-    drawSquare(&lastSquare, lastSquareImg, w, h);
+    drawSquare(&lastSquare, lastSquareImg, w, h, 2);
+
+    // Get square dimension
+    int l1 = getLineLength(&(lastSquare.top));
+
+    int l2 = getLineLength(&(lastSquare.bottom));
+
+    int l3 = getLineLength(&(lastSquare.right));
+
+    int l4 = getLineLength(&(lastSquare.left));
+
+    int biggestLine = l1;
+    int secondBiggestLine = l1;
+    if (l2 > biggestLine)
+    {
+        biggestLine = l2;
+        if (l1 > secondBiggestLine)
+        {
+            secondBiggestLine = l1;
+        }
+        if (l3 > secondBiggestLine)
+        {
+            secondBiggestLine = l3;
+        }
+        if (l4 > secondBiggestLine)
+        {
+            secondBiggestLine = l4;
+        }
+    }
+    if (l3 > biggestLine)
+    {
+        biggestLine = l3;
+        if (l1 > secondBiggestLine)
+        {
+            secondBiggestLine = l1;
+        }
+        if (l2 > secondBiggestLine)
+        {
+            secondBiggestLine = l2;
+        }
+        if (l4 > secondBiggestLine)
+        {
+            secondBiggestLine = l4;
+        }
+    }
+    if (l4 > biggestLine)
+    {
+        biggestLine = l4;
+        if (l1 > secondBiggestLine)
+        {
+            secondBiggestLine = l1;
+        }
+        if (l3 > secondBiggestLine)
+        {
+            secondBiggestLine = l3;
+        }
+        if (l2 > secondBiggestLine)
+        {
+            secondBiggestLine = l2;
+        }
+    }
+
+    // Croping image and getting final result
+    SDL_Surface *surface =
+        SDL_CreateRGBSurface(0, biggestLine, secondBiggestLine, 32, 0, 0, 0, 0);
+    SDL_Rect rect;
+    rect.x = lastSquare.left.xStart;
+    rect.y = lastSquare.left.yStart;
+    rect.w = biggestLine;
+    rect.h = secondBiggestLine;
+    ;
+    SDL_BlitSurface(image->surface, &rect, surface, NULL);
+
+    SDL_SaveBMP(surface, "1.4_Cropped_image.bmp");
+    SDL_FreeSurface(surface);
 
     // Free squares
     free(squares.squares);
@@ -199,12 +273,7 @@ LineList houghtransform(Image *image, Image *drawImage)
 
                 // Draw Lines on the copyImage matrice
                 int *coordinates =
-                    draw_line(drawImage, width, height, &line, 200);
-
-                // printf("Got xStart : %d, yStart : %d, xEnd : %d, yEnd :
-                // %d\n",
-                //       coordinates[0], coordinates[1], coordinates[2],
-                //      coordinates[3]);
+                    draw_line(drawImage, width, height, &line, 200, 1);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
@@ -271,7 +340,8 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 }
 
 // Return the two extreme points of the lignes
-int *draw_line(Image *image, int w, int h, Line *line, unsigned int color)
+int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
+               int thickness)
 {
     // printf("Drawing line\n");
     int x0 = line->xStart;
@@ -290,21 +360,31 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color)
 
     int err = dx + dy;
 
-    // int started = 0;
-
     while (1)
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            // if ((image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g ==
-            // 255
-            //&& image->pixels[x0][y0].b == 255) || started)
-            //{
-            //    started = 1;
             image->pixels[x0][y0].r = abs(255 - color);
             image->pixels[x0][y0].g = abs(255 + color);
             image->pixels[x0][y0].b = color;
 
+            if (thickness == 2)
+            {
+                if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
+                    && (y0 + 1) < h)
+                {
+                    image->pixels[x0 + 1][y0 + 1].r = abs(255 - color);
+                    image->pixels[x0 + 1][y0 + 1].g = abs(255 + color);
+                    image->pixels[x0 + 1][y0 + 1].b = color;
+                }
+                if (0 <= (x0 - 1) && (x0 - 1) < w && 0 <= (y0 - 1)
+                    && (y0 - 1) < h)
+                {
+                    image->pixels[x0 - 1][y0 - 1].r = abs(255 - color);
+                    image->pixels[x0 - 1][y0 - 1].g = abs(255 + color);
+                    image->pixels[x0 - 1][y0 - 1].b = color;
+                }
+            }
             // Get start point
             if (coordinates[0] == -1 && coordinates[1] == -1)
             {

@@ -14,7 +14,8 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
                      double height);
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
               unsigned int max);
-int *draw_line(Image *image, int w, int h, Line *line, unsigned int color);
+int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
+               int thickness);
 void matriceToBmp(unsigned int **matrice, unsigned int swidth,
                   unsigned int height);
 double degrees_ToRadians(double theta);

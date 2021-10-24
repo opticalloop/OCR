@@ -127,7 +127,8 @@ Square getSquare(LineList *lineList, Line *line, int index, int width,
 Dot getIntersection(Line *line1, Line *line2, int width, int height)
 {
     Dot dot;
-    if ((line1->xEnd - line1->xStart) != 0)
+    if ((line1->xEnd - line1->xStart) != 0
+        && (line2->xEnd - line2->xStart) != 0)
     {
         int directCoeff1 =
             (line1->yEnd - line1->yStart) / (line1->xEnd - line1->xStart);
@@ -272,7 +273,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image)
                                         squareList.squares,
                                         (nbSquares + 1) * sizeof(Square));
                                     squareList.squares[nbSquares] = square;
-                                    drawSquare(&square, image, width, height);
+                                    drawSquare(&square, image, width, height,
+                                               2);
                                     nbSquares++;
                                 }
                             }
@@ -340,24 +342,22 @@ int getSquarePerimeter(Square *square)
     return lenLeft + lenright + lentop + lenbottom;
 }
 
+double getLineLength(Line *line)
+{
+    return sqrt((line->xEnd - line->xStart) * (line->xEnd - line->xStart)
+                + ((line->yEnd - line->yStart) * (line->yEnd - line->yStart)));
+}
+
 int getFactor(Square *square)
 {
-    int l1 = sqrt((square->top.xEnd - square->top.xStart)
-                      * (square->top.xEnd - square->top.xStart)
-                  + ((square->top.yEnd - square->top.yStart)
-                     * (square->top.yEnd - square->top.yStart)));
-    int l2 = sqrt((square->bottom.xEnd - square->bottom.xStart)
-                      * (square->bottom.xEnd - square->bottom.xStart)
-                  + ((square->bottom.yEnd - square->bottom.yStart)
-                     * (square->bottom.yEnd - square->bottom.yStart)));
-    int l3 = sqrt((square->right.xEnd - square->right.xStart)
-                      * (square->right.xEnd - square->right.xStart)
-                  + ((square->right.yEnd - square->right.yStart)
-                     * (square->right.yEnd - square->right.yStart)));
-    int l4 = sqrt((square->left.xEnd - square->left.xStart)
-                      * (square->left.xEnd - square->left.xStart)
-                  + ((square->left.yEnd - square->left.yStart)
-                     * (square->left.yEnd - square->left.yStart)));
+    int l1 = getLineLength(&(square->top));
+
+    int l2 = getLineLength(&(square->bottom));
+
+    int l3 = getLineLength(&(square->right));
+
+    int l4 = getLineLength(&(square->left));
+
     int biggestLine = l1;
     if (l2 > biggestLine)
     {
@@ -406,15 +406,16 @@ Square sortSquares(SquareList *squareList)
     return temp;
 }
 
-void drawSquare(Square *square, Image *image, int width, int height)
+void drawSquare(Square *square, Image *image, int width, int height,
+                int thickness)
 {
     // printf("Drawing square\n");
-    int *a = draw_line(image, width, height, &(square->left), 50);
+    int *a = draw_line(image, width, height, &(square->left), 50, thickness);
     free(a);
-    int *b = draw_line(image, width, height, &(square->bottom), 50);
+    int *b = draw_line(image, width, height, &(square->bottom), 50, thickness);
     free(b);
-    int *c = draw_line(image, width, height, &(square->top), 50);
+    int *c = draw_line(image, width, height, &(square->top), 50, thickness);
     free(c);
-    int *d = draw_line(image, width, height, &(square->right), 50);
+    int *d = draw_line(image, width, height, &(square->right), 50, thickness);
     free(d);
 }
