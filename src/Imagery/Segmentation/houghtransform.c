@@ -268,33 +268,34 @@ int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
 
     int err = dx + dy;
 
-    //int started = 0;
+    // int started = 0;
 
     while (1)
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
             // White pixel only
-            //if ((image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g == 255
+            // if ((image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g ==
+            // 255
             //    && image->pixels[x0][y0].b == 255)/* || started*/)
             //{
-                //started = 1;
-                image->pixels[x0][y0].r = 255;
-                image->pixels[x0][y0].g = 0;
-                image->pixels[x0][y0].b = 0;
+            // started = 1;
+            image->pixels[x0][y0].r = 255;
+            image->pixels[x0][y0].g = 0;
+            image->pixels[x0][y0].b = 0;
 
-                // Get start point
-                if (coordinates[0] == -1 && coordinates[1] == -1)
-                {
-                    coordinates[0] = x0;
-                    coordinates[1] = y0;
-                }
-                else
-                {
-                    coordinates[2] = x0;
-                    coordinates[3] = y0;
-                }
-           // }
+            // Get start point
+            if (coordinates[0] == -1 && coordinates[1] == -1)
+            {
+                coordinates[0] = x0;
+                coordinates[1] = y0;
+            }
+            else
+            {
+                coordinates[2] = x0;
+                coordinates[3] = y0;
+            }
+            // }
         }
 
         if (x0 == x1 && y0 == y1)

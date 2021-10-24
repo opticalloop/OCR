@@ -8,7 +8,7 @@ LineList simplifyLines(LineList *linelist)
     if (len <= 0)
     {
         printf("Got no line\n");
-        return  ;
+        return;
     }
     int lastLinesCount = 0;
 
