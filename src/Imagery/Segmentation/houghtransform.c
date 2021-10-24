@@ -1,6 +1,8 @@
 #include "Imagery/Segmentation/houghtransform.h"
 
-void detection(Image *image, Image *drawImage)
+#define THRESHOLD 0.3
+
+void detection(Image *image, Image *drawImage, Image *simplifiedImage)
 {
     // Initialize variables of the image
     // const unsigned int width = image->width, height = image->height;
@@ -8,7 +10,26 @@ void detection(Image *image, Image *drawImage)
     // Call major fonction
     // SobelEdgeDetection(image);
     // saveImage(image,"out.bmp");
-    houghtransform(image, drawImage);
+    LineList list = houghtransform(image, drawImage);
+    printf("Max theta : %f\n", list.maxTheta);
+    double angle = list.maxTheta * 180.0 / M_PI;
+    printf("Angle in degree : %f\n", angle);
+
+    LineList resultingList = simplifyLines(list.lines, list.len);
+
+    const unsigned int w = simplifiedImage->width;
+    const unsigned int h = simplifiedImage->height;
+
+    printf("Resulting line numbers : %d\n", resultingList.len);
+    for (unsigned int i = 0; i < resultingList.len; i++)
+    {
+        Line line = resultingList.lines[i];
+        int *c = draw_line(simplifiedImage, w, h, line.xStart, line.yStart,
+                           line.xEnd, line.yEnd);
+        free(c);
+    }
+    free(resultingList.lines);
+
     // printf(">- End of detection\n");
     // printMatrice(copyImage, height, width);
     // matriceToBmp(copyImage, width, height);
@@ -17,7 +38,7 @@ void detection(Image *image, Image *drawImage)
     // freeMatrice(copyImage, height);
 }
 
-void houghtransform(Image *image, Image *drawImage)
+LineList houghtransform(Image *image, Image *drawImage)
 {
     printf("Initializing values\n");
     // Save the image dimensions
@@ -91,24 +112,21 @@ void houghtransform(Image *image, Image *drawImage)
         }
     }
 
-    // Putting all the value of the accumulator between 0 and 255
-    // for (int theta = 0; theta <= nbTheta; theta++)
-    // {
-    //     for (int rho = 0; rho <= nbRho; rho++)
-    //     {
-    //         double newValue = ((double)accumulator[rho][theta]/(double)max) *
-    //         255.0; accumulator[rho][theta] = (unsigned int)newValue;
-    //     }
-    // }
-
     free(saveCos);
     free(saveSin);
 
-    accToBmp(accumulator, nbTheta + 1, nbRho + 1, max);
+    // accToBmp(accumulator, nbTheta + 1, nbRho + 1, max);
 
     // Finding edges
-    int lineThreshold = max * 0.4;
+    // Computing threshold
+    int lineThreshold = max * THRESHOLD;
     printf("Threshold : %d\n", lineThreshold);
+
+    // Create line return line array
+    Line *allLines = malloc(sizeof(Line));
+
+    int nbEdges = 0;
+    double tempMaxTheta = 0.0;
 
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
@@ -120,7 +138,7 @@ void houghtransform(Image *image, Image *drawImage)
         for (int rho = 0; rho <= nbRho; rho++)
         {
             int val = accumulator[rho][theta];
-            //
+
             if (val >= prev)
             {
                 prev = val;
@@ -145,6 +163,11 @@ void houghtransform(Image *image, Image *drawImage)
             {
                 double r = arrRhos[prev_rho], t = arrThetas[prev_theta];
 
+                if (t > tempMaxTheta)
+                {
+                    tempMaxTheta = t;
+                }
+
                 double c = cos(t), s = sin(t);
                 Dot d0, d1, d2;
                 // Calculate d0 point
@@ -159,17 +182,38 @@ void houghtransform(Image *image, Image *drawImage)
                 d2.Y = d0.Y - (int)(diagonal * c);
 
                 // Draw Lines on the copyImage matrice
-                // drawLineFromDot(copyImage, &d0, &d1, width, height);
-                draw_line(drawImage, width, height, d1.X, d1.Y, d2.X, d2.Y);
+                int *coordinates =
+                    draw_line(drawImage, width, height, d1.X, d1.Y, d2.X, d2.Y);
+
+                printf("Got xStart : %d, yStart : %d, xEnd : %d, yEnd : %d\n",
+                       coordinates[0], coordinates[1], coordinates[2],
+                       coordinates[3]);
+
+                // Add line on our return list
+                allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
+                Line line;
+                line.xStart = coordinates[0];
+                line.yStart = coordinates[1];
+                line.xEnd = coordinates[2];
+                line.yEnd = coordinates[3];
+
+                allLines[nbEdges] = line;
+                free(coordinates);
+
+                nbEdges++;
             }
         }
     }
-    // printMatrice(copyImage, height, width);
-    // matriceToBmp(copyImage, width, height);
+
     // Free cos and sin arrays
     free(arrThetas);
     free(arrRhos);
     freeMatrice(accumulator, nbTheta + 1);
+    LineList list;
+    list.lines = allLines;
+    list.len = nbEdges;
+    list.maxTheta = tempMaxTheta;
+    return list;
 }
 
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
@@ -208,8 +252,12 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
     }
 }
 
-void draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
+// Return the two extreme points of the lignes
+int *draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
 {
+    int *coordinates = malloc(sizeof(int) * 4 + 1);
+    memset(coordinates, -1, sizeof(int) * 4);
+
     int dx = abs(x1 - x0);
     int sx = x0 < x1 ? 1 : -1;
     int dy = -abs(y1 - y0);
@@ -221,9 +269,25 @@ void draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            image->pixels[x0][y0].r = 255;
-            image->pixels[x0][y0].g = 0;
-            image->pixels[x0][y0].b = 0;
+            if (image->pixels[x0][y0].r == 255 && image->pixels[x0][y0].g == 255
+                && image->pixels[x0][y0].b == 255)
+            {
+                image->pixels[x0][y0].r = 255;
+                image->pixels[x0][y0].g = 0;
+                image->pixels[x0][y0].b = 0;
+
+                // Get start point
+                if (coordinates[0] == -1 && coordinates[1] == -1)
+                {
+                    coordinates[0] = x0;
+                    coordinates[1] = y0;
+                }
+                else
+                {
+                    coordinates[2] = x0;
+                    coordinates[3] = y0;
+                }
+            }
         }
 
         if (x0 == x1 && y0 == y1)
@@ -242,6 +306,7 @@ void draw_line(Image *image, int w, int h, int x0, int y0, int x1, int y1)
             y0 += sy;
         }
     }
+    return coordinates;
 }
 
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,

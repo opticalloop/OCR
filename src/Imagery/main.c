@@ -24,15 +24,23 @@ int main(int argc, char *argv[])
     _image.surface = NULL;
     Image *image = &_image;
     newImage(image);
-    blackandwhite(image);
-    reverse_color(image);
+    // blackandwhite(image);
+    // reverse_color(image);
 
     Image _drawImage;
     _drawImage.path = argv[1];
     _drawImage.surface = NULL;
     Image *drawImage = &_drawImage;
+
     newImage(drawImage);
-    detection(image, drawImage);
+
+    Image _simpleImage;
+    _simpleImage.path = argv[1];
+    _simpleImage.surface = NULL;
+    Image *simpleImage = &_simpleImage;
+    newImage(simpleImage);
+
+    detection(image, drawImage, simpleImage);
     // displayImage(image);
     // rotate(image, 180);
 
@@ -44,6 +52,8 @@ int main(int argc, char *argv[])
 
     saveImage(image, argv[2]);
     saveImage(drawImage, "drawImage.bmp");
+    saveImage(simpleImage, "simplifiedImage.bmp");
+    freeImage(simpleImage);
     freeImage(drawImage);
     freeImage(image);
 
