@@ -16,12 +16,13 @@
 /*
  *  Summary:
  *      Split the image in 81 blocks
- * 
+ *
  *  Params:
  *      *image: The image split
  *
  *  Return:
- *      Nothing save is done directly and array is modify directly in the function
+ *      Nothing save is done directly and array is modify directly in the
+ * function
  */
 void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename);
 

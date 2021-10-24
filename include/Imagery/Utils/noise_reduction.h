@@ -58,7 +58,7 @@ unsigned int MedianFilter(Pixel *matrix);
  * Return :
  *      median value of the pixel, based on Median Formula
  */
-unsigned int ConstrastFilter(Pixel pixel, unsigned int *histogram, int max);
+unsigned int ConstrastFilter(Pixel *pixel, unsigned int *histogram, int max);
 
 /*
  * Summary:
