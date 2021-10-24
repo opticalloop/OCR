@@ -1,4 +1,4 @@
-#include "Imagery/Segmentation/houghtransform.h"
+#include "Imagery/Detection/houghtransform.h"
 
 #define THRESHOLD 0.3
 
