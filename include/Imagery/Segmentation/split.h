@@ -35,7 +35,7 @@ int isBlackLine(Image *image, unsigned int y);
 /*
  *  Summary:
  *      Put a red square on the image
- * 
+ *
  *  Params:
  *      *image: image where we want to draw
  *      xstart: coordinate of x top right of the block
@@ -55,8 +55,8 @@ void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
  *
  *  Params:
  *      *image: the square taken from the big image
- *      iall: the position of the square in the grid to know how to name the file
- *      *imagename: name of the big image
+ *      iall: the position of the square in the grid to know how to name the
+ * file *imagename: name of the big image
  *
  *  Return:
  *      Nothing it save directly in a folder

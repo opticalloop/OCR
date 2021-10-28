@@ -25,7 +25,6 @@ int isColumnPartialBlack(Image *image, unsigned int x)
     {
         if (image->pixels[x][y].r < 128)
             nbblack++;
-        
     }
 
     if (nbblack == 0)

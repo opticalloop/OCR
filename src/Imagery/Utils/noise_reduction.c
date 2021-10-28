@@ -169,7 +169,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
     GetHistogram(histogram, image->pixels, w, h);
-    
+
     int max = image->height * image->width;
 
     if (verbose)
@@ -184,7 +184,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 ConstrastFilter(image->pixels[i][j], histogram, max));
         }
     }
-    
+
     SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
@@ -223,7 +223,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     OtsuFilter(image->pixels, w, h, histogram);
     SaveTmpPic(image, pathToSave, "4_otsu");
-    
+
     NegativePictureIfNormal(image);
     SaveTmpPic(image, pathToSave, "5_inversed");
 
