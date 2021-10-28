@@ -20,12 +20,12 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     if (save)
     {
         if (verbose)
-            printf("<--     📂 Saved picture : %s\n", "2.1_Hough_all_lines.bmp");
-        saveImage(drawImage, "Hough_all_lines.bmp");
+            printf("<-- 💾 Saved picture : %s\n", "2.1_Hough_all_lines.bmp");
+        saveImage(drawImage, "2.1_Hough_all_lines.bmp");
         freeImage(drawImage);
     }
     if (verbose)
-        printf("    📈 2.5 Simplyfing lines found\n");
+        printf("    📈 2.3 Simplyfing lines\n");
 
     LineList resultingList = simplifyLines(&list);
     double angle = resultingList.maxTheta * 180.0 / M_PI;
@@ -45,13 +45,12 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         for (unsigned int i = 0; i < len; i++)
         {
             Line line = resultingList.lines[i];
-            int *c = draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
-            free(c);
+            draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
         }
         if (verbose)
-            printf("<--     📂 Saved picture : %s\n",
+            printf("<-- 💾 Saved picture : %s\n",
                    "2.2_Hough_simplified_lines.bmp");
-        saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
+        saveImage(simplifiedImage, "2.2_Hough_simplified_lines.bmp");
         freeImage(simplifiedImage);
     }
 
@@ -59,10 +58,10 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     if (angleRounded >= 88 && angleRounded <= 91)
     {
         if (verbose)
-            printf("    📐 2.6 Do not need to rotate image\n");
+            printf("    📐 2.4 Do not need to rotate image\n");
     }
     else if (verbose)
-        printf("    📐 2.6 Angle found : %d\n", angleRounded);
+        printf("    📐 2.4 Angle found : %d\n", angleRounded);
 
     Image _squareImage;
     _squareImage.path = image->path;
@@ -79,14 +78,14 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     if (save)
     {
         if (verbose)
-            printf("<--     📂 Saved picture : %s\n",
+            printf("<-- 💾 Saved picture : %s\n",
                    "2.3_Hough_squares_only.bmp");
-        saveImage(squareImage, "Hough_squares_only.bmp");
+        saveImage(squareImage, "2.3_Hough_squares_only.bmp");
         freeImage(squareImage);
     }
 
     if (verbose)
-        printf("    📉 2.8 Finding the predominating square\n");
+        printf("    📉 2.5 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares);
 
     if (save)
@@ -95,17 +94,17 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         _lastSquareImg.path = image->path;
         _lastSquareImg.surface = NULL;
         Image *lastSquareImg = &_lastSquareImg;
+
         newImage(lastSquareImg);
-        char str[1000] = "2.4__last_square.bmp";
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         if (verbose)
-            printf("<--   📂 Saved picture : %s\n", str);
-        saveImage(lastSquareImg, str);
+            printf("<-- 💾 Saved picture : %s\n", "2.4_Hough_last_square.bmp");
+        saveImage(lastSquareImg, "2.4_Hough_last_square.bmp");
         freeImage(lastSquareImg);
     }
 
     if (verbose)
-        printf("    📋 2.9 Computing cropped image\n");
+        printf("    📋 2.6 Computing cropped image\n");
 
     // Get square dimension
     int l1 = getLineLength(&(lastSquare.top));
@@ -271,7 +270,10 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     // Computing threshold
     int lineThreshold = max * THRESHOLD;
     if (verbose)
-        printf("    🎨 2.3 Hough Threshold : %d\n", lineThreshold);
+    {
+        printf("    🔼 2.2.1 Hough max value : %u\n", max);
+        printf("    🎨 2.2.2 Hough Threshold : %d\n", lineThreshold);
+    }
 
     // Create line return line array
     Line *allLines = malloc(sizeof(Line));
@@ -284,7 +286,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     int boolIsIncreasing = 1;
 
     if (verbose)
-        printf("    📜 2.4 Drawing on image : %d\n", lineThreshold);
+        printf("    📜 2.2.3 Drawing on image\n");
 
     for (int theta = 0; theta <= nbTheta; theta++)
     {
@@ -339,22 +341,16 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
                 line.xEnd = d2.X;
                 line.yStart = d1.Y;
                 line.yEnd = d2.Y;
+                line.theta = t;
 
                 // Draw Lines on the copyImage matrice
-                int *coordinates =
+                if (draw)
                     draw_line(drawImage, width, height, &line, 200, 1, draw);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
 
-                line.xStart = coordinates[0];
-                line.yStart = coordinates[1];
-                line.xEnd = coordinates[2];
-                line.yEnd = coordinates[3];
-                line.theta = t;
-
                 allLines[nbEdges] = line;
-                free(coordinates);
 
                 nbEdges++;
             }
@@ -409,7 +405,7 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 }
 
 // Return the two extreme points of the lignes
-int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
+void draw_line(Image *image, int w, int h, Line *line, unsigned int color,
                int thickness, int draw)
 {
     // printf("Drawing line\n");
@@ -418,9 +414,6 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
 
     int x1 = line->xEnd;
     int y1 = line->yEnd;
-
-    int *coordinates = malloc(sizeof(int) * 4 + 1);
-    memset(coordinates, -1, sizeof(int) * 4);
 
     int dx = abs(x1 - x0);
     int sx = x0 < x1 ? 1 : -1;
@@ -457,18 +450,6 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
                     }
                 }
             }
-            // Get start point
-            if (coordinates[0] == -1 && coordinates[1] == -1)
-            {
-                coordinates[0] = x0;
-                coordinates[1] = y0;
-            }
-            else
-            {
-                coordinates[2] = x0;
-                coordinates[3] = y0;
-            }
-            // }
         }
 
         if (x0 == x1 && y0 == y1)
@@ -487,7 +468,6 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
             y0 += sy;
         }
     }
-    return coordinates;
 }
 
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,

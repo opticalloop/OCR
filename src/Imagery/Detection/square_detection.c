@@ -60,7 +60,6 @@ LineList simplifyLines(LineList *linelist)
     {
         if (allLines[j].xStart != -1)
         {
-            // printf("j : %d\n", j);
             resultingLines[index] = allLines[j];
             index++;
         }
@@ -176,8 +175,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
             // Get all line that actualLine have a intersection point with
             Dot dot1 = getIntersection(&(lineList->lines[h]),
                                        &(lineList->lines[i]), width, height);
-            // printf("Dot 1.X : %d, Dot 1.Y : %d\n", dot1.X, dot1.Y);
-            // There is an intersection
+
             if (dot1.X != -1)
             {
                 // ALL INTERSECTED EDGES
@@ -188,8 +186,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                     Dot dot2 =
                         getIntersection(&(lineList->lines[i]),
                                         &(lineList->lines[j]), width, height);
-                    // printf("Dot 2.X : %d, Dot 2.Y : %d\n", dot2.X, dot2.Y);
-                    // There is an intersectiont
+
                     if (dot2.X != -1)
                     {
                         // ALL INTERSECTED EDGES
@@ -200,16 +197,14 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                             Dot dot3 = getIntersection(&(lineList->lines[j]),
                                                        &(lineList->lines[k]),
                                                        width, height);
-                            // printf("Dot 3.X : %d, Dot 3.Y : %d\n", dot3.X,
-                            // dot3.Y); There is an intersection
+
                             if (dot3.X != -1)
                             {
                                 // DOES K have intersection with h
                                 Dot dot4 = getIntersection(
                                     &(lineList->lines[k]),
                                     &(lineList->lines[h]), width, height);
-                                // printf("Dot 4.X : %d, Dot 4.Y : %d\n",
-                                // dot4.X, dot4.Y);
+
                                 if (dot4.X != -1)
                                 {
                                     Square square;
@@ -237,22 +232,10 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                                         .yEnd = dot1.Y };
                                     square.left = fourthLine;
 
-                                    int l1 = sqrt((dot2.X - dot1.X)
-                                                      * (dot2.X - dot1.X)
-                                                  + ((dot2.Y - dot1.Y)
-                                                     * (dot2.Y - dot1.Y)));
-                                    int l2 = sqrt((dot3.X - dot2.X)
-                                                      * (dot3.X - dot2.X)
-                                                  + ((dot3.Y - dot2.Y)
-                                                     * (dot3.Y - dot2.Y)));
-                                    int l3 = sqrt((dot4.X - dot3.X)
-                                                      * (dot4.X - dot3.X)
-                                                  + ((dot4.Y - dot3.Y)
-                                                     * (dot4.Y - dot3.Y)));
-                                    int l4 = sqrt((dot1.X - dot4.X)
-                                                      * (dot1.X - dot4.X)
-                                                  + ((dot1.Y - dot4.Y)
-                                                     * (dot1.Y - dot4.Y)));
+                                    int l1 = getLineLength(&firstLine);
+                                    int l2 = getLineLength(&secondLine);
+                                    int l3 = getLineLength(&thirdLine);
+                                    int l4 = getLineLength(&fourthLine);
 
                                     if (l1 <= width / 9 || l2 <= width / 9
                                         || l3 <= width / 9 || l4 <= width / 9
@@ -287,20 +270,13 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
 int isSquare(Square *square)
 {
-    Line left = square->left;
-    int lenLeft = sqrt((left.xEnd - left.xStart) * (left.xEnd - left.xStart)
-                       + (left.yEnd - left.yStart) * (left.yEnd - left.yStart));
-    Line right = square->right;
-    int lenright =
-        sqrt((right.xEnd - right.xStart) * (right.xEnd - right.xStart)
-             + (right.yEnd - right.yStart) * (right.yEnd - right.yStart));
-    Line top = square->top;
-    int lentop = sqrt((top.xEnd - top.xStart) * (top.xEnd - top.xStart)
-                      + (top.yEnd - left.yStart) * (top.yEnd - top.yStart));
-    Line bottom = square->bottom;
-    int lenbottom =
-        sqrt((bottom.xEnd - bottom.xStart) * (bottom.xEnd - bottom.xStart)
-             + (bottom.yEnd - bottom.yStart) * (bottom.yEnd - bottom.yStart));
+    int lenLeft = getLineLength(&(square->left));
+    
+    int lenright = getLineLength(&(square->left));
+    
+    int lentop = getLineLength(&(square->top));
+
+    int lenbottom = getLineLength(&(square->bottom));
 
     if (abs(lenLeft - lentop) > 300)
         return 0;
@@ -321,20 +297,14 @@ int isSquare(Square *square)
 
 int getSquarePerimeter(Square *square)
 {
-    Line left = square->left;
-    int lenLeft = sqrt((left.xEnd - left.xStart) * (left.xEnd - left.xStart)
-                       + (left.yEnd - left.yStart) * (left.yEnd - left.yStart));
-    Line right = square->right;
-    int lenright =
-        sqrt((right.xEnd - right.xStart) * (right.xEnd - right.xStart)
-             + (right.yEnd - right.yStart) * (right.yEnd - right.yStart));
-    Line top = square->top;
-    int lentop = sqrt((top.xEnd - top.xStart) * (top.xEnd - top.xStart)
-                      + (top.yEnd - left.yStart) * (top.yEnd - top.yStart));
-    Line bottom = square->bottom;
-    int lenbottom =
-        sqrt((bottom.xEnd - bottom.xStart) * (bottom.xEnd - bottom.xStart)
-             + (bottom.yEnd - bottom.yStart) * (bottom.yEnd - bottom.yStart));
+    int lenLeft = getLineLength(&(square->left));
+    
+    int lenright =getLineLength(&(square->left));
+    
+    int lentop = getLineLength(&(square->top));
+
+    int lenbottom = getLineLength(&(square->bottom));
+
     return lenLeft + lenright + lentop + lenbottom;
 }
 
@@ -350,7 +320,7 @@ int getFactor(Square *square)
 
     int l2 = getLineLength(&(square->bottom));
 
-    int l3 = getLineLength(&(square->right));
+    int l3 = getLineLength(&(square->left));
 
     int l4 = getLineLength(&(square->left));
 
@@ -405,15 +375,9 @@ Square sortSquares(SquareList *squareList)
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness)
 {
-    // printf("Drawing square\n");
-    int *a = draw_line(image, width, height, &(square->left), 50, thickness, 1);
-    free(a);
-    int *b =
-        draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
-    free(b);
-    int *c = draw_line(image, width, height, &(square->top), 50, thickness, 1);
-    free(c);
-    int *d =
-        draw_line(image, width, height, &(square->right), 50, thickness, 1);
-    free(d);
+    draw_line(image, width, height, &(square->left), 50, thickness, 1);
+    draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
+    draw_line(image, width, height, &(square->top), 50, thickness, 1);
+    draw_line(image, width, height, &(square->right), 50, thickness, 1);
+    
 }
