@@ -2,43 +2,110 @@
 
 #define THRESHOLD 0.3
 
-void detection(Image *image, Image *drawImage, Image *simplifiedImage,
-               Image *squareImage, Image *lastSquareImg)
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 {
+    // Directly free
+    if (!save)
+    {
+        freeImage(drawImage);
+    }
+
     // Initialize variables of the image
-    printf("_________________________________\n");
+    if (verbose)
+        printf("\n    🔍 2. Hough Transform\n");
 
     // Call major fonction
-    LineList list = houghtransform(image, drawImage);
-    printf("Max theta : %f\n", list.maxTheta);
-    double angle = list.maxTheta * 180.0 / M_PI;
-    printf("Angle in degree : %f\n", angle);
+    LineList list = houghtransform(image, drawImage, verbose, save);
+
+    if (save)
+    {
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n", "2.1_Hough_all_lines.bmp");
+        saveImage(drawImage, "Hough_all_lines.bmp");
+        freeImage(drawImage);
+    }
+    if (verbose)
+        printf("    📈 2.5 Simplyfing lines found\n");
 
     LineList resultingList = simplifyLines(&list);
-    angle = resultingList.maxTheta * 180.0 / M_PI;
-    printf("Angle in degree after simplification: %f\n", angle);
+    double angle = resultingList.maxTheta * 180.0 / M_PI;
+
+    if (save)
+    {
+        // Draw simplifieds lines
+        Image _simplifiedImage;
+        _simplifiedImage.path = image->path;
+        _simplifiedImage.surface = NULL;
+        Image *simplifiedImage = &_simplifiedImage;
+        newImage(simplifiedImage);
+        const unsigned int w = simplifiedImage->width;
+        const unsigned int h = simplifiedImage->height;
+
+        const unsigned int len = resultingList.len;
+        for (unsigned int i = 0; i < len; i++)
+        {
+            Line line = resultingList.lines[i];
+            int *c = draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
+            free(c);
+        }
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n",
+                   "2.2_Hough_simplified_lines.bmp");
+        saveImage(simplifiedImage, "Hough_simplified_lines.bmp");
+        freeImage(simplifiedImage);
+    }
+
     int angleRounded = (int)angle % 90;
     if (angleRounded >= 88 && angleRounded <= 91)
     {
-        printf("Don't need to autoRotate !\n");
+        if (verbose)
+            printf("    📐 2.6 Do not need to rotate image\n");
     }
+    else if (verbose)
+        printf("    📐 2.6 Angle found : %d\n", angleRounded);
 
-    // Draw simplifieds lines
-    const unsigned int w = simplifiedImage->width;
-    const unsigned int h = simplifiedImage->height;
-    printf("Resulting line numbers : %d\n", resultingList.len);
-    for (unsigned int i = 0; i < resultingList.len; i++)
+    Image _squareImage;
+    _squareImage.path = image->path;
+    _squareImage.surface = NULL;
+    Image *squareImage = &_squareImage;
+    if (save)
     {
-        Line line = resultingList.lines[i];
-        int *c = draw_line(simplifiedImage, w, h, &line, 200, 2);
-        free(c);
+        // Draw simplifieds lines
+        newImage(squareImage);
     }
-    SquareList squares = findSquare(&resultingList, w, h, squareImage);
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
+    SquareList squares = findSquare(&resultingList, w, h, squareImage, save);
+    if (save)
+    {
+        if (verbose)
+            printf("<--     📂 Saved picture : %s\n",
+                   "2.3_Hough_squares_only.bmp");
+        saveImage(squareImage, "Hough_squares_only.bmp");
+        freeImage(squareImage);
+    }
 
-    printf("Found %d squares\n", squares.len);
+    if (verbose)
+        printf("    📉 2.8 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares);
-    printf("Drawing last square\n");
-    drawSquare(&lastSquare, lastSquareImg, w, h, 2);
+
+    if (save)
+    {
+        Image _lastSquareImg;
+        _lastSquareImg.path = image->path;
+        _lastSquareImg.surface = NULL;
+        Image *lastSquareImg = &_lastSquareImg;
+        newImage(lastSquareImg);
+        char str[1000] = "2.4__last_square.bmp";
+        drawSquare(&lastSquare, lastSquareImg, w, h, 2);
+        if (verbose)
+            printf("<--   📂 Saved picture : %s\n", str);
+        saveImage(lastSquareImg, str);
+        freeImage(lastSquareImg);
+    }
+
+    if (verbose)
+        printf("    📋 2.9 Computing cropped image\n");
 
     // Get square dimension
     int l1 = getLineLength(&(lastSquare.top));
@@ -108,22 +175,19 @@ void detection(Image *image, Image *drawImage, Image *simplifiedImage,
     rect.y = lastSquare.left.yStart;
     rect.w = biggestLine;
     rect.h = secondBiggestLine;
-    ;
-    SDL_BlitSurface(image->surface, &rect, surface, NULL);
 
-    SDL_SaveBMP(surface, "1.4_Cropped_image.bmp");
-    SDL_FreeSurface(surface);
+    SDL_BlitSurface(image->surface, &rect, surface, NULL);
 
     // Free squares
     free(squares.squares);
 
     free(resultingList.lines);
-    printf(">- End of detection\n");
+
+    return surface;
 }
 
-LineList houghtransform(Image *image, Image *drawImage)
+LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
 {
-    printf("Initializing values\n");
     // Save the image dimensions
     const double width = image->width, height = image->height;
     // Calculate the diagonal of the image
@@ -154,7 +218,8 @@ LineList houghtransform(Image *image, Image *drawImage)
         arrThetas[index] = val;
     }
 
-    printf(">Create cos and sin save\n");
+    if (verbose)
+        printf("    🎲 2.1 Computing cos and sin array\n");
     // Create a save of cos and sin value for each theta, to optimize
     // performance.
     double *saveCos = calloc(nbTheta + 1, sizeof(double));
@@ -169,7 +234,8 @@ LineList houghtransform(Image *image, Image *drawImage)
         saveSin[theta] = sin(arrThetas[theta]);
     }
 
-    printf(">>Creating the accumulator\n");
+    if (verbose)
+        printf("    📥 2.2 Filling accumulator\n");
     unsigned int **accumulator = initMatrice(nbTheta + 1, nbRho + 1);
 
     // We intialize the accumulator with all the value
@@ -204,7 +270,8 @@ LineList houghtransform(Image *image, Image *drawImage)
     // Finding edges
     // Computing threshold
     int lineThreshold = max * THRESHOLD;
-    printf("Threshold : %d\n", lineThreshold);
+    if (verbose)
+        printf("    🎨 2.3 Hough Threshold : %d\n", lineThreshold);
 
     // Create line return line array
     Line *allLines = malloc(sizeof(Line));
@@ -215,7 +282,9 @@ LineList houghtransform(Image *image, Image *drawImage)
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
     int boolIsIncreasing = 1;
-    printf(">>>Drawing on the drawImage\n");
+
+    if (verbose)
+        printf("    📜 2.4 Drawing on image : %d\n", lineThreshold);
 
     for (int theta = 0; theta <= nbTheta; theta++)
     {
@@ -273,7 +342,7 @@ LineList houghtransform(Image *image, Image *drawImage)
 
                 // Draw Lines on the copyImage matrice
                 int *coordinates =
-                    draw_line(drawImage, width, height, &line, 200, 1);
+                    draw_line(drawImage, width, height, &line, 200, 1, draw);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
@@ -341,7 +410,7 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 
 // Return the two extreme points of the lignes
 int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
-               int thickness)
+               int thickness, int draw)
 {
     // printf("Drawing line\n");
     int x0 = line->xStart;
@@ -364,25 +433,28 @@ int *draw_line(Image *image, int w, int h, Line *line, unsigned int color,
     {
         if (0 <= x0 && x0 < w && 0 <= y0 && y0 < h)
         {
-            image->pixels[x0][y0].r = abs(255 - color);
-            image->pixels[x0][y0].g = abs(255 + color);
-            image->pixels[x0][y0].b = color;
-
-            if (thickness == 2)
+            if (draw)
             {
-                if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
-                    && (y0 + 1) < h)
+                image->pixels[x0][y0].r = 255 - color;
+                image->pixels[x0][y0].g = 255 + color;
+                image->pixels[x0][y0].b = color;
+
+                if (thickness == 2)
                 {
-                    image->pixels[x0 + 1][y0 + 1].r = abs(255 - color);
-                    image->pixels[x0 + 1][y0 + 1].g = abs(255 + color);
-                    image->pixels[x0 + 1][y0 + 1].b = color;
-                }
-                if (0 <= (x0 - 1) && (x0 - 1) < w && 0 <= (y0 - 1)
-                    && (y0 - 1) < h)
-                {
-                    image->pixels[x0 - 1][y0 - 1].r = abs(255 - color);
-                    image->pixels[x0 - 1][y0 - 1].g = abs(255 + color);
-                    image->pixels[x0 - 1][y0 - 1].b = color;
+                    if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
+                        && (y0 + 1) < h)
+                    {
+                        image->pixels[x0 + 1][y0 + 1].r = 255 - color;
+                        image->pixels[x0 + 1][y0 + 1].g = 255 + color;
+                        image->pixels[x0 + 1][y0 + 1].b = color;
+                    }
+                    if (0 <= (x0 - 1) && (x0 - 1) < w && 0 <= (y0 - 1)
+                        && (y0 - 1) < h)
+                    {
+                        image->pixels[x0 - 1][y0 - 1].r = 255 - color;
+                        image->pixels[x0 - 1][y0 - 1].g = 255 + color;
+                        image->pixels[x0 - 1][y0 - 1].b = color;
+                    }
                 }
             }
             // Get start point

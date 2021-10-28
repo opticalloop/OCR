@@ -8,12 +8,12 @@
 
 LineList simplifyLines(LineList *linelist);
 
-Square getSquare(LineList *lineList, Line *line, int index, int width,
-                 int height);
+Square getSquare(LineList *lineList, Line *line, int index);
 
 Dot getIntersection(Line *line1, Line *line2, int width, int height);
 
-SquareList findSquare(LineList *lineList, int width, int height, Image *image);
+SquareList findSquare(LineList *lineList, int width, int height, Image *image,
+                      int draw);
 
 SquareList getAllSquare(LineList *lineList, int width, int height,
                         Image *image);
