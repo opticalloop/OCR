@@ -358,11 +358,11 @@ Square sortSquares(SquareList *squareList)
 {
     const unsigned int len = squareList->len;
     Square temp = squareList->squares[0];
-    int tempFactor = getFactor(&temp);
+    int tempFactor = getLineLength(&(temp.bottom)) * getLineLength(&(temp.right));
     for (unsigned int i = 1; i < len; i++)
     {
         Square square = squareList->squares[i];
-        int factor = getFactor(&square);
+        int factor = getLineLength(&(square.bottom)) * getLineLength(&(square.right));
         if (factor > tempFactor)
         {
             tempFactor = factor;
