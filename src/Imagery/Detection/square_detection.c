@@ -1,7 +1,9 @@
 #include "Imagery/Detection/square_detection.h"
 
-#define MIN_EQUAL 51
-#define MIN_THETA 31
+#define MIN_EQUAL 101
+#define MIN_THETA 51
+
+#define SQUARE_FACTOR 300
 
 LineList simplifyLines(LineList *linelist)
 {
@@ -143,13 +145,7 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
                 dot.Y = y;
                 return dot;
             }
-            dot.X = -1;
-            dot.Y = -1;
-            return dot;
         }
-        dot.X = -1;
-        dot.Y = -1;
-        return dot;
     }
     dot.X = -1;
     dot.Y = -1;
@@ -232,17 +228,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                                         .yEnd = dot1.Y };
                                     square.left = fourthLine;
 
-                                    int l1 = getLineLength(&firstLine);
-                                    int l2 = getLineLength(&secondLine);
-                                    int l3 = getLineLength(&thirdLine);
-                                    int l4 = getLineLength(&fourthLine);
-
-                                    if (l1 <= width / 9 || l2 <= width / 9
-                                        || l3 <= width / 9 || l4 <= width / 9
-                                        || abs(l1 - l2) >= 200
-                                        || abs(l2 - l3) >= 200
-                                        || abs(l3 - l4) >= 200
-                                        || abs(l4 - l1) >= 200)
+                                    // Not a square
+                                    if (!isSquare(&square, width, height))
                                     {
                                         continue;
                                     }
@@ -268,7 +255,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
     return squareList;
 }
 
-int isSquare(Square *square)
+int isSquare(Square *square, unsigned int width, unsigned int height)
 {
     int lenLeft = getLineLength(&(square->left));
     
@@ -278,80 +265,28 @@ int isSquare(Square *square)
 
     int lenbottom = getLineLength(&(square->bottom));
 
-    if (abs(lenLeft - lentop) > 300)
+    if (lenLeft <= width / 9 || lenright <= width / 9 || lentop <= width / 9 || lenbottom <= width / 9)
         return 0;
-    if (abs(lentop - lenright) > 300)
+    if (abs(lenLeft - lentop) > SQUARE_FACTOR)
         return 0;
-    if (abs(lenright - lenbottom) > 300)
+    if (abs(lentop - lenright) > SQUARE_FACTOR)
         return 0;
-    if (abs(lenbottom - lentop) > 300)
+    if (abs(lenright - lenbottom) > SQUARE_FACTOR)
         return 0;
-    if (abs(lenbottom - lenLeft) > 300)
+    if (abs(lenbottom - lentop) > SQUARE_FACTOR)
         return 0;
-    if (abs(lenLeft - lenright) > 300)
+    if (abs(lenbottom - lenLeft) > SQUARE_FACTOR)
         return 0;
-    printf("L1 : %d, L2 : %d, L3 : %d, L4 : %d\n", lenLeft, lenright, lentop,
-           lenbottom);
+    if (abs(lenLeft - lenright) > SQUARE_FACTOR)
+        return 0;
+
     return 1;
-}
-
-int getSquarePerimeter(Square *square)
-{
-    int lenLeft = getLineLength(&(square->left));
-    
-    int lenright =getLineLength(&(square->left));
-    
-    int lentop = getLineLength(&(square->top));
-
-    int lenbottom = getLineLength(&(square->bottom));
-
-    return lenLeft + lenright + lentop + lenbottom;
 }
 
 double getLineLength(Line *line)
 {
     return sqrt((line->xEnd - line->xStart) * (line->xEnd - line->xStart)
                 + ((line->yEnd - line->yStart) * (line->yEnd - line->yStart)));
-}
-
-int getFactor(Square *square)
-{
-    int l1 = getLineLength(&(square->top));
-
-    int l2 = getLineLength(&(square->bottom));
-
-    int l3 = getLineLength(&(square->left));
-
-    int l4 = getLineLength(&(square->left));
-
-    int biggestLine = l1;
-    if (l2 > biggestLine)
-    {
-        biggestLine = l2;
-    }
-    if (l3 > biggestLine)
-    {
-        biggestLine = l3;
-    }
-    if (l4 > biggestLine)
-    {
-        biggestLine = l4;
-    }
-
-    int shortestLine = l1;
-    if (l2 < shortestLine)
-    {
-        shortestLine = l2;
-    }
-    if (l3 < shortestLine)
-    {
-        shortestLine = l3;
-    }
-    if (l4 < shortestLine)
-    {
-        shortestLine = l4;
-    }
-    return biggestLine - shortestLine;
 }
 
 Square sortSquares(SquareList *squareList)
@@ -379,5 +314,26 @@ void drawSquare(Square *square, Image *image, int width, int height,
     draw_line(image, width, height, &(square->bottom), 50, thickness, 1);
     draw_line(image, width, height, &(square->top), 50, thickness, 1);
     draw_line(image, width, height, &(square->right), 50, thickness, 1);
-    
+}
+
+Dot getBetterCorner(Square *square)
+{
+    // Get the nearest corner from 0 / 0
+    Dot dot = {
+        .X = square->top.xStart, 
+        .Y = square->top.yStart
+    };
+    if (square->bottom.xStart < dot.X && square->bottom.yStart < dot.Y){
+        dot.X = square->bottom.xStart;
+        dot.Y = square->bottom.yStart;
+    }
+    if (square->right.xStart < dot.X && square->right.yStart < dot.Y){
+        dot.X = square->right.xStart;
+        dot.Y = square->right.yStart;
+    }
+    if (square->left.xStart < dot.X && square->left.yStart < dot.Y){
+        dot.X = square->left.xStart;
+        dot.Y = square->left.yStart;
+    }
+    return dot;
 }

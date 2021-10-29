@@ -27,7 +27,11 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     if (verbose)
         printf("    📈 2.3 Simplyfing lines\n");
 
+    // LINES SIMPLIFICATION
+
     LineList resultingList = simplifyLines(&list);
+    if (verbose)
+        printf("    📈 2.3.1 %d edges\n", resultingList.len);
     double angle = resultingList.maxTheta * 180.0 / M_PI;
 
     if (save)
@@ -54,14 +58,23 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         freeImage(simplifiedImage);
     }
 
+    // AUTO ROTATE
+
     int angleRounded = (int)angle % 90;
     if (angleRounded >= 88 && angleRounded <= 91)
     {
         if (verbose)
             printf("    📐 2.4 Do not need to rotate image\n");
     }
-    else if (verbose)
-        printf("    📐 2.4 Angle found : %d\n", angleRounded);
+    else{
+        // ROTATE
+        if (verbose)
+            printf("    📐 2.4 Angle found : %d\n", angleRounded);
+    }
+    // FINDING SQUARES
+
+    if (verbose)
+            printf("    📦 2.5 Finding all squares\n");
 
     Image _squareImage;
     _squareImage.path = image->path;
@@ -69,7 +82,6 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     Image *squareImage = &_squareImage;
     if (save)
     {
-        // Draw simplifieds lines
         newImage(squareImage);
     }
     const unsigned int w = image->width;
@@ -78,14 +90,19 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     if (save)
     {
         if (verbose)
-            printf("<-- 💾 Saved picture : %s\n",
-                   "2.3_Hough_squares_only.bmp");
+        {
+            printf("    🔼 2.5.1 %d squares\n", squares.len);
+
+            printf("<-- 💾 Saved picture : 2.3_Hough_squares_only.bmp\n");
+        }
         saveImage(squareImage, "2.3_Hough_squares_only.bmp");
         freeImage(squareImage);
     }
 
+    // SORTING SQUARES
+
     if (verbose)
-        printf("    📉 2.5 Finding the predominating square\n");
+        printf("    📉 2.6 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares);
 
     if (save)
@@ -98,83 +115,31 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         newImage(lastSquareImg);
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         if (verbose)
-            printf("<-- 💾 Saved picture : %s\n", "2.4_Hough_last_square.bmp");
+            printf("<-- 💾 Saved picture : 2.4_Hough_last_square.bmp\n");
         saveImage(lastSquareImg, "2.4_Hough_last_square.bmp");
         freeImage(lastSquareImg);
     }
 
+    // GETTING MAX SQUARE
+
     if (verbose)
-        printf("    📋 2.6 Computing cropped image\n");
+        printf("    📋 2.7 Computing cropped image\n");
 
     // Get square dimension
     int l1 = getLineLength(&(lastSquare.top));
-
-    int l2 = getLineLength(&(lastSquare.bottom));
-
     int l3 = getLineLength(&(lastSquare.right));
-
-    int l4 = getLineLength(&(lastSquare.left));
-
-    int biggestLine = l1;
-    int secondBiggestLine = l1;
-    if (l2 > biggestLine)
-    {
-        biggestLine = l2;
-        if (l1 > secondBiggestLine)
-        {
-            secondBiggestLine = l1;
-        }
-        if (l3 > secondBiggestLine)
-        {
-            secondBiggestLine = l3;
-        }
-        if (l4 > secondBiggestLine)
-        {
-            secondBiggestLine = l4;
-        }
-    }
-    if (l3 > biggestLine)
-    {
-        biggestLine = l3;
-        if (l1 > secondBiggestLine)
-        {
-            secondBiggestLine = l1;
-        }
-        if (l2 > secondBiggestLine)
-        {
-            secondBiggestLine = l2;
-        }
-        if (l4 > secondBiggestLine)
-        {
-            secondBiggestLine = l4;
-        }
-    }
-    if (l4 > biggestLine)
-    {
-        biggestLine = l4;
-        if (l1 > secondBiggestLine)
-        {
-            secondBiggestLine = l1;
-        }
-        if (l3 > secondBiggestLine)
-        {
-            secondBiggestLine = l3;
-        }
-        if (l2 > secondBiggestLine)
-        {
-            secondBiggestLine = l2;
-        }
-    }
 
     // Croping image and getting final result
     SDL_Surface *surface =
-        SDL_CreateRGBSurface(0, biggestLine, secondBiggestLine, 32, 0, 0, 0, 0);
+        SDL_CreateRGBSurface(0, l1, l3, 24, 0, 0, 0, 0);
     SDL_Rect rect;
-    rect.x = lastSquare.left.xStart;
-    rect.y = lastSquare.left.yStart;
-    rect.w = biggestLine;
-    rect.h = secondBiggestLine;
+    Dot dot = getBetterCorner(&lastSquare);
+    rect.x = dot.X;
+    rect.y = dot.Y;
+    rect.w = l1;
+    rect.h = l3;
 
+    // Save square to surface
     SDL_BlitSurface(image->surface, &rect, surface, NULL);
 
     // Free squares
@@ -361,6 +326,10 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     free(arrThetas);
     free(arrRhos);
     freeMatrice(accumulator, nbTheta + 1);
+
+    if (verbose)
+        printf("    📜 2.2.4 %d edges\n", nbEdges);
+
     LineList list;
     list.lines = allLines;
     list.len = nbEdges;
@@ -514,7 +483,7 @@ void matriceToBmp(unsigned int **matrice, unsigned int width,
             image.pixels[x][y].b = 0;
         }
     }
-    saveImage(&image, "drawingLine.bmp");
+    saveImage(&image, "2.0_Hough_accumulator.bmp");
 
     freeImage(&image);
 }
