@@ -138,8 +138,12 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
             int y = directCoeff2 * (ordOrigin1 - ordOrigin2)
                     / (directCoeff2 - directCoeff1)
                 + ordOrigin2;
+                
+            // In degree
+            int angleDiff = abs(line1->theta * 180.0 / M_PI - line2->theta * 180.0 / M_PI);
 
-            if (x >= 0 && x < width && y >= 0 && y < height)
+            if (x >= 0 && x < width && y >= 0 && y < height 
+                && angleDiff > 85 && angleDiff < 95)
             {
                 dot.X = x;
                 dot.Y = y;
@@ -152,7 +156,6 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     return dot;
 }
 
-// Stop at 4
 SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                       int draw)
 {
@@ -185,6 +188,12 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
                     if (dot2.X != -1)
                     {
+                        // Optimize
+                        Line tempLine = {.xStart = dot1.X, .xStart = dot1.Y, .xEnd = dot2.X, .yEnd = dot2.Y};
+                        if (getLineLength(&tempLine) < width / 9)
+                        {
+                            continue;
+                        }
                         // ALL INTERSECTED EDGES
                         for (unsigned int k = 0; k < len; k++)
                         {
@@ -323,7 +332,7 @@ Dot getBetterCorner(Square *square)
         .X = square->top.xStart, 
         .Y = square->top.yStart
     };
-    if (square->bottom.xStart < dot.X && square->bottom.yStart < dot.Y){
+    if (square->bottom.xStart < dot.X || square->bottom.yStart < dot.Y){
         dot.X = square->bottom.xStart;
         dot.Y = square->bottom.yStart;
     }
