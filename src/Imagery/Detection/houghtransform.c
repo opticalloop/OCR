@@ -1,6 +1,6 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.3
+#define THRESHOLD 0.5
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 {
@@ -46,10 +46,11 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         const unsigned int h = simplifiedImage->height;
 
         const unsigned int len = resultingList.len;
+        Pixel color = { .r = 255, .g = 0, .b = 0 };
         for (unsigned int i = 0; i < len; i++)
         {
             Line line = resultingList.lines[i];
-            draw_line(simplifiedImage, w, h, &line, 200, 2, 1);
+            draw_line(simplifiedImage, w, h, &line, &color, 2, 1);
         }
         if (verbose)
             printf("<-- 💾 Saved picture : %s\n",
@@ -66,7 +67,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         if (verbose)
             printf("    📐 2.4 Do not need to rotate image\n");
     }
-    else{
+    else
+    {
         // ROTATE
         if (verbose)
             printf("    📐 2.4 Angle found : %d\n", angleRounded);
@@ -74,7 +76,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     // FINDING SQUARES
 
     if (verbose)
-            printf("    📦 2.5 Finding all squares\n");
+        printf("    📦 2.5 Finding all squares\n");
 
     Image _squareImage;
     _squareImage.path = image->path;
@@ -130,8 +132,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     int l3 = getLineLength(&(lastSquare.right));
 
     // Croping image and getting final result
-    SDL_Surface *surface =
-        SDL_CreateRGBSurface(0, l1, l3, 24, 0, 0, 0, 0);
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, l1, l3, 24, 0, 0, 0, 0);
     SDL_Rect rect;
     Dot dot = getBetterCorner(&lastSquare);
     rect.x = dot.X;
@@ -153,7 +154,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
 {
     // Save the image dimensions
-    const double width = image->width, height = image->height;
+    const double width = drawImage->width, height = drawImage->height;
     // Calculate the diagonal of the image
     const double diagonal = sqrt(width * width + height * height);
 
@@ -253,6 +254,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     if (verbose)
         printf("    📜 2.2.3 Drawing on image\n");
 
+    Pixel pixel = { .r = 40, .g = 40, .b = 200 };
+
     for (int theta = 0; theta <= nbTheta; theta++)
     {
         for (int rho = 0; rho <= nbRho; rho++)
@@ -310,7 +313,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
 
                 // Draw Lines on the copyImage matrice
                 if (draw)
-                    draw_line(drawImage, width, height, &line, 200, 1, draw);
+                    draw_line(drawImage, width, height, &line, &pixel, 1, draw);
 
                 // Add line on our return list
                 allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
@@ -374,7 +377,7 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 }
 
 // Return the two extreme points of the lignes
-void draw_line(Image *image, int w, int h, Line *line, unsigned int color,
+void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
                int thickness, int draw)
 {
     // printf("Drawing line\n");
@@ -397,25 +400,25 @@ void draw_line(Image *image, int w, int h, Line *line, unsigned int color,
         {
             if (draw)
             {
-                image->pixels[x0][y0].r = 255 - color;
-                image->pixels[x0][y0].g = 255 + color;
-                image->pixels[x0][y0].b = color;
+                image->pixels[x0][y0].r = color->r;
+                image->pixels[x0][y0].g = color->g;
+                image->pixels[x0][y0].b = color->b;
 
                 if (thickness == 2)
                 {
                     if (0 <= (x0 + 1) && (x0 + 1) < w && 0 <= (y0 + 1)
                         && (y0 + 1) < h)
                     {
-                        image->pixels[x0 + 1][y0 + 1].r = 255 - color;
-                        image->pixels[x0 + 1][y0 + 1].g = 255 + color;
-                        image->pixels[x0 + 1][y0 + 1].b = color;
+                        image->pixels[x0 + 1][y0 + 1].r = color->r;
+                        image->pixels[x0 + 1][y0 + 1].g = color->g;
+                        image->pixels[x0 + 1][y0 + 1].b = color->b;
                     }
                     if (0 <= (x0 - 1) && (x0 - 1) < w && 0 <= (y0 - 1)
                         && (y0 - 1) < h)
                     {
-                        image->pixels[x0 - 1][y0 - 1].r = 255 - color;
-                        image->pixels[x0 - 1][y0 - 1].g = 255 + color;
-                        image->pixels[x0 - 1][y0 - 1].b = color;
+                        image->pixels[x0 - 1][y0 - 1].r = color->r;
+                        image->pixels[x0 - 1][y0 - 1].g = color->g;
+                        image->pixels[x0 - 1][y0 - 1].b = color->b;
                     }
                 }
             }
