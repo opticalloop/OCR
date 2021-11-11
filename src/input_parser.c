@@ -369,8 +369,7 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path,
-              "src/NeuralNetwork/Digits-Only/");
+        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
     }
     else if (xor)
     {

@@ -15,7 +15,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
     // 01 : 1
     // 10 : 1
     // 11 : 0
-    const double inputs[] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
+    const int inputs[] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0 };
     const double expecteds[] = { 0.0, 1.0, 1.0, 0.0 };
 
     const unsigned int nbInputs = 2;
@@ -57,7 +57,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
         }
         for (unsigned int j = 0; j < 8; j += 2)
         {
-            double input[2] = { inputs[j], inputs[j + 1] };
+            int input[2] = { inputs[j], inputs[j + 1] };
             double expected[1] = { expecteds[j / 2] };
 
             frontPropagation(network, input);
