@@ -14,20 +14,17 @@ void printResult(double expected[], Neuron neuron[])
             break;
         }
     }
-    // int index = 0;
-    // double temp = neuron[0].value;
-    double sum = 0.0;
-    for (unsigned int k = 0; k < NBOUTPUTS; k++)
+    int index = 0;
+    double temp = neuron[0].value;
+    for (unsigned int k = 1; k < NBOUTPUTS; k++)
     {
-        sum += neuron[k].value;
-        printf("<-- 📉 Output [%u]: %f\n", k, neuron[k].value);
-        // if (neuron[k].value > temp)
-        // {
-        //     temp = neuron[k].value;
-        //     index = k;
-        // }
+        if (neuron[k].value > temp)
+        {
+            temp = neuron[k].value;
+            index = k;
+        }
     }
-    printf("<-- 📉 Sum : %f\n", sum);
+    printf("<-- 📉 Output : %d\n", index);
 }
 
 void checkInputs(double inputs[NBINPUTS])
@@ -203,7 +200,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
         launchWeights(network, launch_path, verbose);
     }
 
-    double errorRate = 0.0;
+    double errorRate;
     int input[NBINPUTS];
     double expected[NBOUTPUTS];
 
@@ -213,6 +210,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     for (unsigned int i = 0; i <= epoch; i++)
     {
+        errorRate = 0.0;
         if (i == epoch && verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
@@ -223,7 +221,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             createData(file, input, expected, &lastchr);
 
             frontPropagation(network, input);
-            errorRate = backPropagation(network, expected);
+            errorRate += backPropagation(network, expected);
             gradientDescent(network);
 
             if (i == epoch && verbose)
@@ -234,12 +232,13 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
         }
         fclose(file);
         lastchr = ' ';
+        
+        if (verbose)
+        {
+            printf("    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+        }
     }
 
-    if (verbose)
-    {
-        printf("    ❗ Error rate = %f\n", errorRate);
-    }
 
     if (strcmp(save_path, ""))
     {
