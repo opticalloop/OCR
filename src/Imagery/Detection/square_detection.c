@@ -191,14 +191,14 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                     if (dot2.X != -1)
                     {
                         // Optimize
-                        Line tempLine = { .xStart = dot1.X,
-                                          .xStart = dot1.Y,
-                                          .xEnd = dot2.X,
-                                          .yEnd = dot2.Y };
-                        if (getLineLength(&tempLine) < width / 9)
-                        {
-                            continue;
-                        }
+                        // Line tempLine = { .xStart = dot1.X,
+                        //                   .yStart = dot1.Y,
+                        //                   .xEnd = dot2.X,
+                        //                   .yEnd = dot2.Y };
+                        // if (getLineLength(&tempLine) < width / 9)
+                        // {
+                        //     continue;
+                        // }
                         // ALL INTERSECTED EDGES
                         for (unsigned int k = 0; k < len; k++)
                         {
@@ -271,28 +271,29 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
 int isSquare(Square *square, unsigned int width, unsigned int height)
 {
+
     unsigned int lenLeft = getLineLength(&(square->left));
 
     unsigned int lenright = getLineLength(&(square->left));
 
-    unsigned int lentop = getLineLength(&(square->top));
+    unsigned  int lentop = getLineLength(&(square->top));
 
     unsigned int lenbottom = getLineLength(&(square->bottom));
 
     if (lenLeft <= width / 9 || lenright <= width / 9 || lentop <= width / 9
         || lenbottom <= width / 9)
         return 0;
-    if (abs(lenLeft - lentop) > SQUARE_FACTOR)
+    if (lenLeft - lentop > SQUARE_FACTOR)
         return 0;
-    if (abs(lentop - lenright) > SQUARE_FACTOR)
+    if (lentop - lenright > SQUARE_FACTOR)
         return 0;
-    if (abs(lenright - lenbottom) > SQUARE_FACTOR)
+    if (lenright - lenbottom > SQUARE_FACTOR)
         return 0;
-    if (abs(lenbottom - lentop) > SQUARE_FACTOR)
+    if (lenbottom - lentop > SQUARE_FACTOR)
         return 0;
-    if (abs(lenbottom - lenLeft) > SQUARE_FACTOR)
+    if (lenbottom - lenLeft > SQUARE_FACTOR)
         return 0;
-    if (abs(lenLeft - lenright) > SQUARE_FACTOR)
+    if (lenLeft - lenright > SQUARE_FACTOR)
         return 0;
 
     return 1;
@@ -304,7 +305,7 @@ double getLineLength(Line *line)
                 + ((line->yEnd - line->yStart) * (line->yEnd - line->yStart)));
 }
 
-Square sortSquares(SquareList *squareList)
+Square sortSquares(SquareList *squareList, Image *image)
 {
     const unsigned int len = squareList->len;
     Square temp = squareList->squares[0];
@@ -315,13 +316,63 @@ Square sortSquares(SquareList *squareList)
         Square square = squareList->squares[i];
         int factor =
             getLineLength(&(square.bottom)) * getLineLength(&(square.right));
-        if (factor > tempFactor)
+        if (factor > tempFactor && canBeSudokuGrid(&square, image))
         {
             tempFactor = factor;
             temp = square;
         }
     }
     return temp;
+}
+
+int canBeSudokuGrid(Square *square, Image *image)
+{
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
+
+    const unsigned int leftLength = getLineLength(&(square->left));
+    const unsigned int topLength = getLineLength(&(square->top));
+
+    Dot topLeftCorner = getBetterCorner(square);
+    unsigned int x = topLeftCorner.X;
+    unsigned int y = topLeftCorner.Y;
+
+    // Check all lines
+    unsigned int i = 0;
+    for (; x < topLeftCorner.X + leftLength && x < height; x++)
+    {
+        for (i = 0; i < topLength && i < width; i++)
+        {
+            // White pixel
+            if (image->pixels[x][i + topLeftCorner.X].r == 255)
+            {
+                break;
+            }
+        }
+        if (i != topLength && i != width)
+        {
+            return 0;
+        }
+    }
+
+    // Check all colums
+    unsigned int j = 0;
+    for (; y < topLeftCorner.Y + topLength && y < width; y++)
+    {
+        for (j = 0; j < leftLength && j < height; j++)
+        {
+            // White pixel
+            if (image->pixels[j + topLeftCorner.Y][y].r == 255)
+            {
+                break;
+            }
+        }
+        if (j != leftLength && j != height)
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void drawSquare(Square *square, Image *image, int width, int height,

@@ -3,14 +3,14 @@
 double Convolution(Image *image, double kernel[3][3], int row, int col)
 {
     double sum = 0;
-    unsigned int r, g, b;
+    unsigned int r;
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
         {
             int x = i + row;
             int y = j + col;
-            if (x >= 0 && y >= 0 && x < image->width && y < image->height)
+            if (x >= 0 && y >= 0 && x < (int) image->width && y < (int) image->height)
             {
                 r = image->pixels[x][y].r;
                 sum += r * kernel[i][j];
@@ -44,7 +44,7 @@ void SobelEdgeDetection(Image *image)
             gy = Convolution(image, kernel_y, j, i);
             g_px = sqrt(gx * gx + gy * gy);
 
-            updatePixelToSameValue(&(image->pixels[j][i]), (unsigned int)g_px);
+            updatePixelToSameValue(&(image->pixels[j][i]), (unsigned int) (g_px > 128 ? 255 : 0));
         }
     }
 }

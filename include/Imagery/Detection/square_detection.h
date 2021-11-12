@@ -22,7 +22,9 @@ int isSquare(Square *square, unsigned int width, unsigned int height);
 
 double getLineLength(Line *line);
 
-Square sortSquares(SquareList *squareList);
+Square sortSquares(SquareList *squareList, Image *image);
+
+int canBeSudokuGrid(Square *square, Image *image);
 
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness);

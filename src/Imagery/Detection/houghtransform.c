@@ -1,9 +1,11 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.5
+#define THRESHOLD 0.4
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 {
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
     // Directly free
     if (!save)
     {
@@ -39,11 +41,10 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         // Draw simplifieds lines
         Image _simplifiedImage;
         _simplifiedImage.path = image->path;
-        _simplifiedImage.surface = NULL;
+        _simplifiedImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, _simplifiedImage.surface, NULL);
         Image *simplifiedImage = &_simplifiedImage;
         newImage(simplifiedImage);
-        const unsigned int w = simplifiedImage->width;
-        const unsigned int h = simplifiedImage->height;
 
         const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
@@ -60,18 +61,13 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     }
 
     // AUTO ROTATE
-
-    int angleRounded = (int)angle % 90;
+    int angleRounded = (int)angle % 90; // ROTATE
+    if (verbose)
+        printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle, list.maxTheta);
     if (angleRounded >= 88 && angleRounded <= 91)
     {
         if (verbose)
-            printf("    📐 2.4 Do not need to rotate image\n");
-    }
-    else
-    {
-        // ROTATE
-        if (verbose)
-            printf("    📐 2.4 Angle found : %d\n", angleRounded);
+            printf("    📐 2.4.1 Do not need to rotate image\n");
     }
     // FINDING SQUARES
 
@@ -80,14 +76,16 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 
     Image _squareImage;
     _squareImage.path = image->path;
-    _squareImage.surface = NULL;
+    _squareImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+    SDL_BlitSurface(image->surface, NULL, _squareImage.surface, NULL);
     Image *squareImage = &_squareImage;
     if (save)
     {
         newImage(squareImage);
     }
-    const unsigned int w = image->width;
-    const unsigned int h = image->height;
+
+    // FIND ALL SQUARES
+
     SquareList squares = findSquare(&resultingList, w, h, squareImage, save);
     if (save)
     {
@@ -105,13 +103,14 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
 
     if (verbose)
         printf("    📉 2.6 Finding the predominating square\n");
-    Square lastSquare = sortSquares(&squares);
+    Square lastSquare = sortSquares(&squares, image);
 
     if (save)
     {
         Image _lastSquareImg;
         _lastSquareImg.path = image->path;
-        _lastSquareImg.surface = NULL;
+        _lastSquareImg.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, _lastSquareImg.surface, NULL);
         Image *lastSquareImg = &_lastSquareImg;
 
         newImage(lastSquareImg);
