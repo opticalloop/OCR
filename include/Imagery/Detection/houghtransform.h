@@ -6,17 +6,18 @@
 #include "Imagery/Detection/square_detection.h"
 #include "Imagery/Detection/struct.h"
 #include "Imagery/Utils/image.h"
+#include "verbose.h"
 
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
+                       char *output_folder);
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save);
-
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw);
+LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                        char *output_folder);
 
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
                      double height);
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
-              unsigned int max);
-
+              unsigned int max, int verbose, char *output_folder);
 
 void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
 

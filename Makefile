@@ -54,3 +54,4 @@ clean:
 	make -C Tests clean
 	rm -rf $(BUILD)
 	${RM} ${OBJ} ${DEP} main
+	clear

@@ -97,9 +97,7 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 
     if (verbose)
     {
-        printf("<-- 📂 Saving grid to ");
-        printf("%s", outputPath);
-        printf("\n");
+        printf("<-- 💾 Saving grid to %s\n", outputPath);
     }
 
     for (unsigned int i = 0; i < dim; i++)
@@ -139,7 +137,7 @@ Image createSudokuImage(unsigned int grid[dim][dim],
     image.height = 266;
     image.surface = NULL;
     image.path = ""; // To create an RGB surface
-    newImage(&image);
+    newImage(&image, 0);
 
     for (unsigned int x = 0; x < 266; x++)
     {

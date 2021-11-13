@@ -160,15 +160,14 @@ static void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
 
 //     fclose(fp);
 // }
-void Preprocessing(Image *image, char pathToSave[], int verbose)
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
 {
-    unsigned int w = image->width;
-    unsigned int h = image->height;
-    if (verbose)
-    {
-        printf("    🎨 1. Applying preprocessing filters\n");
-        printf("    📈 1.1 Calculating Histogram\n");
-    }
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
+
+    printVerbose(verbose, "    🎨 1 Preprocessing image\n");
+    printVerbose(verbose, "    📊 1.1 Getting image histogram\n");
+
     float *binomialFilter = BinomialFilter();
 
     unsigned int *histogram = calloc(256 + 1, sizeof(unsigned int));
@@ -176,8 +175,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
 
     int max = image->height * image->width;
 
-    if (verbose)
-        printf("    📸 1.2 Applying constrast Filter\n");
+    printVerbose(verbose, "    📸 1.2 Applying constrast Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
     {
@@ -189,14 +187,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
         }
     }
 
-    SaveTmpPic(image, pathToSave, "1_constrast");
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
 
-    GetHistogram(histogram, image->pixels, w, h);
+    saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
+    printVerbose(verbose, "    🎥 1.3 Applying Median Filter\n");
 
-    if (verbose)
-        printf("    🎥 1.3 Applying Median Filter\n");
+    GetHistogram(histogram, image->pixels, w, h);
 
     for (unsigned int i = 0; i < w; i++)
     {
@@ -207,12 +204,11 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
         }
     }
     ApplyMaskToImage(image, mask, w, h);
-    SaveTmpPic(image, pathToSave, "2_median");
 
     updateNeigbourgs(image);
 
-    if (verbose)
-        printf("    🎬 1.4 Applying Average Filter\n");
+    saveVerbose(verbose, image, pathToSave, "1.2_Median_filter", save, 0);
+    printVerbose(verbose, "    🎬 1.4 Applying Average Filter\n");
 
     for (unsigned int i = 0; i < w; i++)
         for (unsigned int j = 0; j < h; j++)
@@ -220,16 +216,17 @@ void Preprocessing(Image *image, char pathToSave[], int verbose)
                 &(image->pixels[i][j]),
                 AverageFilter(mask[i][j].matrix, binomialFilter));
 
-    SaveTmpPic(image, pathToSave, "3_average");
+    saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
+    printVerbose(verbose, "    💻 1.5 Applying Otsu Filter\n");
 
-    if (verbose)
-        printf("    💻 1.5 Applying Otsu Filter\n");
+    OtsuFilter(image->pixels, w, h, histogram, verbose);
 
-    OtsuFilter(image->pixels, w, h, histogram);
-    SaveTmpPic(image, pathToSave, "4_otsu");
+    saveVerbose(verbose, image, pathToSave, "1.4_Otsu_filter", save, 0);
+    printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
 
     NegativePictureIfNormal(image);
-    SaveTmpPic(image, pathToSave, "5_inversed");
+
+    saveVerbose(verbose, image, pathToSave, "1.5_Inverted_filter", save, 0);
 
     free(binomialFilter);
     free(histogram);
@@ -365,11 +362,12 @@ double Thresholding(unsigned int *histogram)
 }
 
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
-                unsigned int *histogram)
+                unsigned int *histogram, int verbose)
 {
     double threshold = Thresholding(histogram);
 
-    printf("\t 📊 Threshold value : %f\n", threshold);
+    if (verbose)
+        printf("    📊 1.5.1 Threshold value : %f\n", threshold);
     for (unsigned int i = 0; i < w; i++)
     {
         for (unsigned int j = 0; j < h; j++)

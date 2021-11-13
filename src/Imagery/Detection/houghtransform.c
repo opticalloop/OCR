@@ -1,39 +1,30 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.4
+#define THRESHOLD 0.3
 
-
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
-
+SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
+                       char *output_folder)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
     // Directly free
     if (!save)
     {
-        freeImage(drawImage);
+        freeImage(drawImage, 0);
     }
-
-    // Initialize variables of the image
-    if (verbose)
-        printf("\n    🔍 2. Hough Transform\n");
 
     // Call major fonction
-    LineList list = houghtransform(image, drawImage, verbose, save);
+    LineList list =
+        houghtransform(image, drawImage, verbose, save, output_folder);
 
-    if (save)
-    {
-        if (verbose)
-            printf("<-- 💾 Saved picture : %s\n", "2.1_Hough_all_lines.bmp");
-        saveImage(drawImage, "2.1_Hough_all_lines.bmp");
-        freeImage(drawImage);
-    }
-    if (verbose)
-        printf("    📈 2.3 Simplyfing lines\n");
+    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
+                1);
+    printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
 
     LineList resultingList = simplifyLines(&list);
+
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
     double angle = resultingList.maxTheta * 180.0 / M_PI;
@@ -43,10 +34,11 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
         // Draw simplifieds lines
         Image _simplifiedImage;
         _simplifiedImage.path = image->path;
-        _simplifiedImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        _simplifiedImage.surface = SDL_CreateRGBSurface(
+            0, image->width, image->height, 24, 0, 0, 0, 0);
         SDL_BlitSurface(image->surface, NULL, _simplifiedImage.surface, NULL);
         Image *simplifiedImage = &_simplifiedImage;
-        newImage(simplifiedImage);
+        newImage(simplifiedImage, 0);
 
         const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
@@ -55,78 +47,74 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
             Line line = resultingList.lines[i];
             draw_line(simplifiedImage, w, h, &line, &color, 2, 1);
         }
-        if (verbose)
-            printf("<-- 💾 Saved picture : %s\n",
-                   "2.2_Hough_simplified_lines.bmp");
-        saveImage(simplifiedImage, "2.2_Hough_simplified_lines.bmp");
-        freeImage(simplifiedImage);
+
+        saveVerbose(verbose, simplifiedImage, output_folder,
+                    "2.4_Hough_simplified_lines", save, 1);
     }
 
     // AUTO ROTATE
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
-        printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle, list.maxTheta);
+        printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
+               list.maxTheta);
     if (angleRounded >= 88 && angleRounded <= 91)
     {
-        if (verbose)
-            printf("    📐 2.4.1 Do not need to rotate image\n");
+        printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
     }
+
     // FINDING SQUARES
 
-    if (verbose)
-        printf("    📦 2.5 Finding all squares\n");
-
-    Image _squareImage;
-    _squareImage.path = image->path;
-    _squareImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
-    SDL_BlitSurface(image->surface, NULL, _squareImage.surface, NULL);
-    Image *squareImage = &_squareImage;
-    if (save)
-    {
-        newImage(squareImage);
-    }
+    printVerbose(verbose, "    📦 2.5 Finding all squares\n");
 
     // FIND ALL SQUARES
-
-    SquareList squares = findSquare(&resultingList, w, h, squareImage, save);
+    SquareList squares;
     if (save)
     {
-        if (verbose)
-        {
-            printf("    🔼 2.5.1 %d squares\n", squares.len);
+        Image _squareImage;
+        _squareImage.path = image->path;
+        _squareImage.surface = SDL_CreateRGBSurface(
+            0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, _squareImage.surface, NULL);
+        Image *squareImage = &_squareImage;
+        newImage(squareImage, 0);
 
-            printf("<-- 💾 Saved picture : 2.3_Hough_squares_only.bmp\n");
-        }
-        saveImage(squareImage, "2.3_Hough_squares_only.bmp");
-        freeImage(squareImage);
+        squares = findSquare(&resultingList, w, h, squareImage, save);
+        saveVerbose(verbose, squareImage, output_folder,
+                    "2.5_Hough_squares_only", save, 1);
+    }
+    else
+    {
+        squares = findSquare(&resultingList, w, h, NULL, save);
+    }
+
+    if (verbose)
+    {
+        printf("    🔼 2.5.1 %d squares\n", squares.len);
     }
 
     // SORTING SQUARES
+    printVerbose(verbose, "    📉 2.6 Finding the predominating square\n");
 
-    if (verbose)
-        printf("    📉 2.6 Finding the predominating square\n");
     Square lastSquare = sortSquares(&squares, image);
 
     if (save)
     {
         Image _lastSquareImg;
         _lastSquareImg.path = image->path;
-        _lastSquareImg.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        _lastSquareImg.surface = SDL_CreateRGBSurface(
+            0, image->width, image->height, 24, 0, 0, 0, 0);
         SDL_BlitSurface(image->surface, NULL, _lastSquareImg.surface, NULL);
         Image *lastSquareImg = &_lastSquareImg;
+        newImage(lastSquareImg, 0);
 
-        newImage(lastSquareImg);
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
-        if (verbose)
-            printf("<-- 💾 Saved picture : 2.4_Hough_last_square.bmp\n");
-        saveImage(lastSquareImg, "2.4_Hough_last_square.bmp");
-        freeImage(lastSquareImg);
+        saveVerbose(verbose, lastSquareImg, output_folder,
+                    "2.6_Hough_last_square", save, 1);
     }
 
     // GETTING MAX SQUARE
 
-    if (verbose)
-        printf("    📋 2.7 Computing cropped image\n");
+    printVerbose(verbose, "    📋 2.7 Computing cropped image\n");
 
     // Get square dimension
     int l1 = getLineLength(&(lastSquare.top));
@@ -152,7 +140,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
     return surface;
 }
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
+LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                        char *output_folder)
 {
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
@@ -184,8 +173,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
         arrThetas[index] = val;
     }
 
-    if (verbose)
-        printf("    🎲 2.1 Computing cos and sin array\n");
+    printVerbose(verbose, "    🎲 2.2.1 Computing cos and sin array\n");
     // Create a save of cos and sin value for each theta, to optimize
     // performance.
     double *saveCos = calloc(nbTheta + 1, sizeof(double));
@@ -200,8 +188,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
         saveSin[theta] = sin(arrThetas[theta]);
     }
 
-    if (verbose)
-        printf("    📥 2.2 Filling accumulator\n");
+    printVerbose(verbose, "    📥 2.2.2 Filling accumulator\n");
     unsigned int **accumulator = initMatrice(nbTheta + 1, nbRho + 1);
 
     // We intialize the accumulator with all the value
@@ -231,15 +218,17 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     free(saveSin);
 
     // 5000 * 5000, don't draw it !a
-    // accToBmp(accumulator, nbTheta + 1, nbRho + 1, max);
+    if (draw)
+        accToBmp(accumulator, nbTheta + 1, nbRho + 1, max, verbose,
+                 output_folder);
 
     // Finding edges
     // Computing threshold
     int lineThreshold = max * THRESHOLD;
     if (verbose)
     {
-        printf("    🔼 2.2.1 Hough max value : %u\n", max);
-        printf("    🎨 2.2.2 Hough Threshold : %d\n", lineThreshold);
+        printf("    🔼 2.2.3 Hough max value : %u\n", max);
+        printf("    🎨 2.2.4 Hough Threshold : %d\n", lineThreshold);
     }
 
     // Create line return line array
@@ -252,9 +241,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     int prev_theta = 0, prev_rho = 0;
     int boolIsIncreasing = 1;
 
-    if (verbose)
-        printf("    📜 2.2.3 Drawing on image\n");
-
+    printVerbose(verbose, "    📜 2.2.5 Drawing on image\n");
     Pixel pixel = { .r = 40, .g = 40, .b = 200 };
 
     for (int theta = 0; theta <= nbTheta; theta++)
@@ -332,7 +319,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw)
     freeMatrice(accumulator, nbTheta + 1);
 
     if (verbose)
-        printf("    📜 2.2.4 %d edges\n", nbEdges);
+        printf("    📜 2.2.6 %d edges\n", nbEdges);
 
     LineList list;
     list.lines = allLines;
@@ -445,7 +432,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
 }
 
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
-              unsigned int max)
+              unsigned int max, int verbose, char *output_folder)
 {
     Image image;
     image.width = width;
@@ -454,7 +441,7 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     image.averageColor = 0;
     image.surface = NULL;
     image.pixels = NULL;
-    newImage(&image);
+    newImage(&image, 0);
     for (size_t y = 0; y < height; y++)
     {
         for (size_t x = 0; x < width; x++)
@@ -464,8 +451,7 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
             updatePixelToSameValue(&(image.pixels[x][y]), grayValue);
         }
     }
-    saveImage(&image, "acc.bmp");
-    freeImage(&image);
+    saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
 void matriceToBmp(unsigned int **matrice, unsigned int width,
@@ -478,7 +464,7 @@ void matriceToBmp(unsigned int **matrice, unsigned int width,
     image.averageColor = 0;
     image.surface = NULL;
     image.pixels = NULL;
-    newImage(&image);
+    newImage(&image, 0);
     for (size_t y = 0; y < height; y++)
     {
         for (size_t x = 0; x < width; x++)
@@ -490,7 +476,7 @@ void matriceToBmp(unsigned int **matrice, unsigned int width,
     }
     saveImage(&image, "2.0_Hough_accumulator.bmp");
 
-    freeImage(&image);
+    freeImage(&image, 0);
 }
 
 double degrees_ToRadians(double degrees)
