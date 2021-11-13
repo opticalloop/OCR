@@ -9,6 +9,7 @@
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Segmentation/split.h"
+#include "Imagery/Detection/sobel.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
 
@@ -163,14 +164,16 @@ int main(int argc, char *argv[])
         }
 
         Preprocessing(image, p_output_folder, verbose);
+        SobelEdgeDetection(image);
 
         Image drawImage;
         drawImage.path = argv[1];
-        drawImage.surface = NULL;
+        drawImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, drawImage.surface, NULL);
         newImage(&drawImage);
 
         // All image free in function
-        SDL_Surface *surface = detection(image, &drawImage, verbose);
+        SDL_Surface *surface = detection(image, &drawImage, verbose, 1);
         saveImage(image, argv[2]);
         SDL_FreeSurface(surface);
         freeImage(image);
