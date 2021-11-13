@@ -204,25 +204,39 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     int input[NBINPUTS];
     double expected[NBOUTPUTS];
 
+    // Init 0 expectation
+    int zero_intput[NBINPUTS] = {0};
+    double zero_expected[NBOUTPUTS] = {0.0};
+
     // Open file where data is
     FILE *file;
     char lastchr; // To know where the end of the file is
 
+    int train_count = 0;
     for (unsigned int i = 0; i <= epoch; i++)
     {
+        train_count = 0
         errorRate = 0.0;
         if (i == epoch && verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
     	file = fopen(DATA_FILE_PATH, "r");
-        while (lastchr != EOF)
+        for (;lastchr != EOF, train_count++)
         {
             createData(file, input, expected, &lastchr);
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
             gradientDescent(network);
+
+            // Train for the blank image
+            if (train_count % 9 == 0)
+            {
+                frontPropagation(network, zero_intput);
+                errorRate += backPropagation(network, zero_expected);
+                gradientDescent(network);
+            }
 
             if (i == epoch && verbose)
             {
