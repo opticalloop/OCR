@@ -29,6 +29,7 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
 
                 Image imagebis;
                 imagebis.surface = surface;
+                imagebis.path = "";
                 imagebis.width = block.w;
                 imagebis.height = block.h;
 
@@ -46,13 +47,7 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
                     savesquare(&imageresized, iall, imagename);
                 }
 
-                // freeImage(&imagebis);
-                for (unsigned int xbis = 0; xbis < 28; xbis++)
-                {
-                    free(imageresized.pixels[xbis]);
-                }
-
-                free(imageresized.pixels);
+                freeImage(&imageresized, 0);
             }
             else
             {

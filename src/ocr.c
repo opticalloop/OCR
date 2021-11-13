@@ -80,16 +80,20 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     // Segmentation
     // Initialize all case at NULL
-    SDL_Surface *all_cases[81] = { NULL };
+    SDL_Surface *all_cases[81];
+    if (verbose && save)
+        printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
     split9(&cropped, all_cases, save, output_folder);
 
     freeImage(&cropped, 0);
 
     // Recognisation + Construction
-    printVerbose(verbose, "\n    📊 4 Initing digit recognition\n");
+    printVerbose(verbose, "\n    ❓ 4 Initing digit recognition\n");
     printVerbose(verbose, "    📊 4.1 Creating neural network\n");
 
-    Network network = newNetwork(NBINPUTS, SIZE_HIDDEN, NB_HIDDEN, NBOUTPUTS);
+    Network network;
+    network.sizeInput = NBINPUTS;
+    network.sizeOutput = NBOUTPUTS;
 
     printVerbose(verbose, "    📑 4.2 Initing weights\n");
     launchWeights(&network, WEIGHT_PATH, verbose);

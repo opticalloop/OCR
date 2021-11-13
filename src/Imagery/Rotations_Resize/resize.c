@@ -12,6 +12,7 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
     newimage.width = newwidth;
     newimage.height = newheight;
     newimage.path = "";
+    newimage.surface = NULL;
 
     newImage(&newimage, 0);
 
