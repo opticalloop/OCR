@@ -14,8 +14,12 @@ void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
     {
         char delete[200];
         snprintf(delete, sizeof(delete), "rm -rf %s", imagename);
-        system(delete);
-        system(directory);
+        if (system(delete))
+        {
+        }
+        if (system(directory))
+        {
+        }
     }
 
     SDL_Rect block;

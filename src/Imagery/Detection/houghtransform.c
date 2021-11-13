@@ -2,7 +2,9 @@
 
 #define THRESHOLD 0.4
 
+
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save)
+
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
@@ -376,6 +378,7 @@ void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
 }
 
 // Return the two extreme points of the lignes
+
 void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
                int thickness, int draw)
 {

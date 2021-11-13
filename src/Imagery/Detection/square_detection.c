@@ -251,6 +251,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                         squareList.squares,
                                         (nbSquares + 1) * sizeof(Square));
                                     squareList.squares[nbSquares] = square;
+
                                     if (draw)
                                     {
                                         drawSquare(&square, image, width,
