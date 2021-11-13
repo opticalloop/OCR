@@ -75,7 +75,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     newImage(&cropped, 0);
 
-    saveVerbose(verbose, &cropped, output_folder, "2.6_Cropped_image", save, 0);
+    saveVerbose(verbose, &cropped, output_folder, "2.7_Cropped_image", save, 0);
     printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
 
     // Segmentation
