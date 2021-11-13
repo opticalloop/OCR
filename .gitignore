@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+.vscode/
+.idea/
+/cmake-build-debug/
+out.bmp
+
+Imagery/*.bmp
+Digits-Only/
+
+src/Imagery/img_0*/
