@@ -7,6 +7,7 @@
 
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/reverse_color.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Segmentation/split9.h"
