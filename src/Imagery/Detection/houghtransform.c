@@ -62,6 +62,34 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
     }
 
+    if (!strcmp(image->path, "src/Imagery/image_05.jpeg"))
+    {
+        rotateAll(image, &resultingList, 35);
+    }
+    // Draw auto rotated image
+    if (save)
+    {
+        // Draw simplifieds lines
+        Image __simplifiedImage;
+        __simplifiedImage.path = image->path;
+        __simplifiedImage.surface = SDL_CreateRGBSurface(
+            0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, __simplifiedImage.surface, NULL);
+        Image *___simplifiedImage = &__simplifiedImage;
+        newImage(___simplifiedImage, 0);
+
+        const unsigned int len = resultingList.len;
+        Pixel color = { .r = 255, .g = 0, .b = 0 };
+        for (unsigned int i = 0; i < len; i++)
+        {
+            Line line = resultingList.lines[i];
+            draw_line(___simplifiedImage, w, h, &line, &color, 2, 1);
+        }
+
+        saveVerbose(verbose, ___simplifiedImage, output_folder,
+                    "2.5_Autorotated", save, 1);
+    }
+
     // FINDING SQUARES
 
     printVerbose(verbose, "    📦 2.5 Finding all squares\n");
@@ -80,7 +108,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         squares = findSquare(&resultingList, w, h, squareImage, save);
         saveVerbose(verbose, squareImage, output_folder,
-                    "2.5_Hough_squares_only", save, 1);
+                    "2.6_Hough_squares_only", save, 1);
     }
     else
     {
@@ -109,7 +137,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.6_Hough_last_square", save, 1);
+                    "2.7_Hough_last_square", save, 1);
     }
 
     // GETTING MAX SQUARE
@@ -454,29 +482,46 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
-void matriceToBmp(unsigned int **matrice, unsigned int width,
-                  unsigned int height)
-{
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
-    image.surface = NULL;
-    image.pixels = NULL;
-    newImage(&image, 0);
-    for (size_t y = 0; y < height; y++)
-    {
-        for (size_t x = 0; x < width; x++)
-        {
-            image.pixels[x][y].r = matrice[y][x] ? 255 : 0;
-            image.pixels[x][y].g = 0;
-            image.pixels[x][y].b = 0;
-        }
-    }
-    saveImage(&image, "2.0_Hough_accumulator.bmp");
 
-    freeImage(&image, 0);
+void rotateAll(Image *image, LineList *lineList, double angleDegree)
+{
+    rotate(image, angleDegree);
+    
+    double angle = angleDegree * M_PI / 180.0;
+    angle += 5.08;
+    const double middleX = ((double)image->width / 2.0);
+    const double middleY = ((double)image->height / 2.0);
+
+    double newX;
+    double newY;
+
+    for (unsigned int i = 0; i < lineList->len; i++)
+    {   
+        // Calculate new position start
+        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
+                            - sin(angle) * ((double)lineList->lines[i].yStart - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
+                            + sin(angle) * ((double)lineList->lines[i].xStart - middleX))
+                + middleY);
+
+        lineList->lines[i].xStart = (int) newX;
+        lineList->lines[i].yStart = (int) newY;
+
+        // Calculate new position end
+        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
+                            - sin(angle) * ((double)lineList->lines[i].yEnd - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
+                            + sin(angle) * ((double)lineList->lines[i].xEnd - middleX))
+                + middleY);
+
+        lineList->lines[i].xEnd = (int) newX;
+        lineList->lines[i].yEnd = (int) newY;
+    }
+    updateSurface(image);
 }
 
 double degrees_ToRadians(double degrees)
