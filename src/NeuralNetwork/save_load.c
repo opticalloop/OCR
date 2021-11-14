@@ -104,7 +104,7 @@ void saveWeights(Network *network, char *path)
 
 void launchWeights(Network *network, char *path, int verbose)
 {
-    if(access(path, F_OK) != 0)
+    if (access(path, F_OK) != 0)
     {
         errx(EXIT_FAILURE, "Weights file doesn't exist");
     }

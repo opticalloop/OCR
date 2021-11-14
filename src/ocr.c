@@ -41,6 +41,8 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     newImage(&image, 1);
 
+    saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
+
     // Preprocessing
     grayscale(&image);
     Preprocessing(&image, output_folder, verbose, save);
@@ -106,6 +108,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         {
             grid[i][j] =
                 getNetworkOutput(&network, all_cases[i * dim + j], verbose);
+            SDL_FreeSurface(all_cases[i * dim + j]);
         }
     }
     freeNetwork(&network);

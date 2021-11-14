@@ -47,7 +47,12 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
                     savesquare(&imageresized, iall, imagename);
                 }
 
-                freeImage(&imageresized, 0);
+                // Don't free the surface
+                for (unsigned int x = 0; x < 28; x++)
+                {
+                    free(imageresized.pixels[x]);
+                }
+                free(imageresized.pixels);
             }
             else
             {
