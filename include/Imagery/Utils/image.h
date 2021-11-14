@@ -32,7 +32,7 @@ typedef struct Image
  *  Return:
  *
  */
-void newImage(Image *image);
+void newImage(Image *image, int matrix);
 
 /*
  *  Summary:
@@ -89,7 +89,7 @@ void saveImage(Image *image, char *path);
  *  Return:
  *
  */
-void freeImage(Image *image);
+void freeImage(Image *image, int matrix);
 
 /*
  *  Summary:

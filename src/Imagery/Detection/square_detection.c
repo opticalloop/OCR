@@ -272,12 +272,11 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
 int isSquare(Square *square, unsigned int width, unsigned int height)
 {
-
     unsigned int lenLeft = getLineLength(&(square->left));
 
     unsigned int lenright = getLineLength(&(square->left));
 
-    unsigned  int lentop = getLineLength(&(square->top));
+    unsigned int lentop = getLineLength(&(square->top));
 
     unsigned int lenbottom = getLineLength(&(square->bottom));
 

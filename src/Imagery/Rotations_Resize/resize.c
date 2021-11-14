@@ -12,8 +12,9 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
     newimage.width = newwidth;
     newimage.height = newheight;
     newimage.path = "";
+    newimage.surface = NULL;
 
-    newImage(&newimage);
+    newImage(&newimage, 0);
 
     for (unsigned int x = 0; x < newwidth; x++)
     {
@@ -38,6 +39,6 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
         }
     }
 
-    freeImage(image);
+    freeImage(image, 0);
     return newimage;
 }

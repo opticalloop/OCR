@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-    freeImage(&image);
+    freeImage(&image, 0);
 
     return 0;
 }

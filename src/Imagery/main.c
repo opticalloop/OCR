@@ -6,10 +6,10 @@
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/sobel.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Segmentation/split.h"
-#include "Imagery/Detection/sobel.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
 
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
         _image.path = argv[1];
         _image.surface = NULL;
         Image *image = &_image;
-        newImage(image);
+        newImage(image, 1);
         grayscale(image);
 
         if (!strcmp(p_output_folder, ""))
@@ -163,20 +163,22 @@ int main(int argc, char *argv[])
         {
         }
 
-        Preprocessing(image, p_output_folder, verbose);
+        Preprocessing(image, p_output_folder, verbose, 1);
         SobelEdgeDetection(image);
 
         Image drawImage;
         drawImage.path = argv[1];
-        drawImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+        drawImage.surface = SDL_CreateRGBSurface(0, image->width, image->height,
+                                                 24, 0, 0, 0, 0);
         SDL_BlitSurface(image->surface, NULL, drawImage.surface, NULL);
-        newImage(&drawImage);
+        newImage(&drawImage, 0);
 
         // All image free in function
-        SDL_Surface *surface = detection(image, &drawImage, verbose, 1);
+        SDL_Surface *surface =
+            detection(image, &drawImage, verbose, 1, p_output_folder);
         saveImage(image, argv[2]);
         SDL_FreeSurface(surface);
-        freeImage(image);
+        freeImage(image, 1);
 
         return 0;
     }
@@ -184,7 +186,7 @@ int main(int argc, char *argv[])
     Image img;
     img.path = input_path;
     img.surface = NULL;
-    newImage(&img);
+    newImage(&img, 1);
     printf("egregtrvegat'r\n");
 
     if (preprocessing)
@@ -198,7 +200,7 @@ int main(int argc, char *argv[])
 
         // Preprocessing
         grayscale(&img);
-        Preprocessing(&img, p_output_folder, verbose);
+        Preprocessing(&img, p_output_folder, verbose, 1);
     }
 
     if (_rotate)
@@ -222,7 +224,7 @@ int main(int argc, char *argv[])
     }
 
     saveImage(&img, output_path);
-    freeImage(&img);
+    freeImage(&img, 1);
 
     return EXIT_SUCCESS;
 }
