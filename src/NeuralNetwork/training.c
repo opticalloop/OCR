@@ -222,7 +222,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
     	file = fopen(DATA_FILE_PATH, "r");
-        for (;lastchr != EOF, train_count++)
+        for (;lastchr != EOF; train_count++)
         {
             createData(file, input, expected, &lastchr);
 
