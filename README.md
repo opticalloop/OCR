@@ -34,6 +34,8 @@ OCR options :
     gui : open graphical interface
     -o <output_path> : specify an output path
     -r <angle> : manually rotate the image by the angle in degree
+    -v --verbose : print details of process
+    -S <folder> : save all intermediate images in a folder
     --help : print ocr help
 ./main nn [options]
 Options nn :

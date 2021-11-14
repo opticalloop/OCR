@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     readGrid(grid, argv[1], verbose);
 
-    basicPrint(grid);
+    // basicPrint(grid);
 
     // Copy array to have different color when saving the image
     unsigned int copy[dim][dim];
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-    freeImage(&image);
+    freeImage(&image, 0);
 
     return 0;
 }
