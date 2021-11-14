@@ -215,14 +215,14 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     int train_count = 0;
     for (unsigned int i = 0; i <= epoch; i++)
     {
-        train_count = 0
+        train_count = 0;
         errorRate = 0.0;
         if (i == epoch && verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
     	file = fopen(DATA_FILE_PATH, "r");
-        for (;lastchr != EOF, train_count++)
+        for (;lastchr != EOF; train_count++)
         {
             createData(file, input, expected, &lastchr);
 
