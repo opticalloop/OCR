@@ -68,19 +68,12 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
 void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], char *lastChr)
 {
     char ch;
-    int gotExpected = 0;
     unsigned int input_index = 0;
     while ((ch = fgetc(file)) != EOF)
     {
         // Get expected value
         if (ch == '#')
         {
-            // Can send the binary image to neural network
-            if (gotExpected)
-            {
-                break;
-            }
-            gotExpected = 1;
             ch = fgetc(file);
             for (int i = 0; i < NBOUTPUTS; i++)
             {
@@ -89,19 +82,15 @@ void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], ch
             int expected_value = ch - '0';
             expected[expected_value] = 1;
         }
-        else if (ch == '\n' || ch == '\r' || ch == ' ')
+        else if (ch == '\n')
         {
-            continue;
+            break;
         }
         else
         {
             // 0 or 1
             inputs[input_index] = ch - '0';
             input_index++;
-            if (input_index >= NBINPUTS)
-            {
-                break;
-            }
         }
     }
     *lastChr = ch;
@@ -147,7 +136,7 @@ void generateDataFile(void)
 
         // Write expected value
         char strTemp[50];
-        sprintf(strTemp, "%d\n", num);
+        sprintf(strTemp, "%d", num);
         fputs("#", file);
         fputs(strTemp, file);
 
@@ -206,7 +195,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     // Init 0 expectation
     int zero_intput[NBINPUTS] = {0};
-    double zero_expected[NBOUTPUTS] = {0.0};
+    double zero_expected[NBOUTPUTS] = {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     // Open file where data is
     FILE *file;
@@ -230,19 +219,25 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             errorRate += backPropagation(network, expected);
             gradientDescent(network);
 
+            if (i == epoch && verbose)
+            {
+                printResult(expected,
+                            network->layers[nbHiddenLayers + 1].neurons);
+            }
+
             // Train for the blank image
             if (train_count % 9 == 0)
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
                 gradientDescent(network);
-            }
-
-            if (i == epoch && verbose)
-            {
-                printResult(expected,
+            
+                 if (i == epoch && verbose)
+                {
+                    printResult(zero_expected,
                             network->layers[nbHiddenLayers + 1].neurons);
-            }
+                }
+            }            
         }
         fclose(file);
         lastchr = ' ';
