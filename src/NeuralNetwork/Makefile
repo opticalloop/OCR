@@ -7,7 +7,7 @@ LDLIBS = `pkg-config --libs sdl SDL_image`
 
 BUILD := build
 
-SRC = $(shell find -name "*.c") ../Imagery/Utils/op.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/image.c
+SRC = $(shell find -name "*.c") ../Imagery/Detection/reverse_color.c ../Imagery/Color_Treatment/blackandwhite.c ../Imagery/Utils/op.c ../Imagery/Utils/pixel_operations.c ../Imagery/Utils/image.c
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
 DEP = $(SRC:%.c=$(BUILD)/%.d)
 
