@@ -23,8 +23,12 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
 void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
                int thickness, int draw);
 
+unsigned int findTheta(LineList *lineList);
+
 void rotateAll(Image *image, LineList *lineList, double angleDegree);
 
 double degrees_ToRadians(double theta);
+
+double radian_To_Degree(double radian);
 
 #endif

@@ -1,6 +1,6 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.5
+#define THRESHOLD 0.3
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
                        char *output_folder)
@@ -27,7 +27,6 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
-    double angle = resultingList.maxTheta * 180.0 / M_PI;
 
     if (save)
     {
@@ -53,18 +52,19 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // AUTO ROTATE
+    double angle = resultingList.maxTheta * 180.0 / M_PI;
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
         printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
-               list.maxTheta);
-    if (angleRounded >= 88 && angleRounded <= 91)
+               resultingList.maxTheta);
+    if (angleRounded >= 88 && angleRounded <= 92)
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
     }
-
-    if (!strcmp(image->path, "src/Imagery/image_05.jpeg"))
+    else
     {
-        rotateAll(image, &resultingList, 35);
+        printVerbose(verbose, "    📐 2.4.1 Rotating image");
+        rotateAll(image, &resultingList, angleRounded);
     }
     // Draw auto rotated image
     if (save)
@@ -177,7 +177,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     const double diagonal = sqrt(width * width + height * height);
 
     // Initialize the constant values for theta and rho
-    const double maxTheta = 90.0, minTheta = -90.0;
+    const double maxTheta = 180.0, minTheta = 0.0;
     const double maxRho = diagonal, minRho = -diagonal;
     const double nbRho = 2 * diagonal, nbTheta = nbRho;
 
@@ -263,7 +263,10 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     Line *allLines = malloc(sizeof(Line));
 
     int nbEdges = 0;
+
     double tempMaxTheta = 0.0;
+    unsigned int histogram[181] = {0};
+    unsigned int rounded_angle;
 
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
@@ -305,6 +308,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                 if (t > tempMaxTheta)
                 {
                     tempMaxTheta = t;
+                    rounded_angle = (unsigned int) radian_To_Degree(t);
+                    histogram[rounded_angle]++;
                 }
 
                 double c = cos(t), s = sin(t);
@@ -352,7 +357,16 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     LineList list;
     list.lines = allLines;
     list.len = nbEdges;
-    list.maxTheta = tempMaxTheta;
+
+    // Find best angle
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    list.maxTheta = degrees_ToRadians(angle);
     return list;
 }
 
@@ -482,6 +496,35 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
+unsigned int findTheta(LineList *lineList)
+{
+    unsigned int histogram[181] = {0};
+
+    unsigned int value;
+    for (unsigned int i = 0; i < lineList->len; i++)
+    {
+        value = (unsigned int) radian_To_Degree(lineList->lines[i].theta);
+        value++;
+        printf("Value : %u\n", value);
+        
+        if (value - 1 >= 0 && value - 1 <= 180)
+            histogram[value - 1]++;
+
+        if (value >= 0 && value <= 180)
+            histogram[value]++;
+        
+        if (value + 1 >= 0 && value + 1 <= 180)
+            histogram[value + 1]++;
+    }
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    return angle;
+}
 
 void rotateAll(Image *image, LineList *lineList, double angleDegree)
 {
@@ -527,4 +570,9 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
 double degrees_ToRadians(double degrees)
 {
     return degrees * M_PI / 180.0;
+}
+
+double radian_To_Degree(double radian)
+{
+    return radian * 180.0 / M_PI;
 }
