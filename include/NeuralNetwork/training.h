@@ -15,7 +15,7 @@
 
 #define NBIMAGES 1000 // 36711
 #define NBINPUTS 28 * 28
-#define NBOUTPUTS 9
+#define NBOUTPUTS 10
 
 /*
  *  Summary:

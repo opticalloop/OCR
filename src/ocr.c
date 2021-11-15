@@ -78,6 +78,10 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
     printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
 
+    // Reverse the image before segmenting
+    reverse_color(&cropped);
+    updateSurface(&cropped);
+
     // Segmentation
     // Initialize all case at NULL
     SDL_Surface *all_cases[81];
