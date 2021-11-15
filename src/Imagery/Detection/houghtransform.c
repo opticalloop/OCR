@@ -1,6 +1,6 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.3
+#define THRESHOLD 0.5
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
                        char *output_folder)
