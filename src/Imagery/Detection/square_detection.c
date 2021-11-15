@@ -210,6 +210,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
                             if (dot3.X != -1)
                             {
+                                if (k == h)
+                                    continue;
                                 // DOES K have intersection with h
                                 Dot dot4 = getIntersection(
                                     &(lineList->lines[k]),
