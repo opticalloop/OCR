@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "GUI/load_image.h"
 int main(int argc, char *argv[])
 {
     GtkWidget *window = NULL;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     gtk_widget_show_all(window);
     gtk_main();
 
-    g_error_free(error);
+
     return EXIT_SUCCESS;
-    
+
 }
