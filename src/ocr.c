@@ -54,13 +54,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     SobelEdgeDetection(&image);
 
-    Image drawImage;
-    drawImage.path = image_path;
-    drawImage.surface =
-        SDL_CreateRGBSurface(0, image.width, image.height, 24, 0, 0, 0, 0);
-    SDL_BlitSurface(image.surface, NULL, drawImage.surface, NULL);
-
-    newImage(&drawImage, 0);
+    Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
@@ -73,9 +67,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     // Create cropped image
     Image cropped;
-    cropped.path = image_path;
     cropped.surface = cropped_image;
-
     newImage(&cropped, 0);
 
     saveVerbose(verbose, &cropped, output_folder, "2.7_Cropped_image", save, 0);

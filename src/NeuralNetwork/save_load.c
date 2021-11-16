@@ -191,8 +191,8 @@ void launchWeights(Network *network, char *path, int verbose)
         }
         else if (chr == '|')
         {
-        //     printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-        //            neuronIndex, weightIndex, atof(tempStr));
+            //     printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+            //            neuronIndex, weightIndex, atof(tempStr));
 
             // Save weights
             network->layers[layerIndex]
