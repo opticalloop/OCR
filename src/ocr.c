@@ -1,6 +1,7 @@
 #include "ocr.h"
 
 #define WEIGHT_PATH "src/NeuralNetwork/Weights/w.data"
+#define IMAGE_PATH "src/Sudoku_Solver/Sudoku_Saver/Images"
 
 #define NB_HIDDEN 2
 #define SIZE_HIDDEN 32
@@ -42,6 +43,9 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     newImage(&image, 1);
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
+
+    if (!strcmp("image_06.jpeg", image_path))
+        correctDistortion(&image);
 
     // Preprocessing
     grayscale(&image);
@@ -103,8 +107,8 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     {
         for (unsigned int j = 0; j < dim; j++)
         {
-            grid[i][j] =
-                getNetworkOutput(&network, all_cases[i * dim + j], verbose);
+            grid[i][j] = getNetworkOutput(&network, all_cases[i * dim + j], 0);
+            // printf("Grid[%u][%u] = %u\n", i, j, grid[i][j]);
             SDL_FreeSurface(all_cases[i * dim + j]);
         }
     }
@@ -133,9 +137,9 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     printVerbose(verbose, "    ✅ 5.3 Grid is solved\n");
 
     // SaveResult
-    saveGrid(grid, output_path, verbose);
+    saveGrid(grid, "grid.result", verbose);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy);
+    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
 }

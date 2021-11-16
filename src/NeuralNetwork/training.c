@@ -65,7 +65,8 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
     }
 }
 
-void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], char *lastChr)
+void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS],
+                char *lastChr)
 {
     char ch;
     unsigned int input_index = 0;
@@ -194,8 +195,9 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     double expected[NBOUTPUTS];
 
     // Init 0 expectation
-    int zero_intput[NBINPUTS] = {0};
-    double zero_expected[NBOUTPUTS] = {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    int zero_intput[NBINPUTS] = { 0 };
+    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -210,8 +212,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
-    	file = fopen(DATA_FILE_PATH, "r");
-        for (;lastchr != EOF; train_count++)
+        file = fopen(DATA_FILE_PATH, "r");
+        for (; lastchr != EOF; train_count++)
         {
             createData(file, input, expected, &lastchr);
 
@@ -231,23 +233,22 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
                 gradientDescent(network);
-            
-                 if (i == epoch && verbose)
+
+                if (i == epoch && verbose)
                 {
                     printResult(zero_expected,
-                            network->layers[nbHiddenLayers + 1].neurons);
+                                network->layers[nbHiddenLayers + 1].neurons);
                 }
-            }            
+            }
         }
         fclose(file);
         lastchr = ' ';
-        
+
         if (verbose)
         {
             printf("    ❗ Error rate = %f\n", errorRate / NBIMAGES);
         }
     }
-
 
     if (strcmp(save_path, ""))
     {

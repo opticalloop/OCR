@@ -292,7 +292,7 @@ int isSquare(Square *square, unsigned int width, unsigned int height)
         max = lenbottom;
     if (lentop > max)
         max = lentop;
-    
+
     unsigned int min = lenLeft;
     if (lenright < min)
         min = lenright;
@@ -301,7 +301,6 @@ int isSquare(Square *square, unsigned int width, unsigned int height)
     if (lentop < min)
         min = lentop;
 
-    
     unsigned int val = max - min;
 
     if (val > SQUARE_FACTOR)
@@ -327,7 +326,7 @@ Square sortSquares(SquareList *squareList, Image *image)
         Square square = squareList->squares[i];
         int factor =
             getLineLength(&(square.bottom)) * getLineLength(&(square.right));
-        if (factor > tempFactor)// && canBeSudokuGrid(&square, image))
+        if (factor > tempFactor) // && canBeSudokuGrid(&square, image))
         {
             tempFactor = factor;
             temp = square;

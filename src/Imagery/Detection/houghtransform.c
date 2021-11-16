@@ -57,13 +57,14 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
                resultingList.maxTheta);
-    if (angleRounded >= 88 && angleRounded <= 92)
+    if ((angleRounded >= 88 && angleRounded <= 92)
+        || (angleRounded >= 0 && angleRounded <= 3))
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
     }
     else
     {
-        printVerbose(verbose, "    📐 2.4.1 Rotating image");
+        printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
         rotateAll(image, &resultingList, angleRounded);
     }
     // Draw auto rotated image
@@ -265,7 +266,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     int nbEdges = 0;
 
     double tempMaxTheta = 0.0;
-    unsigned int histogram[181] = {0};
+    unsigned int histogram[181] = { 0 };
     unsigned int rounded_angle;
 
     int prev = accumulator[0][0];
@@ -308,7 +309,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                 if (t > tempMaxTheta)
                 {
                     tempMaxTheta = t;
-                    rounded_angle = (unsigned int) radian_To_Degree(t);
+                    rounded_angle = (unsigned int)radian_To_Degree(t);
                     histogram[rounded_angle]++;
                 }
 
@@ -498,21 +499,21 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
 
 unsigned int findTheta(LineList *lineList)
 {
-    unsigned int histogram[181] = {0};
+    unsigned int histogram[181] = { 0 };
 
     unsigned int value;
     for (unsigned int i = 0; i < lineList->len; i++)
     {
-        value = (unsigned int) radian_To_Degree(lineList->lines[i].theta);
+        value = (unsigned int)radian_To_Degree(lineList->lines[i].theta);
         value++;
         printf("Value : %u\n", value);
-        
+
         if (value - 1 >= 0 && value - 1 <= 180)
             histogram[value - 1]++;
 
         if (value >= 0 && value <= 180)
             histogram[value]++;
-        
+
         if (value + 1 >= 0 && value + 1 <= 180)
             histogram[value + 1]++;
     }
@@ -529,7 +530,7 @@ unsigned int findTheta(LineList *lineList)
 void rotateAll(Image *image, LineList *lineList, double angleDegree)
 {
     rotate(image, angleDegree);
-    
+
     double angle = angleDegree * M_PI / 180.0;
     angle += 5.08;
     const double middleX = ((double)image->width / 2.0);
@@ -539,30 +540,38 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
     double newY;
 
     for (unsigned int i = 0; i < lineList->len; i++)
-    {   
+    {
         // Calculate new position start
-        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
-                            - sin(angle) * ((double)lineList->lines[i].yStart - middleY))
-                + middleX);
+        newX =
+            ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
+                      - sin(angle)
+                          * ((double)lineList->lines[i].yStart - middleY))
+             + middleX);
 
-        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
-                            + sin(angle) * ((double)lineList->lines[i].xStart - middleX))
-                + middleY);
+        newY =
+            ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
+                      + sin(angle)
+                          * ((double)lineList->lines[i].xStart - middleX))
+             + middleY);
 
-        lineList->lines[i].xStart = (int) newX;
-        lineList->lines[i].yStart = (int) newY;
+        lineList->lines[i].xStart = (int)newX;
+        lineList->lines[i].yStart = (int)newY;
 
         // Calculate new position end
-        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
-                            - sin(angle) * ((double)lineList->lines[i].yEnd - middleY))
-                + middleX);
+        newX =
+            ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
+                      - sin(angle)
+                          * ((double)lineList->lines[i].yEnd - middleY))
+             + middleX);
 
-        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
-                            + sin(angle) * ((double)lineList->lines[i].xEnd - middleX))
-                + middleY);
+        newY =
+            ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
+                      + sin(angle)
+                          * ((double)lineList->lines[i].xEnd - middleX))
+             + middleY);
 
-        lineList->lines[i].xEnd = (int) newX;
-        lineList->lines[i].yEnd = (int) newY;
+        lineList->lines[i].xEnd = (int)newX;
+        lineList->lines[i].yEnd = (int)newY;
     }
     updateSurface(image);
 }

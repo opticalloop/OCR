@@ -30,7 +30,7 @@ void correctDistortion(Image *image)
 
     unsigned int xCenter = width - 50;
     unsigned int yCenter = height - 50;
-    
+
     double factor1 = 0.0000005;
     double factor2 = 0.000009;
 
@@ -38,16 +38,21 @@ void correctDistortion(Image *image)
     {
         for (unsigned int j = 0; j < height; j++)
         {
-            double distance = sqrt((i - xCenter) * (i - xCenter) + (j - yCenter) * (j - yCenter));
-            x = i + (2 * factor1 * i * j + factor2 * (distance * distance + 2 * (i * i)));
-            y = j + (factor1 * (distance * distance + 2 * (j * j)) + 2 * factor2 * i * j); 
+            double distance = sqrt((i - xCenter) * (i - xCenter)
+                                   + (j - yCenter) * (j - yCenter));
+            x = i
+                + (2 * factor1 * i * j
+                   + factor2 * (distance * distance + 2 * (i * i)));
+            y = j
+                + (factor1 * (distance * distance + 2 * (j * j))
+                   + 2 * factor2 * i * j);
 
             x -= 55;
 
             if (i % 100 == 0)
             {
-                printf("New x : %u\n", x);
-                printf("New y : %u\n", y);
+                // printf("New x : %u\n", x);
+                // printf("New y : %u\n", y);
             }
 
             if (x < width && y < height)
@@ -72,7 +77,8 @@ void correctDistortion(Image *image)
 
     //         // Check if any of the four locations are invalid. If so,
     //         // skip interpolating this pixel
-    //         // Unsigned int : always > 0, so dont need to check if top and left
+    //         // Unsigned int : always > 0, so dont need to check if top and
+    //         left
     //         // are superior to 0
     //         if (top < height && bottom < height && left < width
     //             && right < width)

@@ -130,7 +130,7 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 }
 
 Image createSudokuImage(unsigned int grid[dim][dim],
-                        unsigned int copy[dim][dim])
+                        unsigned int copy[dim][dim], char *folder_path)
 {
     Image image;
     image.width = 266;
@@ -179,9 +179,12 @@ Image createSudokuImage(unsigned int grid[dim][dim],
                 rect.x = Array[j];
                 rect.y = Array[i];
 
+                SDL_Surface *surface;
                 // Get the image number and copy it
-                SDL_Surface *surface =
-                    getImage(val, IMAGE_DIRECTORY, copy[i][j]);
+                if (!strcmp(folder_path, ""))
+                    surface = getImage(val, IMAGE_DIRECTORY, copy[i][j]);
+                else
+                    surface = getImage(val, folder_path, copy[i][j]);
                 SDL_BlitSurface(surface, NULL, image.surface, &rect);
                 SDL_FreeSurface(surface);
             }
