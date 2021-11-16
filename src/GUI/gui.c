@@ -75,13 +75,13 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     }
 }
 
-void show_page(GtkWidget *widget, gpointer data)
+void show_page(gpointer data)
 {
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
 
-void change_panel(GtkWidget *widget, gpointer data)
+void change_panel(gpointer data)
 {
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
@@ -97,15 +97,15 @@ void stop_processing()
     gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
 }
 
-void run_process(GtkButton *button, gpointer data)
+void run_process(GtkButton *button)
 {
     if (processing)
     {
         processing = 0;
-        
+
         // Change button text
         gtk_button_set_label(button, "Start");
-        
+
         // // Cancel processing
         // pthread_cancel(*thread);
         // pthread_join(*thread, NULL);
@@ -122,13 +122,14 @@ void run_process(GtkButton *button, gpointer data)
         gtk_widget_show(GTK_WIDGET(progress_bar));
         // TODO : Get signal from 9x9 button
         // Get signal from combo box
-        GtkComboBox *combo_box = GTK_COMBO_BOX(
-            gtk_builder_get_object(builder, "dim_input"));
+        GtkComboBox *combo_box =
+            GTK_COMBO_BOX(gtk_builder_get_object(builder, "dim_input"));
         // Get string from combo box
-        char *dim = gtk_combo_box_text_get_active_text(
-            GTK_COMBO_BOX_TEXT(combo_box));
+        char *dim =
+            gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
         printf("%s\n", dim);
-        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
+        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE,
+                            strcmp(dim, "9x9"));
     }
 }
 
@@ -138,7 +139,7 @@ void open_website()
     if (g_find_program_in_path("firefox") != NULL)
     {
         // Open the website
-        if (!system("firefox www.opticalloop.bugbear.com")) // TODO: change website
+        if (!system("firefox www.opticalloop.bugbear.com"))
         {
             printf("Error opening website\n");
         }
