@@ -1,7 +1,10 @@
 /* button separator{
     background-color: rgb(255, 136, 0);
 } */
-* {
+window{
+    color: white;
+}
+window button {
     color: white;
 }
 .left_panel button {
@@ -87,4 +90,11 @@ progress, text {
     font-size: 15px;
     
     margin-top: 15px;
+}
+
+filechooser {
+    color: black;
+}
+filechooser button {
+    color: black;
 }

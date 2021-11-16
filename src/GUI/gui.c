@@ -75,13 +75,13 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     }
 }
 
-void show_page(gpointer data)
+void show_page(GtkWidget *widget, gpointer data)
 {
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
 
-void change_panel(gpointer data)
+void change_panel(GtkWidget *widget, gpointer data)
 {
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
@@ -203,7 +203,7 @@ void *init_gui()
     gtk_widget_show_all(window); // show window
     gtk_widget_hide(GTK_WIDGET(progress_bar)); // hide progress bar
     gtk_main(); // start main loop
-
+    quit();
     pthread_exit(NULL);
 }
 
@@ -215,6 +215,5 @@ void quit()
         pthread_cancel(*thread);
         pthread_join(*thread, NULL);
     }
-
     gtk_main_quit();
 }

@@ -3,6 +3,14 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>jpg</mime-type>
+      <mime-type>bmp</mime-type>
+      <mime-type>jpeg</mime-type>
+      <mime-type>png</mime-type>
+    </mime-types>
+  </object>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <signal name="destroy" handler="quit" swapped="no"/>
@@ -208,14 +216,15 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBoxText" id = "dim_input">
+                          <object class="GtkComboBoxText" id="dim_input">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="active">0</property>
                             <property name="tearoff_title" translatable="yes">dfd</property>
+                            <property name="active_id">9</property>
                             <items>
-                              <item translatable="yes">9x9</item>
-                              <item translatable="yes">16x16</item>
+                              <item id="9" translatable="yes">9x9</item>
+                              <item id="1" translatable="yes">16x16</item>
                             </items>
                           </object>
                           <packing>
