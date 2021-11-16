@@ -1,6 +1,9 @@
 /* button separator{
     background-color: rgb(255, 136, 0);
 } */
+* {
+    color: white;
+}
 .left_panel button {
     /* background-color: rgb(255, 136, 0); */
     border: 1px solid #ff8800;
