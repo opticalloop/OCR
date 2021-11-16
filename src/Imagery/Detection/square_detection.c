@@ -2,7 +2,7 @@
 
 #define MIN_EQUAL 51
 
-#define SQUARE_FACTOR 300
+#define SQUARE_FACTOR 100
 
 LineList simplifyLines(LineList *linelist)
 {
@@ -210,6 +210,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
                             if (dot3.X != -1)
                             {
+                                if (k == h)
+                                    continue;
                                 // DOES K have intersection with h
                                 Dot dot4 = getIntersection(
                                     &(lineList->lines[k]),
@@ -274,26 +276,35 @@ int isSquare(Square *square, unsigned int width, unsigned int height)
 {
     unsigned int lenLeft = getLineLength(&(square->left));
 
-    unsigned int lenright = getLineLength(&(square->left));
+    unsigned int lenright = getLineLength(&(square->right));
 
     unsigned int lentop = getLineLength(&(square->top));
 
     unsigned int lenbottom = getLineLength(&(square->bottom));
 
-    if (lenLeft <= width / 9 || lenright <= width / 9 || lentop <= width / 9
-        || lenbottom <= width / 9)
-        return 0;
-    if (lenLeft - lentop > SQUARE_FACTOR)
-        return 0;
-    if (lentop - lenright > SQUARE_FACTOR)
-        return 0;
-    if (lenright - lenbottom > SQUARE_FACTOR)
-        return 0;
-    if (lenbottom - lentop > SQUARE_FACTOR)
-        return 0;
-    if (lenbottom - lenLeft > SQUARE_FACTOR)
-        return 0;
-    if (lenLeft - lenright > SQUARE_FACTOR)
+    // if (lenLeft <= width / 9 || lenright <= width / 9 || lentop <= width / 9
+    //     || lenbottom <= width / 9)
+    //     return 0;
+    unsigned int max = lenLeft;
+    if (lenright > max)
+        max = lenright;
+    if (lenbottom > max)
+        max = lenbottom;
+    if (lentop > max)
+        max = lentop;
+    
+    unsigned int min = lenLeft;
+    if (lenright < min)
+        min = lenright;
+    if (lenbottom < min)
+        min = lenbottom;
+    if (lentop < min)
+        min = lentop;
+
+    
+    unsigned int val = max - min;
+
+    if (val > SQUARE_FACTOR)
         return 0;
 
     return 1;
@@ -316,7 +327,7 @@ Square sortSquares(SquareList *squareList, Image *image)
         Square square = squareList->squares[i];
         int factor =
             getLineLength(&(square.bottom)) * getLineLength(&(square.right));
-        if (factor > tempFactor && canBeSudokuGrid(&square, image))
+        if (factor > tempFactor)// && canBeSudokuGrid(&square, image))
         {
             tempFactor = factor;
             temp = square;

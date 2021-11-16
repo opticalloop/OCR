@@ -70,7 +70,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     cropped.surface = cropped_image;
     newImage(&cropped, 0);
 
-    saveVerbose(verbose, &cropped, output_folder, "2.7_Cropped_image", save, 0);
+    saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
     printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
 
     // Reverse the image before segmenting

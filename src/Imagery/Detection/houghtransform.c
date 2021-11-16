@@ -27,7 +27,6 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
-    double angle = resultingList.maxTheta * 180.0 / M_PI;
 
     if (save)
     {
@@ -53,13 +52,42 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // AUTO ROTATE
+    double angle = resultingList.maxTheta * 180.0 / M_PI;
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
         printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
-               list.maxTheta);
-    if (angleRounded >= 88 && angleRounded <= 91)
+               resultingList.maxTheta);
+    if (angleRounded >= 88 && angleRounded <= 92)
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
+    }
+    else
+    {
+        printVerbose(verbose, "    📐 2.4.1 Rotating image");
+        rotateAll(image, &resultingList, angleRounded);
+    }
+    // Draw auto rotated image
+    if (save)
+    {
+        // Draw simplifieds lines
+        Image __simplifiedImage;
+        __simplifiedImage.path = image->path;
+        __simplifiedImage.surface = SDL_CreateRGBSurface(
+            0, image->width, image->height, 24, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, __simplifiedImage.surface, NULL);
+        Image *___simplifiedImage = &__simplifiedImage;
+        newImage(___simplifiedImage, 0);
+
+        const unsigned int len = resultingList.len;
+        Pixel color = { .r = 255, .g = 0, .b = 0 };
+        for (unsigned int i = 0; i < len; i++)
+        {
+            Line line = resultingList.lines[i];
+            draw_line(___simplifiedImage, w, h, &line, &color, 2, 1);
+        }
+
+        saveVerbose(verbose, ___simplifiedImage, output_folder,
+                    "2.5_Autorotated", save, 1);
     }
 
     // FINDING SQUARES
@@ -80,7 +108,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         squares = findSquare(&resultingList, w, h, squareImage, save);
         saveVerbose(verbose, squareImage, output_folder,
-                    "2.5_Hough_squares_only", save, 1);
+                    "2.6_Hough_squares_only", save, 1);
     }
     else
     {
@@ -109,7 +137,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.6_Hough_last_square", save, 1);
+                    "2.7_Hough_last_square", save, 1);
     }
 
     // GETTING MAX SQUARE
@@ -149,7 +177,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     const double diagonal = sqrt(width * width + height * height);
 
     // Initialize the constant values for theta and rho
-    const double maxTheta = 90.0, minTheta = -90.0;
+    const double maxTheta = 180.0, minTheta = 0.0;
     const double maxRho = diagonal, minRho = -diagonal;
     const double nbRho = 2 * diagonal, nbTheta = nbRho;
 
@@ -235,7 +263,10 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     Line *allLines = malloc(sizeof(Line));
 
     int nbEdges = 0;
+
     double tempMaxTheta = 0.0;
+    unsigned int histogram[181] = {0};
+    unsigned int rounded_angle;
 
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
@@ -277,6 +308,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                 if (t > tempMaxTheta)
                 {
                     tempMaxTheta = t;
+                    rounded_angle = (unsigned int) radian_To_Degree(t);
+                    histogram[rounded_angle]++;
                 }
 
                 double c = cos(t), s = sin(t);
@@ -324,7 +357,16 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     LineList list;
     list.lines = allLines;
     list.len = nbEdges;
-    list.maxTheta = tempMaxTheta;
+
+    // Find best angle
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    list.maxTheta = degrees_ToRadians(angle);
     return list;
 }
 
@@ -454,32 +496,83 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
-void matriceToBmp(unsigned int **matrice, unsigned int width,
-                  unsigned int height)
+unsigned int findTheta(LineList *lineList)
 {
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
-    image.surface = NULL;
-    image.pixels = NULL;
-    newImage(&image, 0);
-    for (size_t y = 0; y < height; y++)
-    {
-        for (size_t x = 0; x < width; x++)
-        {
-            image.pixels[x][y].r = matrice[y][x] ? 255 : 0;
-            image.pixels[x][y].g = 0;
-            image.pixels[x][y].b = 0;
-        }
-    }
-    saveImage(&image, "2.0_Hough_accumulator.bmp");
+    unsigned int histogram[181] = {0};
 
-    freeImage(&image, 0);
+    unsigned int value;
+    for (unsigned int i = 0; i < lineList->len; i++)
+    {
+        value = (unsigned int) radian_To_Degree(lineList->lines[i].theta);
+        value++;
+        printf("Value : %u\n", value);
+        
+        if (value - 1 >= 0 && value - 1 <= 180)
+            histogram[value - 1]++;
+
+        if (value >= 0 && value <= 180)
+            histogram[value]++;
+        
+        if (value + 1 >= 0 && value + 1 <= 180)
+            histogram[value + 1]++;
+    }
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    return angle;
+}
+
+void rotateAll(Image *image, LineList *lineList, double angleDegree)
+{
+    rotate(image, angleDegree);
+    
+    double angle = angleDegree * M_PI / 180.0;
+    angle += 5.08;
+    const double middleX = ((double)image->width / 2.0);
+    const double middleY = ((double)image->height / 2.0);
+
+    double newX;
+    double newY;
+
+    for (unsigned int i = 0; i < lineList->len; i++)
+    {   
+        // Calculate new position start
+        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
+                            - sin(angle) * ((double)lineList->lines[i].yStart - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
+                            + sin(angle) * ((double)lineList->lines[i].xStart - middleX))
+                + middleY);
+
+        lineList->lines[i].xStart = (int) newX;
+        lineList->lines[i].yStart = (int) newY;
+
+        // Calculate new position end
+        newX = ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
+                            - sin(angle) * ((double)lineList->lines[i].yEnd - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
+                            + sin(angle) * ((double)lineList->lines[i].xEnd - middleX))
+                + middleY);
+
+        lineList->lines[i].xEnd = (int) newX;
+        lineList->lines[i].yEnd = (int) newY;
+    }
+    updateSurface(image);
 }
 
 double degrees_ToRadians(double degrees)
 {
     return degrees * M_PI / 180.0;
+}
+
+double radian_To_Degree(double radian)
+{
+    return radian * 180.0 / M_PI;
 }
