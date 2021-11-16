@@ -1,24 +1,30 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.3
+#define THRESHOLD 0.4
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
                        char *output_folder)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
+
+    // Surface without sobel filter
+    Image tempImage;
+    tempImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+    SDL_BlitSurface(drawImage->surface, NULL, tempImage.surface, NULL);
+
     // Directly free
     if (!save)
     {
         freeImage(drawImage, 0);
     }
+    newImage(&tempImage, 0);
 
     // Call major fonction
     LineList list =
         houghtransform(image, drawImage, verbose, save, output_folder);
 
-    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
-                1);
+    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save, 1);
     printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
@@ -35,7 +41,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         _simplifiedImage.path = image->path;
         _simplifiedImage.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _simplifiedImage.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, _simplifiedImage.surface, NULL);
         Image *simplifiedImage = &_simplifiedImage;
         newImage(simplifiedImage, 0);
 
@@ -55,16 +61,16 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     double angle = resultingList.maxTheta * 180.0 / M_PI;
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
-        printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
+        printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
                resultingList.maxTheta);
-    if (angleRounded >= 88 && angleRounded <= 92)
+    if ((angleRounded >= 88 && angleRounded <= 92) || (angleRounded >= 0 && angleRounded <= 3))
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
     }
     else
     {
-        printVerbose(verbose, "    📐 2.4.1 Rotating image");
-        rotateAll(image, &resultingList, angleRounded);
+        printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
+        rotateAll(&tempImage, &resultingList, angleRounded);
     }
     // Draw auto rotated image
     if (save)
@@ -74,7 +80,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         __simplifiedImage.path = image->path;
         __simplifiedImage.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, __simplifiedImage.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, __simplifiedImage.surface, NULL);
         Image *___simplifiedImage = &__simplifiedImage;
         newImage(___simplifiedImage, 0);
 
@@ -102,7 +108,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         _squareImage.path = image->path;
         _squareImage.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _squareImage.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, _squareImage.surface, NULL);
         Image *squareImage = &_squareImage;
         newImage(squareImage, 0);
 
@@ -131,7 +137,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         _lastSquareImg.path = image->path;
         _lastSquareImg.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _lastSquareImg.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, _lastSquareImg.surface, NULL);
         Image *lastSquareImg = &_lastSquareImg;
         newImage(lastSquareImg, 0);
 
@@ -158,7 +164,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     rect.h = l3;
 
     // Save square to surface
-    SDL_BlitSurface(image->surface, &rect, surface, NULL);
+    SDL_BlitSurface(tempImage.surface, &rect, surface, NULL);
+    freeImage(&tempImage, 0);
 
     // Free squares
     free(squares.squares);

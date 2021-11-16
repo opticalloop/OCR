@@ -1,8 +1,8 @@
 #include "Imagery/Detection/square_detection.h"
 
-#define MIN_EQUAL 51
+#define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 100
+#define SQUARE_FACTOR 50
 
 LineList simplifyLines(LineList *linelist)
 {
@@ -133,19 +133,18 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
         int ordOrigin1 = line1->yStart - directCoeff1 * line1->xStart;
         int ordOrigin2 = line2->yStart - directCoeff2 * line2->xStart;
 
-        if ((directCoeff2 - directCoeff1) != 0)
+        if ((directCoeff1 - directCoeff2) != 0)
         {
             int x = (ordOrigin1 - ordOrigin2) / (directCoeff2 - directCoeff1);
-            int y = directCoeff2 * (ordOrigin1 - ordOrigin2)
-                    / (directCoeff2 - directCoeff1)
-                + ordOrigin2;
+            int y = directCoeff1 * (ordOrigin2 - ordOrigin1)
+                    / (directCoeff1 - directCoeff2)
+                + ordOrigin1;
 
             // In degree
             int angleDiff =
-                abs(line1->theta * 180.0 / M_PI - line2->theta * 180.0 / M_PI);
-
-            if (x >= 0 && x < width && y >= 0 && y < height && angleDiff > 85
-                && angleDiff < 95)
+                abs(radian_To_Degree(line1->theta) - radian_To_Degree(line2->theta));
+            
+            if (x >= 0 && x < width && y >= 0 && y < height && angleDiff > 85 && angleDiff < 95)
             {
                 dot.X = x;
                 dot.Y = y;
@@ -190,15 +189,6 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
                     if (dot2.X != -1)
                     {
-                        // Optimize
-                        // Line tempLine = { .xStart = dot1.X,
-                        //                   .yStart = dot1.Y,
-                        //                   .xEnd = dot2.X,
-                        //                   .yEnd = dot2.Y };
-                        // if (getLineLength(&tempLine) < width / 9)
-                        // {
-                        //     continue;
-                        // }
                         // ALL INTERSECTED EDGES
                         for (unsigned int k = 0; k < len; k++)
                         {
