@@ -115,4 +115,6 @@ void NegativePictureIfNormal(Image *image);
 
 void adaptativeThreshold2(Image *image);
 
+void l(Image *image);
+
 #endif // OCR_NOISE_REDUCTION_H

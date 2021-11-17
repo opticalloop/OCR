@@ -166,11 +166,6 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     const unsigned int w = image->width;
     const unsigned int h = image->height;
 
-    adaptativeThreshold2(image);
-    saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_Threshold", save, 0);
-
-    return;
-
     printVerbose(verbose, "    🎨 1 Preprocessing image\n");
     printVerbose(verbose, "    📊 1.1 Getting image histogram\n");
 
@@ -183,20 +178,20 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
 
     printVerbose(verbose, "    📸 1.2 Applying constrast Filter\n");
 
-    for (unsigned int i = 0; i < w; i++)
-    {
-        for (unsigned int j = 0; j < h; j++)
-        {
-            updatePixelToSameValue(
-                &(image->pixels[i][j]),
-                ConstrastFilter(&(image->pixels[i][j]), histogram, max));
-        }
-    }
+    // for (unsigned int i = 0; i < w; i++)
+    // {
+    //     for (unsigned int j = 0; j < h; j++)
+    //     {
+    //         updatePixelToSameValue(
+    //             &(image->pixels[i][j]),
+    //             ConstrastFilter(&(image->pixels[i][j]), histogram, max));
+    //     }
+    // }
 
     Pixel **mask = copyPixelsArray(image);
     updateNeigbourgs(image);
 
-    saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
+    //saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
     printVerbose(verbose, "    🎥 1.3 Applying Median Filter\n");
 
     GetHistogram(histogram, image->pixels, w, h);
@@ -223,15 +218,17 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
                 AverageFilter(mask[i][j].matrix, binomialFilter));
 
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
-    printVerbose(verbose, "    💻 1.5 Applying Otsu Filter\n");
+    
+    printVerbose(verbose, "    💻 1.5 Applying Adaptative Threshold Filter\n");
+    
+    adaptativeThreshold2(image);
+    saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_Threshold", save, 0);
 
+    // printVerbose(verbose, "    💻 1.5 Applying Adaptative Otsu Filter\n");
     // OtsuFilter(image->pixels, w, h, histogram, verbose);
-
-    saveVerbose(verbose, image, pathToSave, "1.4_Otsu_filter", save, 0);
-    printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
-
-    NegativePictureIfNormal(image);
-
+    // saveVerbose(verbose, image, pathToSave, "1.4_Otsu_filter", save, 0);
+    printVerbose(verbose, "    ❓ 1.6 Inverting  and smoothing image\n");
+    l(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Inverted_filter", save, 0);
 
     free(binomialFilter);
@@ -419,55 +416,117 @@ void adaptativeThreshold2(Image *image)
         }
     }
  
+    const double t = 0.1;
     const int S = width / 8;
-    int s2 = S/2;
-    const float t = 0.5;
+    const int s2 = S/2;
     unsigned long* integral_image = 0;
-    integral_image = malloc(width * height * sizeof(unsigned long));
     long sum = 0;
-    int count = 0;
-    int index;
+    unsigned int count = 0;
     int x1, y1, x2, y2;
-    for (int i = 0; i < width; i++)
+
+    integral_image = calloc(width * height, sizeof(unsigned long));
+
+    for (unsigned int i = 1; i < width; i++)
     {
         sum = 0;
-        for (int j = 1; j < height; j++)
+        for (int j = 0; j < height; j++)
         {
             sum += _pixels[i][j].r;
-            if (i == 0)
-                integral_image[j * width + i] = sum;
-            else
-                integral_image[j * width + i] = integral_image[j * width + i - 1] + sum;
+            integral_image[j * width + i] = integral_image[j * width + i - 1] + sum;
         }
     }
     for (int i = 0; i < width; i++)
     {
         for (int j = 0; j < height; j++)
         {
-            index = j * width + i;
-            x1=i-s2;
-            x2=i+s2;
-            y1=j-s2;
-            y2=j+s2;
+            x1 = i - s2;
+            x2 = i + s2;
+            y1 = j - s2;
+            y2 = j + s2;
             if (x1 < 0)
                 x1 = 0;
             if (x2 >= width)
-                x2 = width-1;
+                x2 = width - 1;
             if (y1 < 0)
                 y1 = 0;
             if (y2 >= height)
-                y2 = height-1;
-            count = (x2-x1)*(y2-y1);
-            sum = integral_image[y2*width+x2] - integral_image[y1*width+x2] -
-                        integral_image[y2*width+x1] + integral_image[y1*width+x1];
-            if ((long)(_pixels[i][j].r * count) < (long)(sum * (1.0 - t)))
-                updatePixelToSameValue(&(image->pixels[i][j]),0);
-            else
-                updatePixelToSameValue(&(image->pixels[i][j]),255);
+                y2 = height - 1;
+            count = (x2 - x1) * (y2 - y1);
+            sum = integral_image[y2 * width + x2] - integral_image[y1 * width + x2] - 
+                  integral_image[y2 * width + x1] + integral_image[y1 * width + x1];
+            
+            updatePixelToSameValue(&(image->pixels[i][j]), 
+                _pixels[i][j].r * count < sum * (1.0 - t) ? 0 : 255);
         }
     }
     // Free
     free(integral_image);
+    for (unsigned int i = 0; i < width; i++)
+    {
+        free(_pixels[i]);
+    }
+    free(_pixels);
+}
+
+void l(Image *image)
+{
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
+
+    // Create two dimensional array of pixels
+    Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
+    if (_pixels == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
+
+    unsigned int x = 0;
+    for (; x < width; x++)
+    {
+        _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
+        if (_pixels[x] == NULL)
+        {
+            errx(EXIT_FAILURE, "Error while allocating memory");
+        }
+    }
+    // '\0'
+    _pixels[x] = NULL;
+
+    // Copy of all pixel
+    for (unsigned int x = 0; x < width; x++)
+    {
+        for (unsigned int y = 0; y < height; y++)
+        {
+            // Consider that the image is in grayscale
+            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
+            updatePixelToSameValue(&(image->pixels[x][y]), 0);
+        }
+    }
+
+    for (unsigned int i = 1; i < width - 1; i++)
+    {
+        for (unsigned int j = 1; j < height - 1; j++)
+        {
+            // Black pixel
+            if (_pixels[i][j].r == 255)
+            {
+                // Check if white pixel around
+                if (_pixels[i + 1][j - 1].r <= 200 || _pixels[i + 1][j].r <= 200 ||
+                    _pixels[i + 1][j + 1].r <= 200 || _pixels[i][j - 1].r <= 200 ||
+                    _pixels[i][j + 1].r <= 200 || _pixels[i - 1][j - 1].r <= 200 ||
+                    _pixels[i - 1][j].r <= 200 || _pixels[i - 1][j + 1].r <= 200)
+                {
+                    updatePixelToSameValue(&(image->pixels[i][j]), 255);
+                }
+            }
+            else
+            {
+                updatePixelToSameValue(&(image->pixels[i][j]), 255);
+            }
+        }
+    }
+    
+    // Free
     for (unsigned int i = 0; i < width; i++)
     {
         free(_pixels[i]);
