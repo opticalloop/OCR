@@ -220,15 +220,23 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     
     printVerbose(verbose, "    💻 1.5 Applying Adaptative Threshold Filter\n");
-    
     adaptativeThreshold2(image);
     saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_Threshold", save, 0);
+
+    // printVerbose(verbose, "    💻 1.6 Applying Dilate Filter\n");
+    // dilate(image);
+    // saveVerbose(verbose, image, pathToSave, "1.5_Dilate_filter", save, 0);
+
+    // printVerbose(verbose, "    💻 1.7 Applying Erode Filter\n");
+    // erode(image);
+    // saveVerbose(verbose, image, pathToSave, "1.6_Erode_filter", save, 0);
 
     // printVerbose(verbose, "    💻 1.5 Applying Adaptative Otsu Filter\n");
     // OtsuFilter(image->pixels, w, h, histogram, verbose);
     // saveVerbose(verbose, image, pathToSave, "1.4_Otsu_filter", save, 0);
-    printVerbose(verbose, "    ❓ 1.6 Inverting  and smoothing image\n");
-    l(image);
+
+    printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
+    NegativePictureIfNormal(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Inverted_filter", save, 0);
 
     free(binomialFilter);
@@ -416,7 +424,7 @@ void adaptativeThreshold2(Image *image)
         }
     }
  
-    const double t = 0.1;
+    const double t = 0.3;
     const int S = width / 8;
     const int s2 = S/2;
     unsigned long* integral_image = 0;
@@ -468,7 +476,69 @@ void adaptativeThreshold2(Image *image)
     free(_pixels);
 }
 
-void l(Image *image)
+void dilate(Image *image)
+{
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
+
+    // Create two dimensional array of pixels
+    Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
+    if (_pixels == NULL)
+    {
+        errx(EXIT_FAILURE, "Error while allocating memory");
+    }
+
+    unsigned int x = 0;
+    for (; x < width; x++)
+    {
+        _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
+        if (_pixels[x] == NULL)
+        {
+            errx(EXIT_FAILURE, "Error while allocating memory");
+        }
+    }
+    // '\0'
+    _pixels[x] = NULL;
+
+    // Copy of all pixel
+    for (unsigned int x = 0; x < width; x++)
+    {
+        for (unsigned int y = 0; y < height; y++)
+        {
+            // Consider that the image is in grayscale
+            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
+            updatePixelToSameValue(&(image->pixels[x][y]), 0);
+        }
+    }
+
+    for (unsigned int i = 1; i < width - 1; i++)
+    {
+        for (unsigned int j = 1; j < height - 1; j++)
+        {
+            // If white and black around
+            if (_pixels[i][j].r == 255)
+            {
+                // Check if white pixel around
+                if (_pixels[i + 1][j].r != 0 && _pixels[i][j - 1].r != 0 &&
+                    _pixels[i][j + 1].r != 0 && _pixels[i - 1][j].r != 0)
+                {
+                    updatePixelToSameValue(&(image->pixels[i][j]), 255);
+                    continue;
+                }
+            }
+            updatePixelToSameValue(&(image->pixels[i][j]), 0);
+        }
+    }
+    
+    // Free
+    for (unsigned int i = 0; i < width; i++)
+    {
+        free(_pixels[i]);
+    }
+    free(_pixels);
+}
+
+void erode(Image *image)
 {
     const unsigned int width = image->width;
     const unsigned int height = image->height;
@@ -508,21 +578,17 @@ void l(Image *image)
         for (unsigned int j = 1; j < height - 1; j++)
         {
             // Black pixel
-            if (_pixels[i][j].r == 255)
+            if (_pixels[i][j].r == 0)
             {
                 // Check if white pixel around
-                if (_pixels[i + 1][j - 1].r <= 200 || _pixels[i + 1][j].r <= 200 ||
-                    _pixels[i + 1][j + 1].r <= 200 || _pixels[i][j - 1].r <= 200 ||
-                    _pixels[i][j + 1].r <= 200 || _pixels[i - 1][j - 1].r <= 200 ||
-                    _pixels[i - 1][j].r <= 200 || _pixels[i - 1][j + 1].r <= 200)
+                if (_pixels[i + 1][j].r != 255 && _pixels[i][j - 1].r != 255 &&
+                    _pixels[i][j + 1].r != 255 && _pixels[i - 1][j].r != 255)
                 {
-                    updatePixelToSameValue(&(image->pixels[i][j]), 255);
+                    updatePixelToSameValue(&(image->pixels[i][j]), 0);
+                    continue;
                 }
             }
-            else
-            {
-                updatePixelToSameValue(&(image->pixels[i][j]), 255);
-            }
+            updatePixelToSameValue(&(image->pixels[i][j]), 255);
         }
     }
     

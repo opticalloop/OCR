@@ -115,6 +115,8 @@ void NegativePictureIfNormal(Image *image);
 
 void adaptativeThreshold2(Image *image);
 
-void l(Image *image);
+void dilate(Image *image);
+
+void erode(Image *image);
 
 #endif // OCR_NOISE_REDUCTION_H
