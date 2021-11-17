@@ -119,4 +119,12 @@ void dilate(Image *image);
 
 void erode(Image *image);
 
+double *histogram(Image *image);
+
+double cumulative_histogram_rec(double *hist,int i,double div);
+
+double *cumulative_histogram(Image *image);
+
+void histogram_equil(Image *image);
+
 #endif // OCR_NOISE_REDUCTION_H

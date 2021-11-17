@@ -219,9 +219,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
 
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     
-    printVerbose(verbose, "    💻 1.5 Applying Adaptative Threshold Filter\n");
+    printVerbose(verbose, "    💻 1.5 Applying histogram equal\n");
+    histogram_equil(image);
+    saveVerbose(verbose, image, pathToSave, "1.4_Histogramr_equal", save, 0);
+
+    printVerbose(verbose, "    💻 1.6 Applying Adaptative Threshold Filter\n");
     adaptativeThreshold2(image);
-    saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_Threshold", save, 0);
+    saveVerbose(verbose, image, pathToSave, "1.5_Adaptative_Threshold", save, 0);
 
     // printVerbose(verbose, "    💻 1.6 Applying Dilate Filter\n");
     // dilate(image);
@@ -237,7 +241,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
 
     printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
     NegativePictureIfNormal(image);
-    saveVerbose(verbose, image, pathToSave, "1.5_Inverted_filter", save, 0);
+    saveVerbose(verbose, image, pathToSave, "1.7_Inverted_filter", save, 0);
 
     free(binomialFilter);
     free(histogram);
@@ -424,7 +428,7 @@ void adaptativeThreshold2(Image *image)
         }
     }
  
-    const double t = 0.3;
+    const double t = 0.4;
     const int S = width / 8;
     const int s2 = S/2;
     unsigned long* integral_image = 0;
@@ -598,4 +602,74 @@ void erode(Image *image)
         free(_pixels[i]);
     }
     free(_pixels);
+}
+
+double *histogram(Image *image)
+{
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
+    double *histogramm = calloc(256, sizeof(double));
+    for (unsigned int i = 0; i < w; i++)
+    {   
+        for (unsigned int j = 0; j < h; j++)
+        {
+            histogramm[image->pixels[i][j].r]++;
+        }
+    }
+    return histogramm;
+}
+
+double cumulative_histogram_rec(double *hist, int i, double div){
+    if(i == 0){
+        hist[i] = (hist[i] * 255.)/ div;
+        return hist[i];
+    }
+    else{
+        hist[i] = (hist[i] * 255.) / div;
+        hist[i] += cumulative_histogram_rec(hist,i - 1,div);
+        return hist[i];
+    }
+}
+
+double *cumulative_histogram(Image *image){
+    int w = image->width;
+    int h = image->height;
+    double div = (double)(w * h);
+    double *hist = histogram(image);
+    cumulative_histogram_rec(hist, 255, div);
+    return hist;
+}
+
+void histogram_equil(Image *image)
+{
+    int w = image->width;
+    int h = image->height;
+    double *hist = cumulative_histogram(image);
+    for (int i = 0; i < w; i++)
+    {   
+        for (int j = 0; j < h; j++)
+        {
+            updatePixelToSameValue(&(image->pixels[i][j]), hist[image->pixels[i][j].r]);
+        }
+    }
+
+    // double max = hist[0];
+    // double min = hist[0];
+    // for (int i = 0; i < 256; i++)
+    // {
+    //     if (hist[i] > max)
+    //         max = hist[i];
+    //     else if (hist[i] < min)
+    //         min = hist[i];
+    // }
+
+    // for (int i = 0; i < w; i++)
+    // {   
+    //     for (int j = 0; j < h; j++)
+    //     {
+    //         updatePixelToSameValue(&(image->pixels[i][j]), hist[image->pixels[i][j].r]);
+    //     }
+    // }
+
+    free(hist); 
 }
