@@ -112,4 +112,7 @@ double Thresholding(unsigned int *histogram);
  *      void
  */
 void NegativePictureIfNormal(Image *image);
+
+void adaptativeThreshold2(Image *image);
+
 #endif // OCR_NOISE_REDUCTION_H
