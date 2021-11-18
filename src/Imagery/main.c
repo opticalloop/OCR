@@ -187,7 +187,6 @@ int main(int argc, char *argv[])
     img.path = input_path;
     img.surface = NULL;
     newImage(&img, 1);
-    printf("egregtrvegat'r\n");
 
     if (preprocessing)
     {
