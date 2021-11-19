@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 // #include "GUI/load_image.h"
 
 GtkWidget *image;
@@ -16,7 +17,7 @@ char *get_filename_ext(const char *filename)
         return "";
     return dot + 1;
 }
-void on_file_set(GtkFileChooserButton *file_chooser)
+void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 {
     // select filename and update image
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
@@ -26,6 +27,8 @@ void on_file_set(GtkFileChooserButton *file_chooser)
         || strcmp(ext, "jpeg") == 0)
     { // if image file is selected load image
         gtk_image_set_from_file(GTK_IMAGE(image), filename);
+        GtkButton *button = data;
+        gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE);
     }
     else
     {
@@ -36,6 +39,16 @@ void on_file_set(GtkFileChooserButton *file_chooser)
         gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
         gtk_widget_destroy(dialog); // destroy dialog
     }
+}
+
+void run_process(GtkButton *button, gpointer data)
+{
+    // run OCR process
+    GtkWidget *dialog = gtk_message_dialog_new(
+        GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_OTHER, GTK_BUTTONS_CLOSE, "Processing...");
+    gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+    gtk_widget_destroy(dialog); // destroy dialog
 }
 
 int main(int argc, char *argv[])
@@ -84,10 +97,12 @@ int main(int argc, char *argv[])
     // load widgets
     image = GTK_WIDGET(gtk_builder_get_object(builder, "sudoku_image"));
     file_chooser = GTK_WIDGET(gtk_builder_get_object(builder, "file_chooser"));
+    GtkButton *button_start = GTK_WIDGET(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE);
 
     // link signals to widgets
-    g_signal_connect(file_chooser, "file-set", G_CALLBACK(on_file_set),
-                     NULL); // choose file
+    g_signal_connect(file_chooser, "file-set", G_CALLBACK(on_file_set),  button_start); // choose file
+    g_signal_connect(button_start, "clicked", G_CALLBACK(run_process), NULL); // quit
     // load UI
     gtk_widget_show_all(window); // show window
     gtk_main(); // start main loop
