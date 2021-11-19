@@ -89,8 +89,7 @@ void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], ch
             {
                 expected_value = ch - 'A' + 10;
             }
-
-            expected[expected_value] = 1;
+            expected[expected_value] = 1.0;
         }
         else if (ch == '\n')
         {
@@ -125,6 +124,7 @@ void generateDataFile(void)
     {
         errx(1, "Error : Failed to open input directory\n");
     }
+    int count = 0;
     while ((in_file = readdir(directory)) != NULL)
     {
         if (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
@@ -158,6 +158,9 @@ void generateDataFile(void)
             fputs(strTemp, file);
         }
         fputs("\n", file);
+        count++;
+        if (count % 100 == 0)
+            printf("%d/%d\n", count, NBIMAGES);
     }
     closedir(directory);
     fclose(file);
