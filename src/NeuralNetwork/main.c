@@ -4,10 +4,16 @@
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Detection/reverse_color.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
+    if (argc < 3)
+    {
+        printf("Specify <epoch_times> <path>");
+        return 0;
+    }
     // generateDataFile();
-    train(100, 2, 32, 1, "", "w.data");
+    int epoch = atoi(argv[1]);
+    train(epoch, 2, 64, 1, "", argv[2]);
 
     // Network n;
     // n.sizeInput = NBINPUTS;
@@ -22,4 +28,5 @@ int main(void)
     // printf("Ouput : %d\n", res);
     // freeNetwork(network);
     // SDL_FreeSurface(surface);    
+    return 0;
 }

@@ -69,17 +69,27 @@ void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], ch
 {
     char ch;
     unsigned int input_index = 0;
+    for (int i = 0; i < NBOUTPUTS; i++)
+    {
+        expected[i] = 0.0;
+    }
     while ((ch = fgetc(file)) != EOF)
     {
         // Get expected value
         if (ch == '#')
         {
             ch = fgetc(file);
-            for (int i = 0; i < NBOUTPUTS; i++)
+            int expected_value;
+
+            if (ch >= '0' && ch <= '9')
             {
-                expected[i] = 0;
+                expected_value = ch - '0';
             }
-            int expected_value = ch - '0';
+            else
+            {
+                expected_value = ch - 'A' + 10;
+            }
+
             expected[expected_value] = 1;
         }
         else if (ch == '\n')
@@ -132,11 +142,11 @@ void generateDataFile(void)
         SDL_FreeSurface(surface);
 
         // Get expected value
-        int num = in_file->d_name[strlen(in_file->d_name) - 5] - '0';
-
+        char ch = in_file->d_name[strlen(in_file->d_name) - 5];
+        
         // Write expected value
         char strTemp[50];
-        sprintf(strTemp, "%d", num);
+        sprintf(strTemp, "%c", ch);
         fputs("#", file);
         fputs(strTemp, file);
 
@@ -195,7 +205,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
     // Init 0 expectation
     int zero_intput[NBINPUTS] = {0};
-    double zero_expected[NBOUTPUTS] = {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double zero_expected[NBOUTPUTS] = {0.0};
+    zero_expected[0] = 1.0;
 
     // Open file where data is
     FILE *file;
@@ -226,7 +237,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             }
 
             // Train for the blank image
-            if (train_count % 9 == 0)
+            if (train_count % NBOUTPUTS == 0)
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
