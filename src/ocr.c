@@ -76,12 +76,25 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     Image cropped;
     cropped.surface = cropped_image;
     newImage(&cropped, 0);
+
     unsigned int grid[dim][dim];
     unsigned int copy[dim][dim];
+    
+     // Recognisation + Construction
+    printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
+    printVerbose(verbose, "    📊 3.1 Creating neural network\n");
+
+    Network network;
+    network.sizeInput = NBINPUTS;
+    network.sizeOutput = NBOUTPUTS;
+
+    printVerbose(verbose, "    📑 3.2 Initing weights\n");
+    launchWeights(&network, WEIGHT_PATH, verbose);
+    
     for (unsigned int angle_index = 1; angle_index < 4; angle_index++)
     {
         saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
-        printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
+        printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
         // Reverse the image before segmenting
         reverse_color(&cropped);
@@ -94,24 +107,14 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
 
-        // Recognisation + Construction
-        printVerbose(verbose, "\n    ❓ 4 Initing digit recognition\n");
-        printVerbose(verbose, "    📊 4.1 Creating neural network\n");
-
-        Network network;
-        network.sizeInput = NBINPUTS;
-        network.sizeOutput = NBOUTPUTS;
-
-        printVerbose(verbose, "    📑 4.2 Initing weights\n");
-        launchWeights(&network, WEIGHT_PATH, verbose);
-
-        printVerbose(verbose, "    🔨 4.3 Creating sudoku grid\n");
+        printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         for (unsigned int i = 0; i < dim; i++)
         {
             for (unsigned int j = 0; j < dim; j++)
             {
                 grid[i][j] =
-                    getNetworkOutput(&network, all_cases[i * dim + j], verbose);
+                    getNetworkOutput(&network, all_cases[i * dim + j], 0);
+                printf("grid[i][j] = %u\n", grid[i][j]);
        
                 SDL_FreeSurface(all_cases[i * dim + j]);
             }
@@ -121,16 +124,22 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         if (!isSolvable(grid))
         {
             rotate(&cropped, four_angles[angle_index]);
-            if (angle_index == 3)
+            if (angle_index == 4)
             {
-              printf("No solution");
-              return;
+                printf("No solution\n");
+                freeImage(&cropped, 0);   
+                freeNetwork(&network);
+                return;
+            }
+            if (verbose)
+            {
+                
+                printf("    ❌ 3.5 Grid is not solvable\n");
+                printf("\n\n    ❓ Re-attemping with %f degree angle\n", four_angles[angle_index]);
             }
             continue;
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
         }
-
-        printVerbose(verbose, "\n    🎲 5 Solving sudoku grid\n");
         
         // Copy array to have different color when saving the image
         copyArray(grid, copy);
@@ -139,8 +148,10 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         freeNetwork(&network);
         break;
     }
-    printVerbose(verbose, "    ✅ 5.1 Grid is solvable\n");
-    printVerbose(verbose, "    🔍 5.2 Solving grid\n");
+    
+    printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
+    printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
+    printVerbose(verbose, "    🔍 4.2 Solving grid\n");
 
     solveSuduko(grid, 0, 0);
 
@@ -148,7 +159,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     {
         errx(EXIT_FAILURE, "    ⛔ Error while solving grid");
     }
-    printVerbose(verbose, "    ✅ 5.3 Grid is solved\n");
+    printVerbose(verbose, "    ✅ 4.3 Grid is solved\n");
 
     // SaveResult
     saveGrid(grid, "grid.result", verbose);

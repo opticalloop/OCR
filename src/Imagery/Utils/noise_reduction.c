@@ -226,21 +226,21 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     // histogram_spreading(image);
     // saveVerbose(verbose, image, pathToSave, "1.5_Histogram_spreading", save, 0);
     
-    double sum = 0.0;
-    for (unsigned int i = 0; i < w; i++)
-    {
-        for (unsigned int j = 0; j < h; j++)
-        {
-            if (image->pixels[i][j].r < 200)
-                sum++;
-        }
-    }
-    sum /= (w * h);
-    printf("%f\n", sum);
+    // double sum = 0.0;
+    // for (unsigned int i = 0; i < w; i++)
+    // {
+    //     for (unsigned int j = 0; j < h; j++)
+    //     {
+    //         if (image->pixels[i][j].r < 200)
+    //             sum++;
+    //     }
+    // }
+    // sum /= (w * h);
+    // printf("%f\n", sum);
 
-    printVerbose(verbose, "    💻 1.7 Applying Adaptative Threshold Filter\n");
+    printVerbose(verbose, "    💻 1.5 Applying Adaptative Threshold Filter\n");
     adaptativeThreshold2(image, 0.15);
-    saveVerbose(verbose, image, pathToSave, "1.6_Adaptative_threshold", save, 0);
+    saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_threshold", save, 0);
     
     // printVerbose(verbose, "    💻 1.6 Applying Dilate Filter\n");
     // dilate(image);
@@ -254,9 +254,9 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     // OtsuFilter(image->pixels, w, h, histogram, verbose);
     // saveVerbose(verbose, image, pathToSave, "1.4_Otsu_filter", save, 0);
 
-    printVerbose(verbose, "    ❓ 1.8 Inverting image\n");
+    printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
     NegativePictureIfNormal(image);
-    saveVerbose(verbose, image, pathToSave, "1.7_Inverted_filter", save, 0);
+    saveVerbose(verbose, image, pathToSave, "1.5_Inverted_filter", save, 0);
 
     free(histogram);
     free(binomialFilter);
