@@ -131,7 +131,7 @@ void initNetwork(Network *network)
     }
 }
 
-void frontPropagation(Network *network, double input[])
+void frontPropagation(Network *network, int input[])
 {
     // First layer
     Layer *layer = &(network->layers[0]);

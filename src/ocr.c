@@ -1,6 +1,7 @@
 #include "ocr.h"
 
 #define WEIGHT_PATH "src/NeuralNetwork/Weights/w.data"
+#define IMAGE_PATH "src/Sudoku_Solver/Sudoku_Saver/Images"
 
 #define NB_HIDDEN 2
 #define SIZE_HIDDEN 32
@@ -41,6 +42,11 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     newImage(&image, 1);
 
+    saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
+
+    if (!strcmp("image_06.jpeg", image_path))
+        correctDistortion(&image);
+
     // Preprocessing
     grayscale(&image);
     Preprocessing(&image, output_folder, verbose, save);
@@ -52,13 +58,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
 
     SobelEdgeDetection(&image);
 
-    Image drawImage;
-    drawImage.path = image_path;
-    drawImage.surface =
-        SDL_CreateRGBSurface(0, image.width, image.height, 24, 0, 0, 0, 0);
-    SDL_BlitSurface(image.surface, NULL, drawImage.surface, NULL);
-
-    newImage(&drawImage, 0);
+    Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
@@ -72,10 +72,9 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     // Free image
     freeImage(&image, 1);
 
+    // Create cropped image
     Image cropped;
-    cropped.path = image_path;
     cropped.surface = cropped_image;
-
     newImage(&cropped, 0);
     unsigned int grid[dim][dim];
     unsigned int copy[dim][dim];
@@ -113,6 +112,8 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
             {
                 grid[i][j] =
                     getNetworkOutput(&network, all_cases[i * dim + j], verbose);
+       
+                SDL_FreeSurface(all_cases[i * dim + j]);
             }
         }
 
@@ -120,6 +121,11 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         if (!isSolvable(grid))
         {
             rotate(&cropped, four_angles[angle_index]);
+            if (angle_index == 3)
+            {
+              printf("No solution");
+              return;
+            }
             continue;
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
         }
@@ -145,9 +151,9 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     printVerbose(verbose, "    ✅ 5.3 Grid is solved\n");
 
     // SaveResult
-    saveGrid(grid, output_path, verbose);
+    saveGrid(grid, "grid.result", verbose);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy);
+    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
 }

@@ -22,7 +22,7 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose);
 void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose);
 
 Image createSudokuImage(unsigned int grid[dim][dim],
-                        unsigned int copy[dim][dim]);
+                        unsigned int copy[dim][dim], char *folder_path);
 
 SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green);
 
