@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     if (argc < 3)
     {
-        printf("Specify <epoch_times> <path>");
+        printf("Specify <epoch_times> <path>\n");
         return 0;
     }
     // generateDataFile();
