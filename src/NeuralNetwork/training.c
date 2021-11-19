@@ -258,7 +258,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
         
         if (verbose)
         {
-            printf("    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+            printf("    ❗ (%u/%u) Error rate = %f\n", i, epoch, errorRate / NBIMAGES);
         }
     }
 

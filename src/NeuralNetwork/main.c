@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     }
     // generateDataFile();
     int epoch = atoi(argv[1]);
-    train(epoch, 3, 128, 1, "", argv[2]);
+    train(epoch, 2, 64, 1, "", argv[2]);
 
     // Network n;
     // n.sizeInput = NBINPUTS;
