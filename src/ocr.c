@@ -63,8 +63,11 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
+    // Four possible angle
+    double four_angles[4] = {0};
+
     SDL_Surface *cropped_image =
-        detection(&image, &drawImage, verbose, save, output_folder);
+        detection(&image, &drawImage, verbose, save, output_folder, four_angles);
 
     // Free image
     freeImage(&image, 1);
@@ -74,56 +77,61 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     cropped.surface = cropped_image;
 
     newImage(&cropped, 0);
-
-    saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
-    printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
-
-    // Reverse the image before segmenting
-    reverse_color(&cropped);
-    updateSurface(&cropped);
-
-    // Segmentation
-    // Initialize all case at NULL
-    SDL_Surface *all_cases[81];
-    if (verbose && save)
-        printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-    split9(&cropped, all_cases, save, output_folder);
-
-    freeImage(&cropped, 0);
-
-    // Recognisation + Construction
-    printVerbose(verbose, "\n    ❓ 4 Initing digit recognition\n");
-    printVerbose(verbose, "    📊 4.1 Creating neural network\n");
-
-    Network network;
-    network.sizeInput = NBINPUTS;
-    network.sizeOutput = NBOUTPUTS;
-
-    printVerbose(verbose, "    📑 4.2 Initing weights\n");
-    launchWeights(&network, WEIGHT_PATH, verbose);
-
-    printVerbose(verbose, "    🔨 4.3 Creating sudoku grid\n");
     unsigned int grid[dim][dim];
-    for (unsigned int i = 0; i < dim; i++)
-    {
-        for (unsigned int j = 0; j < dim; j++)
-        {
-            grid[i][j] =
-                getNetworkOutput(&network, all_cases[i * dim + j], verbose);
-        }
-    }
-    freeNetwork(&network);
-
-    printVerbose(verbose, "\n    🎲 5 Solving sudoku grid\n");
-
-    // Copy array to have different color when saving the image
     unsigned int copy[dim][dim];
-    copyArray(grid, copy);
-
-    // Solver
-    if (!isSolvable(grid))
+    for (unsigned int angle_index = 1; angle_index < 4; angle_index++)
     {
-        errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
+        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
+        printVerbose(verbose, "\n    🪓 3 Segmenting cropped image\n");
+
+        // Reverse the image before segmenting
+        reverse_color(&cropped);
+        updateSurface(&cropped);
+
+        // Segmentation
+        // Initialize all case at NULL
+        SDL_Surface *all_cases[81];
+        if (verbose && save)
+            printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
+        split9(&cropped, all_cases, save, output_folder);
+
+        // Recognisation + Construction
+        printVerbose(verbose, "\n    ❓ 4 Initing digit recognition\n");
+        printVerbose(verbose, "    📊 4.1 Creating neural network\n");
+
+        Network network;
+        network.sizeInput = NBINPUTS;
+        network.sizeOutput = NBOUTPUTS;
+
+        printVerbose(verbose, "    📑 4.2 Initing weights\n");
+        launchWeights(&network, WEIGHT_PATH, verbose);
+
+        printVerbose(verbose, "    🔨 4.3 Creating sudoku grid\n");
+        for (unsigned int i = 0; i < dim; i++)
+        {
+            for (unsigned int j = 0; j < dim; j++)
+            {
+                grid[i][j] =
+                    getNetworkOutput(&network, all_cases[i * dim + j], verbose);
+            }
+        }
+
+        // Solver
+        if (!isSolvable(grid))
+        {
+            rotate(&cropped, four_angles[angle_index]);
+            continue;
+            // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
+        }
+
+        printVerbose(verbose, "\n    🎲 5 Solving sudoku grid\n");
+        
+        // Copy array to have different color when saving the image
+        copyArray(grid, copy);
+        
+        freeImage(&cropped, 0);   
+        freeNetwork(&network);
+        break;
     }
     printVerbose(verbose, "    ✅ 5.1 Grid is solvable\n");
     printVerbose(verbose, "    🔍 5.2 Solving grid\n");

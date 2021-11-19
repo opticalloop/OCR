@@ -3,7 +3,7 @@
 #define THRESHOLD 0.4
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder)
+                       char *output_folder, double four_angles[4])
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
@@ -66,12 +66,22 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if ((angleRounded >= 88 && angleRounded <= 92) || (angleRounded >= 0 && angleRounded <= 3))
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
+        four_angles[0] = 0;
+        four_angles[1] = 90;
+        four_angles[2] = 180;
+        four_angles[3] = 270;
     }
     else
     {
         printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
+        four_angles[0] = angleRounded;
+        four_angles[1] = angleRounded + 90;
+        four_angles[2] = angleRounded + 180;
+        four_angles[3] = angleRounded + 270;
         rotateAll(&tempImage, &resultingList, angleRounded);
     }
+    
+
     // Draw auto rotated image
     if (save)
     {
