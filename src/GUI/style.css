@@ -1,3 +1,28 @@
-button separator{
-    background-color: blue;
+/* button separator{
+    background-color: rgb(255, 136, 0);
+} */
+.left_panel button {
+    /* background-color: rgb(255, 136, 0); */
+    border: 2px solid rgb(255, 136, 0);
+    border-radius: 10px;
+}
+.left_panel {
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    padding: 30px;
+
+}
+.right_panel image {
+   background-color: rgb(38, 38, 47);
+   margin-left:  200px ;
+   margin-right:  200px ;
+}
+.right_panel {
+    background-color: rgb(16, 16, 42);
+    /* border-radius: 10px; */
+    padding: 30px;
+}
+.button_panel .button_element {
+    margin-top: 15px;
+    margin-bottom: 15px;
 }

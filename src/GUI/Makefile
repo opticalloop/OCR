@@ -27,6 +27,10 @@ UI: $(OBJ)
 $(BUILD)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
+# Format all files
+format:
+	find -name "*.[ch]" -exec clang-format --verbose -i {} \;
+
 clean:
 	rm -rf $(BUILD)
 	$(RM) $(EXEC)
