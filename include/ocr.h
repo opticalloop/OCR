@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/distortion_correction.h"
@@ -21,6 +22,18 @@
 #include "Sudoku_Solver/sudoku_solver.h"
 #include "verbose.h"
 
+typedef struct Thread_argument
+{
+    char *image_path;
+    char *output_path; 
+    int verbose;
+    int save;
+    char *output_folder;
+}Thread_argument;
+
+int OCR_thread(char *image_path, char *output_path, int verbose, int save,
+         char *output_folder);
+
 /*
  *  Summary:
  *
@@ -32,7 +45,6 @@
  *  Return:
  *
  */
-void OCR(char *image_path, char *output_path, int verbose, int save,
-         char *output_folder);
+void *OCR(void *Thread_args);
 
 #endif

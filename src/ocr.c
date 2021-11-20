@@ -25,9 +25,23 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-void OCR(char *image_path, char *output_path, int verbose, int save,
+int OCR_thread(char *image_path, char *output_path, int verbose, int save,
          char *output_folder)
 {
+    pthread_t thread;
+    Thread_argument arg = {image_path, output_path, verbose, save, output_folder};
+    pthread_create(&thread, NULL, OCR, (void *)&arg);
+    pthread_exit(NULL);
+}
+
+void *OCR(void *Thread_args)
+{
+    Thread_argument arg = *(Thread_argument *)Thread_args;
+    char *image_path = arg.image_path;
+    char *output_path = arg.output_path;
+    int verbose = arg.verbose;
+    int save = arg.save;
+    char *output_folder = arg.output_folder;
     if (save)
     {
         // Clean the output folder
@@ -64,7 +78,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-    double four_angles[4] = {0};
+    double four_angles[4] = {0.0};
 
     SDL_Surface *cropped_image =
         detection(&image, &drawImage, verbose, save, output_folder, four_angles);
@@ -106,6 +120,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
+        // saveVerbose(verbose, &cropped, output_folder, "3.0_Segmented_image", save, 0);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         for (unsigned int i = 0; i < dim; i++)
@@ -129,7 +144,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
                 printf("No solution\n");
                 freeImage(&cropped, 0);   
                 freeNetwork(&network);
-                return;
+                pthread_exit(NULL);
             }
             if (verbose)
             {
@@ -167,4 +182,5 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     // Create, save and free the image
     Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
+    pthread_exit(NULL);
 }

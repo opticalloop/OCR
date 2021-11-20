@@ -35,5 +35,6 @@ $(BUILD)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
 clean:
-	rm verbose.d verbose.o || rm -rf $(BUILD) Imagery
+	rm -rf $(BUILD) Imagery
 	${RM} solver *.bmp *.result
+	rm -f verbose.d verbose.o

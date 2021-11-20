@@ -2,8 +2,13 @@ CC = gcc -Iinclude/
 
 CPPFLAGS = `pkg-config --cflags sdl gtk+-3.0` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
+<<<<<<< HEAD
 LDLFLAGS = -lm
 LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
+=======
+LDLFLAGS = -lm -lpthread
+LDLIBS = `pkg-config --libs sdl SDL_image` 
+>>>>>>> d7dea0189251e3efa1e1e3ec56c7cd4b0f97e8e3
 
 BUILD := build
 SOURCE_DIR := src

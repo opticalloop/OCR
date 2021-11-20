@@ -181,7 +181,7 @@ static void analyzeOCR(int argc, char **argv)
             output_folder = argv[i];
         }
     }
-    OCR(input_path, output_path, verbose, save, output_folder);
+    OCR_thread(input_path, output_path, verbose, save, output_folder);
     printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 
