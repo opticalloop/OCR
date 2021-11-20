@@ -3,7 +3,7 @@ CC = gcc -I../../include/
 CPPFLAGS = `pkg-config --cflags gtk+-3.0` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
 LDLFLAGS = -lm
-LDLIBS = `pkg-config --libs gtk+-3.0`
+LDLIBS = `pkg-config --libs gtk+-3.0` -rdynamic
 
 BUILD := build
 EXEC := main
