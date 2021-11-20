@@ -1,13 +1,14 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 
-// #include "GUI/load_image.h"
-
-GtkWidget *image;
-GtkFileChooserButton *file_chooser;
+GtkBuilder *builder;
 gchar *filename;
 GtkWidget *window = NULL;
+GtkStack *stack;
+GtkStack *stack_2;
 
 char *get_filename_ext(const char *filename)
 {
@@ -22,16 +23,24 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     // select filename and update image
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
     char *ext = get_filename_ext(filename);
-
+    GtkButton *button = data;
     if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
         || strcmp(ext, "jpeg") == 0)
     { // if image file is selected load image
+
+        gtk_stack_set_visible_child_name(stack_2, "page2");
+
+        GtkImage *image = GTK_IMAGE(gtk_builder_get_object(builder, "sudoku"));
         gtk_image_set_from_file(GTK_IMAGE(image), filename);
-        GtkButton *button = data;
+        
         gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE);
     }
     else
     {
+        gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE); // if not image file disable button
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser), NULL); // reset filename
+
+
         // display error message
         GtkWidget *dialog = gtk_message_dialog_new(
             GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -39,6 +48,17 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
         gtk_widget_destroy(dialog); // destroy dialog
     }
+}
+
+void show_page(GtkWidget *widget, gpointer data)
+{
+    GtkWidget * page = data;
+    gtk_stack_set_visible_child(stack, page);
+}
+void change_panel(GtkWidget *widget, gpointer data)
+{
+    GtkWidget * page = data;
+    gtk_stack_set_visible_child(stack_2, page);
 }
 
 void run_process(GtkButton *button, gpointer data)
@@ -51,9 +71,14 @@ void run_process(GtkButton *button, gpointer data)
     gtk_widget_destroy(dialog); // destroy dialog
 }
 
+void open_website()
+{
+   system("firefox www.google.com");
+}
+
 int main(int argc, char *argv[])
 {
-    GtkBuilder *builder = NULL;
+    builder = NULL;
     GError *error = NULL;
     gchar *filename = NULL;
 
@@ -73,8 +98,8 @@ int main(int argc, char *argv[])
     window =
         GTK_WIDGET(gtk_builder_get_object(builder, "window")); // get window
 
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit),
-                     NULL); // destroy window when clicked
+    gtk_builder_connect_signals(builder, NULL); // connect signals
+
 
     // Set title
     gtk_window_set_title(GTK_WINDOW(window), "opticalloop");
@@ -95,14 +120,13 @@ int main(int argc, char *argv[])
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // load widgets
-    image = GTK_WIDGET(gtk_builder_get_object(builder, "sudoku_image"));
-    file_chooser = GTK_WIDGET(gtk_builder_get_object(builder, "file_chooser"));
     GtkButton *button_start = GTK_WIDGET(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE); // disable button
 
-    // link signals to widgets
-    g_signal_connect(file_chooser, "file-set", G_CALLBACK(on_file_set),  button_start); // choose file
-    g_signal_connect(button_start, "clicked", G_CALLBACK(run_process), NULL); // quit
+    stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
+    stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+
+
     // load UI
     gtk_widget_show_all(window); // show window
     gtk_main(); // start main loop
