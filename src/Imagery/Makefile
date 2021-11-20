@@ -32,5 +32,6 @@ $(BUILD)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
 clean:
-	rm verbose.d verbose.o || rm -rf $(BUILD)
+	rm -rf $(BUILD)
 	$(RM) $(EXEC)
+	rm verbose.d verbose.o
