@@ -22,6 +22,18 @@
 #include "Sudoku_Solver/sudoku_solver.h"
 #include "verbose.h"
 
+typedef struct Thread_argument
+{
+    char *image_path;
+    char *output_path; 
+    int verbose;
+    int save;
+    char *output_folder;
+}Thread_argument;
+
+int OCR_thread(char *image_path, char *output_path, int verbose, int save,
+         char *output_folder);
+
 /*
  *  Summary:
  *
@@ -33,7 +45,6 @@
  *  Return:
  *
  */
-void OCR(char *image_path, char *output_path, int verbose, int save,
-         char *output_folder);
+void *OCR(void *Thread_args);
 
 #endif
