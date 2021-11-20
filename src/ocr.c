@@ -25,13 +25,18 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-int OCR_thread(char *image_path, char *output_path, int verbose, int save,
-         char *output_folder)
+pthread_t * OCR_thread(char *image_path, char *output_path, int verbose, int save,
+         char *output_folder,int gui)
 {
     pthread_t thread;
-    Thread_argument arg = {image_path, output_path, verbose, save, output_folder};
+    Thread_argument arg = {image_path, output_path, verbose, save, output_folder,gui};
     pthread_create(&thread, NULL, OCR, (void *)&arg);
-    pthread_exit(NULL);
+
+    return  &thread;
+
+    // pthread_join(thread, NULL);
+
+    // pthread_exit(NULL);
 }
 
 void *OCR(void *Thread_args)
@@ -42,7 +47,8 @@ void *OCR(void *Thread_args)
     int verbose = arg.verbose;
     int save = arg.save;
     char *output_folder = arg.output_folder;
-    if (save)
+    int gui = arg.gui;
+    if (save || gui)
     {
         // Clean the output folder
         checkFolderOutput(output_folder);
@@ -63,7 +69,10 @@ void *OCR(void *Thread_args)
 
     // Preprocessing
     grayscale(&image);
-    Preprocessing(&image, output_folder, verbose, save);
+    saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
+    changeImageGUI(output_folder, "1.1_Contrast_filter.bmp", gui);
+
+    Preprocessing(&image, output_folder, verbose, save, gui);
 
     // DETECTION
 

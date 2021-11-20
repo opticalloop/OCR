@@ -25,7 +25,7 @@ enum Filter
  * Return:
  *      void
  */
-void Preprocessing(Image *image, char pathToSave[], int verbose, int save);
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save, int gui);
 
 void applyFilter(Pixel **mask, Image *image, unsigned int(*f)(Pixel *pixel), enum Filter filter,
                 unsigned int width, unsigned int height);

@@ -279,7 +279,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="hexpand">True</property>
-                <property name="transition_type">crossfade</property>
+                <property name="transition_type">slide-up</property>
                 <child>
                   <object class="GtkBox" id="page1">
                     <property name="visible">True</property>
@@ -359,11 +359,17 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="baseline_position">top</property>
                     <child>
-                      <object class="GtkImage" id="sudoku">
+                      <object class="GtkImage" id="selected_image">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
                         <property name="stock">gtk-missing-image</property>
+                        <style>
+                          <class name="sudoku_test"/>
+                        </style>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -372,7 +378,16 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkLabel" id="picture_path">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">label</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -380,6 +395,9 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                     <property name="title" translatable="yes">page0</property>
                     <property name="position">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <style>
                   <class name="right_panel"/>

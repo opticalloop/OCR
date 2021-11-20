@@ -122,7 +122,11 @@ static void analyzeOCR(int argc, char **argv)
         // GUI
         if (!strcmp(argv[i], "gui"))
         {
-            // TODO : Launch GUI
+            // pthread_t thread;
+            // pthread_create(&thread, NULL, init_gui, NULL);
+            // pthread_join(thread, NULL);
+
+            init_gui();
             return;
         }
         else if (!strcmp(argv[i], "--help"))
@@ -181,7 +185,7 @@ static void analyzeOCR(int argc, char **argv)
             output_folder = argv[i];
         }
     }
-    OCR_thread(input_path, output_path, verbose, save, output_folder);
+    OCR_thread(input_path, output_path, verbose, save, output_folder,0);
     printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 

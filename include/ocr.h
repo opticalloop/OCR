@@ -29,10 +29,11 @@ typedef struct Thread_argument
     int verbose;
     int save;
     char *output_folder;
+    int gui;
 }Thread_argument;
 
-int OCR_thread(char *image_path, char *output_path, int verbose, int save,
-         char *output_folder);
+pthread_t * OCR_thread(char *image_path, char *output_path, int verbose, int save,
+         char *output_folder,int gui);
 
 /*
  *  Summary:

@@ -4,7 +4,7 @@
 
 #define NOISE_THRESHOLD 0.5
 
-void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save, int gui)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
@@ -17,6 +17,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     invert(image);
     image_normalize_brightness(image);
     saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
+    changeImageGUI(pathToSave, "1.1_Contrast_filter.bmp", gui);
+    
     
     // MEDIAN
     printVerbose(verbose, "    🎥 1.2 Applying Median Filter\n");
@@ -26,11 +28,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     ApplyMaskToImage(image, mask, w, h);
     updateNeigbourgs(image);
     saveVerbose(verbose, image, pathToSave, "1.2_Median_filter", save, 0);
+    changeImageGUI(pathToSave, "1.2_Median_filter.bmp", gui);
 
     // AVERAGE
     printVerbose(verbose, "    🎬 1.3 Applying Average Filter\n");
     applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
+    changeImageGUI(pathToSave, "1.3_Average_filter.bmp", gui);
    
     // ADAPTATIVE THRESHOLD
     printVerbose(verbose, "    💻 1.4 Applying Adaptative Threshold Filter\n");
@@ -39,16 +43,19 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
         	printf("    👍 1.4.1 Noise level : %f\n", noise);
     adaptativeThreshold(image, noise > 200 ? 0.5 : 0.15);
     saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_threshold", save, 0);
+    changeImageGUI(pathToSave, "1.4_Adaptative_threshold.bmp", gui);
     
     // DILATE
     printVerbose(verbose, "    🧱 1.5 Smoothing image\n");
     dilate(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Smooth_filter", save, 0);
+    changeImageGUI(pathToSave, "1.5_Smooth_filter.bmp", gui);
 
     // INTERTING
     printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
     NegativePictureIfNormal(image);
     saveVerbose(verbose, image, pathToSave, "1.6_Inverted_filter", save, 0);
+    changeImageGUI(pathToSave, "1.6_Inverted_filter.bmp", gui);
 
     freeMatrixArray(mask, w, h);
 }

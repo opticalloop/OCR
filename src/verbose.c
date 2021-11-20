@@ -21,6 +21,17 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
     }
 }
 
+void changeImageGUI(char *output_folder,char *output_path,int gui)
+{
+    if (gui)
+    {
+        char output[200];
+        snprintf(output, sizeof(output), "%s/%s", output_folder,
+                 output_path);
+        change_image(output);
+    }
+}
+
 void printVerbose(int verbose, char *message)
 {
     if (verbose)
