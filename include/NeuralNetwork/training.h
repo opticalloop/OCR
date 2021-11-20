@@ -13,9 +13,9 @@
 #include "NeuralNetwork/neural_network.h"
 #include "NeuralNetwork/save_load.h"
 
-#define NBIMAGES 1000 // 36711
+#define NBIMAGES 61054
 #define NBINPUTS 28 * 28
-#define NBOUTPUTS 9
+#define NBOUTPUTS 16
 
 /*
  *  Summary:
@@ -55,7 +55,7 @@ void checkInputs(double inputs[NBINPUTS]);
  *      Fill the array inputs so void
  */
 
-void imageToBinary(SDL_Surface *surface, double inputs[]);
+void imageToBinary(SDL_Surface *surface, int inputs[]);
 
 /*
  * Summary:
@@ -69,7 +69,9 @@ void imageToBinary(SDL_Surface *surface, double inputs[]);
  * Return :
  *      Fill the arrays so void
  */
-void createData(char *path, double inputs[], double expected[]);
+void createData(FILE *file, int inputs[], double expected[], char *lastChr);
+
+void generateDataFile(void);
 
 /*
  *  Summary:
@@ -85,7 +87,7 @@ void createData(char *path, double inputs[], double expected[]);
 
 void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
            const unsigned int nbNodesPerHidden, const int verbose,
-           char *launch_path, char *save_path, char *directory);
+           char *launch_path, char *save_path);
 
 /*
  *  Summary:

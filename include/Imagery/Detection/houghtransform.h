@@ -5,11 +5,12 @@
 #include "Imagery/Detection/sobel.h"
 #include "Imagery/Detection/square_detection.h"
 #include "Imagery/Detection/struct.h"
+#include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder);
+                       char *output_folder, double four_angles[4]);
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                         char *output_folder);
@@ -20,10 +21,14 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
               unsigned int max, int verbose, char *output_folder);
 
 void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
-
                int thickness, int draw);
-void matriceToBmp(unsigned int **matrice, unsigned int swidth,
-                  unsigned int height);
+
+unsigned int findTheta(LineList *lineList);
+
+void rotateAll(Image *image, LineList *lineList, double angleDegree);
+
 double degrees_ToRadians(double theta);
+
+double radian_To_Degree(double radian);
 
 #endif
