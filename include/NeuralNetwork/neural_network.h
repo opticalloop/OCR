@@ -138,7 +138,7 @@ void initNetwork(Network *network);
  *      Directly affect the network in parameter, so void
  */
 
-void frontPropagation(Network *network, double input[]);
+void frontPropagation(Network *network, int input[]);
 
 /*
  *  Summary:

@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     saveGrid(grid, output_path, verbose);
 
     // Create, save and free the image
-    Image image = createSudokuImage(grid, copy);
+    Image image = createSudokuImage(grid, copy, "");
 
     char str[1000];
     snprintf(str, sizeof(str), "%s_result.bmp", argv[1]);
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-    freeImage(&image);
+    freeImage(&image, 0);
 
     return 0;
 }

@@ -104,6 +104,11 @@ void saveWeights(Network *network, char *path)
 
 void launchWeights(Network *network, char *path, int verbose)
 {
+    if (access(path, F_OK) != 0)
+    {
+        errx(EXIT_FAILURE, "Weights file doesn't exist");
+    }
+
     if (verbose)
     {
         printf("--> 💾 Initing weights from %s\n", path);
@@ -186,8 +191,8 @@ void launchWeights(Network *network, char *path, int verbose)
         }
         else if (chr == '|')
         {
-            printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-                   neuronIndex, weightIndex, atof(tempStr));
+            //     printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+            //            neuronIndex, weightIndex, atof(tempStr));
 
             // Save weights
             network->layers[layerIndex]

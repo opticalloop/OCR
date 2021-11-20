@@ -12,22 +12,23 @@ Square getSquare(LineList *lineList, Line *line, int index);
 
 Dot getIntersection(Line *line1, Line *line2, int width, int height);
 
-SquareList findSquare(LineList *lineList, int width, int height, Image *image);
+SquareList findSquare(LineList *lineList, int width, int height, Image *image,
+                      int draw);
 
 SquareList getAllSquare(LineList *lineList, int width, int height,
                         Image *image);
 
-int isSquare(Square *square);
-
-int getSquarePerimeter(Square *square);
+int isSquare(Square *square, unsigned int width, unsigned int height);
 
 double getLineLength(Line *line);
 
-int getFactor(Square *square);
+Square sortSquares(SquareList *squareList, Image *image);
 
-Square sortSquares(SquareList *squareList);
+int canBeSudokuGrid(Square *square, Image *image);
 
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness);
+
+Dot getBetterCorner(Square *square);
 
 #endif

@@ -63,7 +63,7 @@ void savesquare(Image *image, unsigned int iall, char *imagename)
     int dozen = iall / 9;
     int unit = iall % 9;
 
-    snprintf(str, sizeof(str), "%s/%d%d.bmp", imagename, dozen, unit);
+    snprintf(str, sizeof(str), "%s/3_%d%d.bmp", imagename, dozen, unit);
     saveImage(image, str);
 }
 
@@ -151,7 +151,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
 
             printf("widthnew: %d, heightnew: %d\n", imagebis.surface->w,
                    imagebis.surface->h);
-            newImage(&imagebis);
+            newImage(&imagebis, 0);
 
             resize(&imagebis, 28, 28);
             updateSurface(&imagebis);
@@ -163,7 +163,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                 savesquare(&imagebis, iall, imagename);
             }
 
-            freeImage(&imagebis);
+            freeImage(&imagebis, 0);
         }
         i++;
         y += ylen;

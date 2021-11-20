@@ -1,26 +1,12 @@
 #include "Imagery/Segmentation/split9.h"
 
-void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
+void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
 {
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
     const unsigned int xincrem = width / 9;
     const unsigned int yincrem = height / 9;
-
-    char directory[200];
-    snprintf(directory, sizeof(directory), "mkdir %s", imagename);
-    if (!system(directory))
-    {
-        char delete[200];
-        snprintf(delete, sizeof(delete), "rm -rf %s", imagename);
-        if (system(delete))
-        {
-        }
-        if (system(directory))
-        {
-        }
-    }
 
     SDL_Rect block;
     unsigned int iall = 0;
@@ -39,43 +25,33 @@ void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                 SDL_Surface *surface =
                     SDL_CreateRGBSurface(0, block.w, block.h, 24, 0, 0, 0, 0);
 
-                // printf("xstart: %d, ystart: %d, width: %d, height: %d\n",
-                //       block.x, block.y, block.w, block.h);
-
                 SDL_BlitSurface(image->surface, &block, surface, NULL);
-
-                // display_image(surface);
 
                 Image imagebis;
                 imagebis.surface = surface;
+                imagebis.path = "";
                 imagebis.width = block.w;
                 imagebis.height = block.h;
 
-                newImage(&imagebis);
+                newImage(&imagebis, 0);
 
                 // imagebis free in resize
                 Image imageresized = resize(&imagebis, 28, 28);
 
                 clearsquare(&imageresized);
-                // printf("iall: %d\n",iall);
+
                 seg81[iall] = imageresized.surface;
 
                 if (save)
                 {
-                    // printf("x: %d, y:%d, iall:%d\n",x,y,iall);
                     savesquare(&imageresized, iall, imagename);
                 }
 
-                // freeImage(&imagebis);
-                for (unsigned int xbis = 0; xbis < 28; xbis++)
+                // Don't free the surface
+                for (unsigned int x = 0; x < 28; x++)
                 {
-                    for (unsigned int ybis = 0; ybis < 28; ybis++)
-                    {
-                        free(imageresized.pixels[xbis][ybis].matrix);
-                    }
-                    free(imageresized.pixels[xbis]);
+                    free(imageresized.pixels[x]);
                 }
-
                 free(imageresized.pixels);
             }
             else

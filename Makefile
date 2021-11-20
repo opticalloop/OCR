@@ -24,14 +24,8 @@ init:
 main: $(OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
-nn:
-	make -C NeuralNetwork nn
-
 sudoku:
 	make -C Sudoku_Solver
-
-xor:
-	make -C NeuralNetwork xor
 
 utils:
 	make -C Imagery
@@ -49,6 +43,14 @@ $(BUILD)/%.o : %.c
 format:
 	find -name "*.[ch]" -exec clang-format --verbose -i {} \;
 
+test:
+	./main ocr src/Imagery/image_01.jpeg -v -S output_1 \
+	|| ./main ocr src/Imagery/image_02.jpeg -v -S output_2 \
+	|| ./main ocr src/Imagery/image_03.jpeg -v -S output_3 \
+	|| ./main ocr src/Imagery/image_04.jpeg -v -S output_4 \
+	|| ./main ocr src/Imagery/image_05.jpeg -v -S output_5 \
+	|| ./main ocr src/Imagery/image_06.jpeg -v -S output_6
+
 # Clean all trash files
 clean:
 	make -C $(SOURCE_DIR)/Imagery clean
@@ -57,3 +59,4 @@ clean:
 	make -C Tests clean
 	rm -rf $(BUILD)
 	${RM} ${OBJ} ${DEP} main
+	clear

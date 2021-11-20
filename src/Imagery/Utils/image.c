@@ -49,7 +49,7 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
     }
 }
 
-void newImage(Image *image)
+void newImage(Image *image, int matrix)
 {
     SDL_Surface *surface;
     if (image->surface != NULL)
@@ -107,13 +107,16 @@ void newImage(Image *image)
             image->pixels[x][y].g = rgb.g;
             image->pixels[x][y].b = rgb.b;
 
-            image->pixels[x][y].matrix = NULL;
-            image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
-            if (image->pixels[x][y].matrix == NULL)
+            if (matrix)
             {
-                errx(EXIT_FAILURE,
-                     "Error while allocating pixels pointers for the image "
-                     "(matrix creation)");
+                image->pixels[x][y].matrix = NULL;
+                image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
+                if (image->pixels[x][y].matrix == NULL)
+                {
+                    errx(EXIT_FAILURE,
+                         "Error while allocating pixels pointers for the image "
+                         "(matrix creation)");
+                }
             }
 
             averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
@@ -123,63 +126,17 @@ void newImage(Image *image)
     image->averageColor = averageColor;
     image->surface = surface;
 
-    // fill the neighbours matrix
-    for (unsigned int i = 0; i < width; ++i)
+    if (matrix)
     {
-        for (unsigned int j = 0; j < height; ++j)
+        // fill the neighbours matrix
+        for (unsigned int i = 0; i < width; ++i)
         {
-            FillMatrix(image->pixels, i, j, width, height);
-        }
-    }
-}
-
-Pixel **copyPixelsArray(Image *image)
-{
-    const unsigned int w = image->width;
-    const unsigned int h = image->height;
-    Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
-    if (mask == NULL)
-    {
-        errx(EXIT_FAILURE,
-             "Error while allocating pixels pointers for the image "
-             "(copy Pixels Array) 1");
-    }
-    for (unsigned int i = 0; i < w; i++)
-    {
-        mask[i] = (Pixel *)malloc((h + 1) * sizeof(Pixel));
-
-        if (mask[i] == NULL)
-        {
-            errx(EXIT_FAILURE,
-                 "Error while allocating pixels pointers for the image "
-                 "(copy Pixels Array) 2");
-        }
-
-        for (unsigned int j = 0; j < h; j++)
-        { // MEDIAN FILTER
-            mask[i][j].r = image->pixels[i][j].r;
-            mask[i][j].g = image->pixels[i][j].g;
-            mask[i][j].b = image->pixels[i][j].b;
-            mask[i][j].matrix = NULL;
-            mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
-
-            if (mask[i][j].matrix == NULL)
+            for (unsigned int j = 0; j < height; ++j)
             {
-                errx(EXIT_FAILURE,
-                     "Error while allocating pixels pointers for the image "
-                     "(matrix)");
+                FillMatrix(image->pixels, i, j, width, height);
             }
         }
     }
-    // fill the neighbours matrix
-    for (unsigned int i = 0; i < w; ++i)
-    {
-        for (unsigned int j = 0; j < h; ++j)
-        {
-            FillMatrix(mask, i, j, w, h);
-        }
-    }
-    return mask;
 }
 
 void freeMatrixArray(Pixel **mask, int w, int h)
@@ -264,6 +221,86 @@ Pixel InstantiatePixelZero()
     return pixel;
 }
 
+Pixel **copyPixelsArray(Image *image)
+{
+    const unsigned int w = image->width;
+    const unsigned int h = image->height;
+    Pixel **mask = malloc((w + 1) * sizeof(Pixel *));
+    if (mask == NULL)
+    {
+        errx(EXIT_FAILURE,
+             "Error while allocating pixels pointers for the image "
+             "(copy Pixels Array) 1");
+    }
+    for (unsigned int i = 0; i < w; i++)
+    {
+        mask[i] = (Pixel *)malloc((h + 1) * sizeof(Pixel));
+
+        if (mask[i] == NULL)
+        {
+            errx(EXIT_FAILURE,
+                 "Error while allocating pixels pointers for the image "
+                 "(copy Pixels Array) 2");
+        }
+
+        for (unsigned int j = 0; j < h; j++)
+        { // MEDIAN FILTER
+            mask[i][j].r = image->pixels[i][j].r;
+            mask[i][j].g = image->pixels[i][j].g;
+            mask[i][j].b = image->pixels[i][j].b;
+            mask[i][j].matrix = NULL;
+            mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
+            if (mask[i][j].matrix == NULL)
+            {
+                errx(EXIT_FAILURE,
+                     "Error while allocating pixels pointers for the image "
+                     "(matrix)");
+            }
+        }
+    }
+    // fill the neighbours matrix
+    for (unsigned int i = 0; i < w; ++i)
+    {
+        for (unsigned int j = 0; j < h; ++j)
+        {
+            FillMatrix(mask, i, j, w, h);
+        }
+    }
+    return mask;
+}
+
+Image copyImage(Image *image, int matrix)
+{
+    Image res;
+    res.surface =
+        SDL_CreateRGBSurface(0, image->width, image->height, 32, 0, 0, 0, 0);
+    SDL_BlitSurface(image->surface, NULL, res.surface, NULL);
+    newImage(&res, matrix);
+    return res;
+}
+
+void freeImage(Image *image, int matrix)
+{
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
+
+    for (unsigned int x = 0; x < width; x++)
+    {
+        if (matrix)
+        {
+            for (unsigned int y = 0; y < height; y++)
+            {
+                free(image->pixels[x][y].matrix);
+            }
+        }
+        free(image->pixels[x]);
+    }
+
+    free(image->pixels);
+    SDL_FreeSurface(image->surface);
+}
+
 void updateNeigbourgs(Image *image)
 {
     unsigned int h = image->height;
@@ -275,22 +312,4 @@ void updateNeigbourgs(Image *image)
             FillMatrix(image->pixels, i, j, w, h);
         }
     }
-}
-
-void freeImage(Image *image)
-{
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
-
-    for (unsigned int x = 0; x < width; x++)
-    {
-        for (unsigned int y = 0; y < height; y++)
-        {
-            free(image->pixels[x][y].matrix);
-        }
-        free(image->pixels[x]);
-    }
-
-    free(image->pixels);
-    SDL_FreeSurface(image->surface);
 }

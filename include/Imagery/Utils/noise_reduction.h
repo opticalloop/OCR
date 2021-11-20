@@ -11,6 +11,7 @@
 
 #include "Imagery/Utils/array_sort.h"
 #include "Imagery/Utils/image.h"
+#include "verbose.h"
 
 /*
  * Summary:
@@ -22,7 +23,7 @@
  * Return:
  *      void
  */
-void Preprocessing(Image *image, char pathToSave[], int verbose);
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save);
 
 /*
  * Summary:
@@ -89,7 +90,7 @@ void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
  *
  */
 void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
-                unsigned int *histogram);
+                unsigned int *histogram, int verbose);
 
 /*
  * Summary:
@@ -111,4 +112,19 @@ double Thresholding(unsigned int *histogram);
  *      void
  */
 void NegativePictureIfNormal(Image *image);
+
+void adaptativeThreshold2(Image *image, const double t);
+
+void dilate(Image *image);
+
+void erode(Image *image);
+
+unsigned int cumulative_histogram_rec(unsigned int *hist,int i,double div);
+
+unsigned int *cumulative_histogram(Image *image);
+
+void histogram_equil(Image *image);
+
+void histogram_spreading(Image *image);
+
 #endif // OCR_NOISE_REDUCTION_H

@@ -9,6 +9,7 @@
 #include "NeuralNetwork/save_load.h"
 #include "NeuralNetwork/training.h"
 #include "ocr.h"
+#include "verbose.h"
 
 #define WEIGHT_PATH "src/NeuralNetwork/Weights/w.data"
 #define NB_HIDDEN 2
@@ -22,17 +23,6 @@ static void checkError(int condition, char *message)
     if (condition)
     {
         errx(EXIT_FAILURE, "%s", message);
-    }
-}
-
-/*
- * Check if verbose, if so print
- */
-static void printVerbose(int verbose, char *message)
-{
-    if (verbose)
-    {
-        printf("%s", message);
     }
 }
 
@@ -75,6 +65,7 @@ static void printHelpOCR()
         "      -o <output_path> : specify an output path\n"
         "      -r <angle> : manually rotate the image by the angle in degree\n"
         "      -v --verbose : print details of process\n"
+        "      -S <folder> : save all intermediate images in a folder\n"
         "      --help : print ocr help\n");
 }
 
@@ -119,6 +110,10 @@ static void analyzeOCR(int argc, char **argv)
     int verbose = 0;
     char *input_path = argv[2];
     char *output_path = "auto_save.bmp";
+
+    char *output_folder = "";
+    int save = 0;
+
     double rotateAngle = 0.0;
 
     // Parse all input
@@ -169,8 +164,24 @@ static void analyzeOCR(int argc, char **argv)
         {
             verbose = 1;
         }
+        // Output folderr and SAVE
+        else if (!strcmp(argv[i], "-S"))
+        {
+            i++;
+            checkError(i >= argc,
+                       "⛔ You need to specify an output folder after -S. See "
+                       "--help with for more");
+
+            if (!strcmp(argv[i], "--help"))
+            {
+                printHelpOCR();
+                return;
+            }
+            save = 1;
+            output_folder = argv[i];
+        }
     }
-    OCR(input_path, output_path, verbose);
+    OCR(input_path, output_path, verbose, save, output_folder);
     printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 
@@ -369,8 +380,7 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path,
-              "src/NeuralNetwork/Digits-Only/");
+        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
     }
     else if (xor)
     {
