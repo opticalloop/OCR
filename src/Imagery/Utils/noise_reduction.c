@@ -29,7 +29,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
 
     // AVERAGE
     printVerbose(verbose, "    🎬 1.3 Applying Average Filter\n");
-    applyFilter(mask, image, MedianFilter, Binomial, w, h);
+    applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
    
     // ADAPTATIVE THRESHOLD
