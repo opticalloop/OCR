@@ -14,7 +14,7 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
     {
         for (unsigned int x = 0; x < width && iall < 81; x += xincrem, iall++)
         {
-            if (y + yincrem < height && x + xincrem < width)
+            if (y + yincrem <= height && x + xincrem <= width)
             {
                 displayblock(image, x, y, xincrem, yincrem);
                 block.x = x;
@@ -39,7 +39,7 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
                 Image imageresized = resize(&imagebis, 28, 28);
 
                 clearsquare(&imageresized);
-
+                updateSurface(&imageresized);
                 seg81[iall] = imageresized.surface;
 
                 if (save)

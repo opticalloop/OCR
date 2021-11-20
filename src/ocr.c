@@ -64,7 +64,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-    double four_angles[4] = {0};
+    double four_angles[4] = {0.0};
 
     SDL_Surface *cropped_image =
         detection(&image, &drawImage, verbose, save, output_folder, four_angles);
@@ -106,6 +106,7 @@ void OCR(char *image_path, char *output_path, int verbose, int save,
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
+        // saveVerbose(verbose, &cropped, output_folder, "3.0_Segmented_image", save, 0);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         for (unsigned int i = 0; i < dim; i++)

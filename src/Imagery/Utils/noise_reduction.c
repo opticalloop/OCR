@@ -37,7 +37,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save)
     float noise = noiseLevel(image);
     if (verbose)
         	printf("    👍 1.4.1 Noise level : %f\n", noise);
-    adaptativeThreshold(image, noise > 200 ? 0.45 : 0.15);
+    adaptativeThreshold(image, noise > 200 ? 0.5 : 0.15);
     saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_threshold", save, 0);
     
     // DILATE

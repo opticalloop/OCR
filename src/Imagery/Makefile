@@ -34,4 +34,4 @@ $(BUILD)/%.o : %.c
 clean:
 	rm -rf $(BUILD)
 	$(RM) $(EXEC)
-	rm verbose.d verbose.o
+	rm -f verbose.d verbose.o

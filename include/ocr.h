@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/distortion_correction.h"
