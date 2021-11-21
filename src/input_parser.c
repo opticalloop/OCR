@@ -185,7 +185,8 @@ static void analyzeOCR(int argc, char **argv)
             output_folder = argv[i];
         }
     }
-    OCR_thread(input_path, output_path, verbose, save, output_folder,0);
+    pthread_t * thread = OCR_thread(input_path, output_path, verbose, save, output_folder,0);
+    pthread_join(*thread, NULL);
     printf("%s %s %f", input_path, output_path, rotateAngle);
 }
 

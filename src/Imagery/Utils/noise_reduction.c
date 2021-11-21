@@ -18,6 +18,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save, int g
     image_normalize_brightness(image);
     saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
     changeImageGUI(pathToSave, "1.1_Contrast_filter.bmp", gui);
+    edit_progress_bar(0.1, "Constrast Filter");
     
     
     // MEDIAN
@@ -29,12 +30,14 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save, int g
     updateNeigbourgs(image);
     saveVerbose(verbose, image, pathToSave, "1.2_Median_filter", save, 0);
     changeImageGUI(pathToSave, "1.2_Median_filter.bmp", gui);
+    edit_progress_bar(0.2, "Median Filter");
 
     // AVERAGE
     printVerbose(verbose, "    🎬 1.3 Applying Average Filter\n");
     applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     changeImageGUI(pathToSave, "1.3_Average_filter.bmp", gui);
+    edit_progress_bar(0.3, "Average Filter");
    
     // ADAPTATIVE THRESHOLD
     printVerbose(verbose, "    💻 1.4 Applying Adaptative Threshold Filter\n");
@@ -44,18 +47,21 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save, int g
     adaptativeThreshold(image, noise > 200 ? 0.5 : 0.15);
     saveVerbose(verbose, image, pathToSave, "1.4_Adaptative_threshold", save, 0);
     changeImageGUI(pathToSave, "1.4_Adaptative_threshold.bmp", gui);
+    edit_progress_bar(0.4, "Adaptative Threshold Filter");
     
     // DILATE
     printVerbose(verbose, "    🧱 1.5 Smoothing image\n");
     dilate(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Smooth_filter", save, 0);
     changeImageGUI(pathToSave, "1.5_Smooth_filter.bmp", gui);
+    edit_progress_bar(0.5, "Smooth Filter");
 
     // INTERTING
     printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
     NegativePictureIfNormal(image);
     saveVerbose(verbose, image, pathToSave, "1.6_Inverted_filter", save, 0);
     changeImageGUI(pathToSave, "1.6_Inverted_filter.bmp", gui);
+    edit_progress_bar(0.6, "Inverted Filter");
 
     freeMatrixArray(mask, w, h);
 }

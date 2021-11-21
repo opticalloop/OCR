@@ -5,7 +5,7 @@
   <!-- interface-css-provider-path style.css -->
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <signal name="destroy" handler="gtk_main_quit" swapped="no"/>
+    <signal name="destroy" handler="quit" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
@@ -235,6 +235,50 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Rotation</property>
+                            <attributes>
+                              <attribute name="font-desc" value="Sans Bold 10"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">Edit</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <style>
+                          <class name="button_element"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkButton" id="start">
                         <property name="label" translatable="yes">Start Process</property>
                         <property name="visible">True</property>
@@ -251,7 +295,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <style>
@@ -336,7 +380,8 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Welcome to the opticalloop group's application, opticalloop.
 This application is made to help you resolve the hardest sudoku ever created.
-For that, you only need to give one of your kidneys, nothing more simple, after that you load the picture of the sudoku you have taken in photo, and TADA a sudoku completely solved.</property>
+For that, you only need to give one of your kidneys, nothing more simple,
+after that you load the picture of the sudoku you have taken in photo, and TADA a sudoku completely solved.</property>
                         <property name="wrap">True</property>
                         <attributes>
                           <attribute name="font-desc" value="Sans Bold 10"/>
@@ -368,7 +413,7 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                         <property name="valign">center</property>
                         <property name="stock">gtk-missing-image</property>
                         <style>
-                          <class name="sudoku_test"/>
+                          <class name="sudoku_image"/>
                         </style>
                       </object>
                       <packing>
@@ -378,10 +423,34 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="picture_path">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">label</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkLabel" id="picture_path">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">label</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkProgressBar" id="progress_bar">
+                            <property name="can_focus">False</property>
+                            <property name="vexpand">False</property>
+                            <property name="show_text">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -397,7 +466,39 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkBox" id="page3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkImage" id="selected_image1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="stock">gtk-connect</property>
+                        <style>
+                          <class name="sudoku_image"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">page2</property>
+                    <property name="title" translatable="yes">page0</property>
+                    <property name="position">2</property>
+                  </packing>
                 </child>
                 <style>
                   <class name="right_panel"/>
@@ -415,9 +516,6 @@ For that, you only need to give one of your kidneys, nothing more simple, after 
             <property name="title" translatable="yes">page0</property>
             <property name="position">1</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>

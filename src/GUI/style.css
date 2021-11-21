@@ -37,6 +37,14 @@
     /* border-radius: 10px; */
     padding: 30px;
 }
+.sudoku_image {
+
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    padding: 15px;
+    border-radius: 15px;
+}
+
 .button_panel .button_element {
     margin-top: 15px;
     margin-bottom: 15px;
@@ -49,19 +57,31 @@
     background:rgb(38, 38, 47);
 }
 
-.linear-wipe {
-    /* text-align: center; */
-    
-    background: linear-gradient(to right, #FFF 20%, #FF0 40%, #FF0 60%, #FFF 80%);
-    background-size: 200% auto;
-    
-    color: #000;
-    animation-name: example;
-  }
 
-.logo image:hover {
-    animation-name: spin;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    }
+
+progress, trough,text {
+    
+    min-height: 20px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+
+
+  }
+progress {
+    background-image: linear-gradient(to right, rgb(189, 120, 10) 100%, #ff8800 100%);
+    background-repeat: no-repeat;
+}
+trough {
+    
+    background-color: rgb(38, 38, 47);
+    
+}
+text {
+    padding: 8px;
+}
+progress, text {
+    color: white;
+    font-size: 15px;
+    
+    margin-top: 15px;
+}

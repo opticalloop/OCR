@@ -21,12 +21,19 @@ void change_image(char * filename)
 {
     GtkImage *imageWidget = GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); // get image
     GdkPixbuf *image = gdk_pixbuf_new_from_file(filename, NULL); // load image
-    printf("%s\n", filename);
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(image, 500, 500, GDK_INTERP_BILINEAR); // resize image
     gtk_image_set_from_pixbuf(imageWidget, resized_image); // set image
     g_object_unref(image); // free image
     g_object_unref(resized_image); // free resized image
 }
+
+void edit_progress_bar(float progress, char * text)
+{
+    GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+    gtk_progress_bar_set_fraction(progress_bar, progress);
+    gtk_progress_bar_set_text(progress_bar, text);
+}
+
 void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 {
     // select filename and update image
@@ -72,24 +79,41 @@ void change_panel(GtkWidget *widget, gpointer data)
     GtkWidget * page = data;
     gtk_stack_set_visible_child(stack_2, page);
 }
+void stop_processing()
+{
+    // get button
+    GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE); // enable button to start processing
+    gtk_button_set_label(button, "Start Process");
+    gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
 
+}
 void run_process(GtkButton *button, gpointer data)
 {
     if (thread != NULL)
     {
-        // exit thread
-        pthread_cancel(*thread);
-        pthread_join(*thread, NULL);
-        thread = NULL;
-        // change button text
-        gtk_button_set_label(button, "Start");       
+        // change button text 
+        // gtk_button_set_label(button, "Start");      
+
+        // // cancel thread
+        // pthread_cancel(*thread);
+        // pthread_join(*thread, NULL);
+
+        // thread = NULL;
+       
     }
     else
     {
         // change text on button
         gtk_button_set_label(button, "Cancel");
+        // show progress bar
+        GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+        gtk_widget_show(GTK_WIDGET(progress_bar));
         // run the process
-        thread = OCR_thread(filename,NULL,TRUE,TRUE,"tmp",TRUE);
+        char output[200];
+        snprintf(output, sizeof(output), "%s%s/", "tmp",filename);
+
+        thread = OCR_thread(filename,NULL,TRUE,TRUE,output,TRUE);
     }
 
     
@@ -153,10 +177,27 @@ void * init_gui()
     stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
     stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
+    GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+    
+
 
     // load UI
     gtk_widget_show_all(window); // show window
+    gtk_widget_hide(progress_bar); // hide progress bar
     gtk_main(); // start main loop
 
     pthread_exit(NULL);
+}
+
+void quit()
+{
+    if (thread != NULL)
+    {
+        // cancel thread
+        pthread_cancel(*thread);
+        pthread_join(*thread, NULL);
+    }
+
+
+    gtk_main_quit();
 }

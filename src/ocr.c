@@ -8,6 +8,7 @@
 
 static void checkFolderOutput(char *output_folder)
 {
+    printf("%s\n", output_folder);
     DIR *dir = opendir(output_folder);
     if (dir)
     {
@@ -48,6 +49,9 @@ void *OCR(void *Thread_args)
     int save = arg.save;
     char *output_folder = arg.output_folder;
     int gui = arg.gui;
+
+    printf("%s\n",output_folder);
+
     if (save || gui)
     {
         // Clean the output folder
@@ -84,6 +88,7 @@ void *OCR(void *Thread_args)
     Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
+    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui);
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
@@ -117,6 +122,7 @@ void *OCR(void *Thread_args)
     for (unsigned int angle_index = 1; angle_index < 4; angle_index++)
     {
         saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
+        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui);
         printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
         // Reverse the image before segmenting
@@ -191,5 +197,7 @@ void *OCR(void *Thread_args)
     // Create, save and free the image
     Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
+    changeImageGUI(output_folder, "Result.bmp", gui);
+
     pthread_exit(NULL);
 }
