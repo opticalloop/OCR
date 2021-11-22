@@ -21,14 +21,15 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
     }
 }
 
-void changeImageGUI(char *output_folder,char *output_path,int gui)
+void changeImageGUI(char *output_folder, char *output_path, int gui,
+                    double value, char *message)
 {
     if (gui)
     {
         char output[200];
-        snprintf(output, sizeof(output), "%s/%s", output_folder,
-                 output_path);
+        snprintf(output, sizeof(output), "%s/%s", output_folder, output_path);
         change_image(output);
+        edit_progress_bar(value, message);
     }
 }
 

@@ -26,14 +26,15 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t * OCR_thread(char *image_path, char *output_path, int verbose, int save,
-         char *output_folder,int gui)
+pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
+                      int save, char *output_folder, int gui)
 {
     pthread_t thread;
-    Thread_argument arg = {image_path, output_path, verbose, save, output_folder,gui};
+    Thread_argument arg = { image_path, output_path,   verbose,
+                            save,       output_folder, gui };
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
-    return  &thread;
+    return &thread;
 
     // pthread_join(thread, NULL);
 
@@ -50,7 +51,7 @@ void *OCR(void *Thread_args)
     char *output_folder = arg.output_folder;
     int gui = arg.gui;
 
-    printf("%s\n",output_folder);
+    printf("%s\n", output_folder);
 
     if (save || gui)
     {
@@ -74,7 +75,8 @@ void *OCR(void *Thread_args)
     // Preprocessing
     grayscale(&image);
     saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
-    changeImageGUI(output_folder, "1.1_Contrast_filter.bmp", gui);
+    changeImageGUI(output_folder, "1.0_Grayscale.bmp", gui, 1 / 17,
+                   "Grayscale image");
 
     Preprocessing(&image, output_folder, verbose, save, gui);
 
@@ -88,14 +90,15 @@ void *OCR(void *Thread_args)
     Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
-    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui);
+    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui, 8 / 17,
+                   "Sobel filter");
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-    double four_angles[4] = {0.0};
+    double four_angles[4] = { 0.0 };
 
-    SDL_Surface *cropped_image =
-        detection(&image, &drawImage, verbose, save, output_folder, four_angles);
+    SDL_Surface *cropped_image = detection(&image, &drawImage, verbose, save,
+                                           output_folder, four_angles, gui);
 
     // Free image
     freeImage(&image, 1);
@@ -107,8 +110,8 @@ void *OCR(void *Thread_args)
 
     unsigned int grid[dim][dim];
     unsigned int copy[dim][dim];
-    
-     // Recognisation + Construction
+
+    // Recognisation + Construction
     printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
     printVerbose(verbose, "    📊 3.1 Creating neural network\n");
 
@@ -118,11 +121,13 @@ void *OCR(void *Thread_args)
 
     printVerbose(verbose, "    📑 3.2 Initing weights\n");
     launchWeights(&network, WEIGHT_PATH, verbose);
-    
+
     for (unsigned int angle_index = 1; angle_index < 4; angle_index++)
     {
-        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save, 0);
-        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui);
+        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
+                    0);
+        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui, 16 / 17,
+                       "Cropped image");
         printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
         // Reverse the image before segmenting
@@ -135,7 +140,8 @@ void *OCR(void *Thread_args)
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
-        // saveVerbose(verbose, &cropped, output_folder, "3.0_Segmented_image", save, 0);
+        // saveVerbose(verbose, &cropped, output_folder, "3.0_Segmented_image",
+        // save, 0);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         for (unsigned int i = 0; i < dim; i++)
@@ -145,7 +151,7 @@ void *OCR(void *Thread_args)
                 grid[i][j] =
                     getNetworkOutput(&network, all_cases[i * dim + j], 0);
                 printf("grid[i][j] = %u\n", grid[i][j]);
-       
+
                 SDL_FreeSurface(all_cases[i * dim + j]);
             }
         }
@@ -157,28 +163,28 @@ void *OCR(void *Thread_args)
             if (angle_index == 4)
             {
                 printf("No solution\n");
-                freeImage(&cropped, 0);   
+                freeImage(&cropped, 0);
                 freeNetwork(&network);
                 pthread_exit(NULL);
             }
             if (verbose)
             {
-                
                 printf("    ❌ 3.5 Grid is not solvable\n");
-                printf("\n\n    ❓ Re-attemping with %f degree angle\n", four_angles[angle_index]);
+                printf("\n\n    ❓ Re-attemping with %f degree angle\n",
+                       four_angles[angle_index]);
             }
             continue;
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
         }
-        
+
         // Copy array to have different color when saving the image
         copyArray(grid, copy);
-        
-        freeImage(&cropped, 0);   
+
+        freeImage(&cropped, 0);
         freeNetwork(&network);
         break;
     }
-    
+
     printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
     printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, "    🔍 4.2 Solving grid\n");
@@ -197,7 +203,7 @@ void *OCR(void *Thread_args)
     // Create, save and free the image
     Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
-    changeImageGUI(output_folder, "Result.bmp", gui);
+    changeImageGUI(output_folder, "Result.bmp", gui, 1, "Result");
 
     pthread_exit(NULL);
 }

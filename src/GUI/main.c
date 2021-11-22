@@ -1,8 +1,8 @@
 #include <gtk/gtk.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 
 GtkBuilder *builder;
 gchar *filename;
@@ -32,14 +32,15 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         GtkImage *image = GTK_IMAGE(gtk_builder_get_object(builder, "sudoku"));
         gtk_image_set_from_file(GTK_IMAGE(image), filename);
-        
+
         gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE);
     }
     else
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE); // if not image file disable button
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser), NULL); // reset filename
-
+        gtk_widget_set_sensitive(GTK_WIDGET(button),
+                                 FALSE); // if not image file disable button
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
+                                      NULL); // reset filename
 
         // display error message
         GtkWidget *dialog = gtk_message_dialog_new(
@@ -52,12 +53,12 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
 void show_page(GtkWidget *widget, gpointer data)
 {
-    GtkWidget * page = data;
+    GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
 void change_panel(GtkWidget *widget, gpointer data)
 {
-    GtkWidget * page = data;
+    GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
 }
 
@@ -65,15 +66,15 @@ void run_process(GtkButton *button, gpointer data)
 {
     // run OCR process
     GtkWidget *dialog = gtk_message_dialog_new(
-        GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_OTHER, GTK_BUTTONS_CLOSE, "Processing...");
+        GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_OTHER,
+        GTK_BUTTONS_CLOSE, "Processing...");
     gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
     gtk_widget_destroy(dialog); // destroy dialog
 }
 
 void open_website()
 {
-   system("firefox www.google.com");
+    system("firefox www.google.com");
 }
 
 int main(int argc, char *argv[])
@@ -100,7 +101,6 @@ int main(int argc, char *argv[])
 
     gtk_builder_connect_signals(builder, NULL); // connect signals
 
-
     // Set title
     gtk_window_set_title(GTK_WINDOW(window), "opticalloop");
 
@@ -120,12 +120,12 @@ int main(int argc, char *argv[])
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // load widgets
-    GtkButton *button_start = GTK_WIDGET(gtk_builder_get_object(builder, "start"));
+    GtkButton *button_start =
+        GTK_WIDGET(gtk_builder_get_object(builder, "start"));
     gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE); // disable button
 
     stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
     stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
-
 
     // load UI
     gtk_widget_show_all(window); // show window

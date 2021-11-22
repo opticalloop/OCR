@@ -3,18 +3,19 @@
 #define THRESHOLD 0.4
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder, double four_angles[4])
+                       char *output_folder, double four_angles[4], int gui)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
 
     // Surface without sobel filter
     Image tempImage;
-    tempImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
+    tempImage.surface =
+        SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
     SDL_BlitSurface(drawImage->surface, NULL, tempImage.surface, NULL);
 
     // Directly free
-    if (!save)
+    if (!(save || gui))
     {
         freeImage(drawImage, 0);
     }
@@ -22,9 +23,12 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     // Call major fonction
     LineList list =
-        houghtransform(image, drawImage, verbose, save, output_folder);
+        houghtransform(image, drawImage, verbose, save || gui, output_folder);
 
-    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save, 1);
+    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines",
+                save || gui, 1);
+    changeImageGUI(output_folder, "2.3_Hough_all_lines.bmp", gui, 9 / 17,
+                   "Hough all lines");
     printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
@@ -34,14 +38,15 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
 
-    if (save)
+    if (save || gui)
     {
         // Draw simplifieds lines
         Image _simplifiedImage;
         _simplifiedImage.path = image->path;
         _simplifiedImage.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, _simplifiedImage.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, _simplifiedImage.surface,
+                        NULL);
         Image *simplifiedImage = &_simplifiedImage;
         newImage(simplifiedImage, 0);
 
@@ -54,7 +59,9 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         }
 
         saveVerbose(verbose, simplifiedImage, output_folder,
-                    "2.4_Hough_simplified_lines", save, 1);
+                    "2.4_Hough_simplified_lines", save || gui, 1);
+        changeImageGUI(output_folder, "2.4_Hough_simplified_lines.bmp", gui,
+                       10 / 17, "Hough simplified lines");
     }
 
     // AUTO ROTATE
@@ -63,7 +70,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
                resultingList.maxTheta);
-    if ((angleRounded >= 88 && angleRounded <= 92) || (angleRounded >= 0 && angleRounded <= 3))
+    if ((angleRounded >= 88 && angleRounded <= 92)
+        || (angleRounded >= 0 && angleRounded <= 3))
 
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
@@ -80,19 +88,18 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         four_angles[2] = angleRounded + 180;
         four_angles[3] = angleRounded + 270;
         rotateAll(&tempImage, &resultingList, angleRounded);
-
     }
-    
 
     // Draw auto rotated image
-    if (save)
+    if (save || gui)
     {
         // Draw simplifieds lines
         Image __simplifiedImage;
         __simplifiedImage.path = image->path;
         __simplifiedImage.surface = SDL_CreateRGBSurface(
             0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, __simplifiedImage.surface, NULL);
+        SDL_BlitSurface(tempImage.surface, NULL, __simplifiedImage.surface,
+                        NULL);
         Image *___simplifiedImage = &__simplifiedImage;
         newImage(___simplifiedImage, 0);
 
@@ -105,7 +112,9 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         }
 
         saveVerbose(verbose, ___simplifiedImage, output_folder,
-                    "2.5_Autorotated", save, 1);
+                    "2.5_Autorotated", save || gui, 1);
+        changeImageGUI(output_folder, "2.5_Autorotated", gui, 11 / 17,
+                       "Hough autorotated lines");
     }
 
     // FINDING SQUARES
@@ -114,7 +123,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     // FIND ALL SQUARES
     SquareList squares;
-    if (save)
+    if (save || gui)
     {
         Image _squareImage;
         _squareImage.path = image->path;
@@ -124,13 +133,15 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         Image *squareImage = &_squareImage;
         newImage(squareImage, 0);
 
-        squares = findSquare(&resultingList, w, h, squareImage, save);
+        squares = findSquare(&resultingList, w, h, squareImage, save || gui);
         saveVerbose(verbose, squareImage, output_folder,
-                    "2.6_Hough_squares_only", save, 1);
+                    "2.6_Hough_squares_only", save || gui, 1);
+        changeImageGUI(output_folder, "2.6_Hough_squares_only.bmp", gui,
+                       12 / 17, "Hough squares only");
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, NULL, save);
+        squares = findSquare(&resultingList, w, h, NULL, save || gui);
     }
 
     if (verbose)
@@ -143,7 +154,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     Square lastSquare = sortSquares(&squares, image);
 
-    if (save)
+    if (save || gui)
     {
         Image _lastSquareImg;
         _lastSquareImg.path = image->path;
@@ -155,7 +166,9 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.7_Hough_last_square", save, 1);
+                    "2.7_Hough_last_square", save || gui, 1);
+        changeImageGUI(output_folder, "2.7_Hough_last_square.bmp", gui, 13 / 17,
+                       "Hough last square");
     }
 
     // GETTING MAX SQUARE

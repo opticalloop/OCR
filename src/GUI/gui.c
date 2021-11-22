@@ -6,7 +6,7 @@ gchar *filename;
 GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
-pthread_t * thread;
+pthread_t *thread;
 
 char *get_filename_ext(const char *filename)
 {
@@ -17,19 +17,22 @@ char *get_filename_ext(const char *filename)
     return dot + 1;
 }
 
-void change_image(char * filename)
+void change_image(char *filename)
 {
-    GtkImage *imageWidget = GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); // get image
+    GtkImage *imageWidget = GTK_IMAGE(
+        gtk_builder_get_object(builder, "selected_image")); // get image
     GdkPixbuf *image = gdk_pixbuf_new_from_file(filename, NULL); // load image
-    GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(image, 500, 500, GDK_INTERP_BILINEAR); // resize image
+    GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
+        image, 500, 500, GDK_INTERP_BILINEAR); // resize image
     gtk_image_set_from_pixbuf(imageWidget, resized_image); // set image
     g_object_unref(image); // free image
     g_object_unref(resized_image); // free resized image
 }
 
-void edit_progress_bar(float progress, char * text)
+void edit_progress_bar(float progress, char *text)
 {
-    GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+    GtkProgressBar *progress_bar =
+        GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
     gtk_progress_bar_set_fraction(progress_bar, progress);
     gtk_progress_bar_set_text(progress_bar, text);
 }
@@ -41,24 +44,26 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     char *ext = get_filename_ext(filename);
     GtkButton *button = data;
     if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
-        || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)  // if image file is selected load image
-    { 
-       
+        || strcmp(ext, "jpeg") == 0
+        || strcmp(ext, "bmp") == 0) // if image file is selected load image
+    {
         change_image(filename);
 
         // update label
-        GtkLabel *label = GTK_LABEL(gtk_builder_get_object(builder, "picture_path"));
+        GtkLabel *label =
+            GTK_LABEL(gtk_builder_get_object(builder, "picture_path"));
         gtk_label_set_text(label, filename);
-        
 
         gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
-        gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE); // enable button to start processing
+        gtk_widget_set_sensitive(GTK_WIDGET(button),
+                                 TRUE); // enable button to start processing
     }
     else
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE); // if not image file disable button
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser), NULL); // reset filename
-
+        gtk_widget_set_sensitive(GTK_WIDGET(button),
+                                 FALSE); // if not image file disable button
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
+                                      NULL); // reset filename
 
         // display error message
         GtkWidget *dialog = gtk_message_dialog_new(
@@ -71,63 +76,58 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
 void show_page(GtkWidget *widget, gpointer data)
 {
-    GtkWidget * page = data;
+    GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
 void change_panel(GtkWidget *widget, gpointer data)
 {
-    GtkWidget * page = data;
+    GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
 }
 void stop_processing()
 {
     // get button
     GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button), TRUE); // enable button to start processing
+    gtk_widget_set_sensitive(GTK_WIDGET(button),
+                             TRUE); // enable button to start processing
     gtk_button_set_label(button, "Start Process");
     gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
-
 }
 void run_process(GtkButton *button, gpointer data)
 {
     if (thread != NULL)
     {
-        // change button text 
-        // gtk_button_set_label(button, "Start");      
+        // change button text
+        // gtk_button_set_label(button, "Start");
 
         // // cancel thread
         // pthread_cancel(*thread);
         // pthread_join(*thread, NULL);
 
         // thread = NULL;
-       
     }
     else
     {
         // change text on button
         gtk_button_set_label(button, "Cancel");
         // show progress bar
-        GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+        GtkProgressBar *progress_bar =
+            GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
         gtk_widget_show(GTK_WIDGET(progress_bar));
         // run the process
-        char output[200];
-        snprintf(output, sizeof(output), "%s%s/", "tmp",filename);
-
-        thread = OCR_thread(filename,NULL,TRUE,TRUE,output,TRUE);
+        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE);
     }
-
-    
 }
 
 void open_website()
 {
-   if (!system("firefox www.opticalloop.bugbear.com")) // TODO: change website
+    if (!system("firefox www.opticalloop.bugbear.com")) // TODO: change website
     {
         printf("Error opening website\n");
     }
 }
 
-void * init_gui()
+void *init_gui()
 {
     builder = NULL;
     GError *error = NULL;
@@ -151,7 +151,6 @@ void * init_gui()
 
     gtk_builder_connect_signals(builder, NULL); // connect signals
 
-
     // Set title
     gtk_window_set_title(GTK_WINDOW(window), "opticalloop");
 
@@ -171,15 +170,15 @@ void * init_gui()
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // load widgets
-    GtkButton *button_start = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    GtkButton *button_start =
+        GTK_BUTTON(gtk_builder_get_object(builder, "start"));
     gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE); // disable button
 
     stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
     stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
-    GtkProgressBar *progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
-    
-
+    GtkProgressBar *progress_bar =
+        GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
 
     // load UI
     gtk_widget_show_all(window); // show window
@@ -197,7 +196,6 @@ void quit()
         pthread_cancel(*thread);
         pthread_join(*thread, NULL);
     }
-
 
     gtk_main_quit();
 }
