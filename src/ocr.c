@@ -8,7 +8,6 @@
 
 static void checkFolderOutput(char *output_folder)
 {
-    printf("%s\n", output_folder);
     DIR *dir = opendir(output_folder);
     if (dir)
     {
@@ -27,18 +26,19 @@ static void checkFolderOutput(char *output_folder)
 }
 
 pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
-                      int save, char *output_folder, int gui)
+                      int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    Thread_argument arg = { image_path, output_path,   verbose,
-                            save,       output_folder, gui };
+    Thread_argument arg = { image_path,    output_path, verbose, save,
+                            output_folder, gui,         hexa };
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
+    if (gui == 0)
+    {
+        pthread_join(thread, NULL);
+    }
+
     return &thread;
-
-    // pthread_join(thread, NULL);
-
-    // pthread_exit(NULL);
 }
 
 void *OCR(void *Thread_args)
@@ -50,8 +50,7 @@ void *OCR(void *Thread_args)
     int save = arg.save;
     char *output_folder = arg.output_folder;
     int gui = arg.gui;
-
-    printf("%s\n", output_folder);
+    int hexa = arg.hexa;
 
     if (save || gui)
     {
@@ -108,8 +107,9 @@ void *OCR(void *Thread_args)
     cropped.surface = cropped_image;
     newImage(&cropped, 0);
 
-    unsigned int grid[dim][dim];
-    unsigned int copy[dim][dim];
+    unsigned int dimension = hexa ? 16 : 9;
+    unsigned int **grid = allocGrid(dimension);
+    unsigned int **copy = allocGrid(dimension);
 
     // Recognisation + Construction
     printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
@@ -144,20 +144,26 @@ void *OCR(void *Thread_args)
         // save, 0);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
-        for (unsigned int i = 0; i < dim; i++)
+        int val;
+        for (unsigned int i = 0; i < dimension; i++)
         {
-            for (unsigned int j = 0; j < dim; j++)
+            for (unsigned int j = 0; j < dimension; j++)
             {
-                grid[i][j] =
-                    getNetworkOutput(&network, all_cases[i * dim + j], 0);
-                printf("grid[i][j] = %u\n", grid[i][j]);
+                val =
+                    getNetworkOutput(&network, all_cases[i * dimension + j], 0);
+                if (hexa && val > 9)
+                {
+                    val = 0;
+                }
+                grid[i][j] = val;
+                printf("grid[%u][%u] = %u\n", i, j, val);
 
-                SDL_FreeSurface(all_cases[i * dim + j]);
+                SDL_FreeSurface(all_cases[i * dimension + j]);
             }
         }
 
         // Solver
-        if (!isSolvable(grid))
+        if (!isSolvable(grid, dimension))
         {
             rotate(&cropped, four_angles[angle_index]);
             if (angle_index == 4)
@@ -178,7 +184,7 @@ void *OCR(void *Thread_args)
         }
 
         // Copy array to have different color when saving the image
-        copyArray(grid, copy);
+        copyArray(grid, copy, dimension);
 
         freeImage(&cropped, 0);
         freeNetwork(&network);
@@ -189,19 +195,19 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, "    🔍 4.2 Solving grid\n");
 
-    solveSuduko(grid, 0, 0);
+    solveSuduko(grid, 0, 0, dimension);
 
-    if (!isSolved(grid))
+    if (!isSolved(grid, dimension))
     {
         errx(EXIT_FAILURE, "    ⛔ Error while solving grid");
     }
     printVerbose(verbose, "    ✅ 4.3 Grid is solved\n");
 
     // SaveResult
-    saveGrid(grid, "grid.result", verbose);
+    saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH);
+    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
     changeImageGUI(output_folder, "Result.bmp", gui, 1, "Result");
 

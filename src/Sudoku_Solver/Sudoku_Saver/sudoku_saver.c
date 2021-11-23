@@ -1,29 +1,30 @@
 #include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 
-void copyArray(unsigned int grid[dim][dim], unsigned int destination[dim][dim])
+void copyArray(unsigned int **grid, unsigned int **destination,
+               unsigned int dimension)
 {
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             destination[i][j] = grid[i][j];
         }
     }
 }
 
-void basicPrint(unsigned int grid[dim][dim])
+void basicPrint(unsigned int **grid, unsigned int dimension)
 {
     printf("\n");
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        if (i % ((unsigned int)sqrt(dim)) == 0 && i != 0)
+        if (i % ((unsigned int)sqrt(dimension)) == 0 && i != 0)
         {
             printf("\n");
         }
 
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
-            if (j % ((unsigned int)sqrt(dim)) == 0 && j != 0)
+            if (j % ((unsigned int)sqrt(dimension)) == 0 && j != 0)
             {
                 printf(" ");
             }
@@ -34,7 +35,8 @@ void basicPrint(unsigned int grid[dim][dim])
     }
 }
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
+void readGrid(unsigned int **grid, char inputPath[], int verbose,
+              unsigned int dimension)
 {
     FILE *fp;
 
@@ -52,7 +54,7 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
     }
 
     char ch = 0;
-    unsigned int tempGrid[dim * dim];
+    unsigned int tempGrid[dimension * dimension];
     unsigned int index = 0;
 
     while ((ch = fgetc(fp)) != EOF)
@@ -76,18 +78,19 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
         index++;
     }
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
-            grid[i][j] = tempGrid[i * dim + j];
+            grid[i][j] = tempGrid[i * dimension + j];
         }
     }
 
     fclose(fp);
 }
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
+void saveGrid(unsigned int **grid, char outputPath[], int verbose,
+              unsigned int dimension)
 {
     FILE *f = fopen(outputPath, "w");
     if (f == NULL)
@@ -100,9 +103,9 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
         printf("<-- 💾 Saving grid to %s\n", outputPath);
     }
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             if (grid[i][j] == 0)
             {
@@ -129,8 +132,8 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
     fclose(f);
 }
 
-Image createSudokuImage(unsigned int grid[dim][dim],
-                        unsigned int copy[dim][dim], char *folder_path)
+Image createSudokuImage(unsigned int **grid, unsigned int **copy,
+                        char *folder_path, unsigned int dimension)
 {
     Image image;
     image.width = 266;
@@ -161,7 +164,7 @@ Image createSudokuImage(unsigned int grid[dim][dim],
     updateSurface(&image);
 
     // Coordonates
-    unsigned int Array[dim] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
+    unsigned int Array[9] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
     unsigned int val;
 
     // SDL_Rect to copy to the actual image
@@ -169,9 +172,9 @@ Image createSudokuImage(unsigned int grid[dim][dim],
     rect.w = IMAGE_SIZE;
     rect.h = IMAGE_SIZE;
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             val = grid[i][j];
             if (val != 0)

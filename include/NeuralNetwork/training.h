@@ -1,3 +1,6 @@
+#ifndef TRAINING_H
+#define TRAINING_H
+
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
@@ -102,3 +105,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
  */
 
 int getNetworkOutput(Network *network, SDL_Surface *image, int verbose);
+
+int isFullWhite(SDL_Surface *surface);
+
+#endif

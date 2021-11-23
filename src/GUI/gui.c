@@ -79,11 +79,13 @@ void show_page(GtkWidget *widget, gpointer data)
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
+
 void change_panel(GtkWidget *widget, gpointer data)
 {
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
 }
+
 void stop_processing()
 {
     // get button
@@ -93,6 +95,7 @@ void stop_processing()
     gtk_button_set_label(button, "Start Process");
     gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
 }
+
 void run_process(GtkButton *button, gpointer data)
 {
     if (thread != NULL)
@@ -115,7 +118,8 @@ void run_process(GtkButton *button, gpointer data)
             GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
         gtk_widget_show(GTK_WIDGET(progress_bar));
         // run the process
-        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE);
+        // TODO : Get signal from 9x9 button
+        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE, 0);
     }
 }
 
@@ -182,7 +186,7 @@ void *init_gui()
 
     // load UI
     gtk_widget_show_all(window); // show window
-    gtk_widget_hide(progress_bar); // hide progress bar
+    gtk_widget_hide(GTK_WIDGET(progress_bar)); // hide progress bar
     gtk_main(); // start main loop
 
     pthread_exit(NULL);

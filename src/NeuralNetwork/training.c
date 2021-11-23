@@ -270,6 +270,10 @@ int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
     {
         printf("    📈 Getting network output\n");
     }
+    if (isFullWhite(image))
+    {
+        return 0;
+    }
     int inputs[NBINPUTS];
     imageToBinary(image, inputs);
     frontPropagation(network, inputs);
@@ -288,4 +292,22 @@ int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
         }
     }
     return result;
+}
+
+int isFullWhite(SDL_Surface *surface)
+{
+    Uint32 pixel;
+    for (unsigned int i = 0; i < surface->w; i++)
+    {
+        for (unsigned int j = 0; j < surface->h; j++)
+        {
+            // Get pixel from surface
+            pixel = get_pixel(surface, i, j);
+            if (pixel == 0)
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }

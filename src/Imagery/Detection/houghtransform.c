@@ -1,6 +1,6 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.4
+#define THRESHOLD 0.3
 
 SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
                        char *output_folder, double four_angles[4], int gui)
@@ -113,7 +113,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         saveVerbose(verbose, ___simplifiedImage, output_folder,
                     "2.5_Autorotated", save || gui, 1);
-        changeImageGUI(output_folder, "2.5_Autorotated", gui, 11 / 17,
+        changeImageGUI(output_folder, "2.5_Autorotated.bmp", gui, 11 / 17,
                        "Hough autorotated lines");
     }
 
