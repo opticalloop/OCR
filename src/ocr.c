@@ -74,7 +74,7 @@ void *OCR(void *Thread_args)
     // Preprocessing
     grayscale(&image);
     saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
-    changeImageGUI(output_folder, "1.0_Grayscale.bmp", gui, 1 / 17,
+    changeImageGUI(output_folder, "1.0_Grayscale.bmp", gui, 0.05,
                    "Grayscale image");
 
     Preprocessing(&image, output_folder, verbose, save, gui);
@@ -89,7 +89,7 @@ void *OCR(void *Thread_args)
     Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
-    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui, 8 / 17,
+    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui, 0.4,
                    "Sobel filter");
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
@@ -122,11 +122,12 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "    📑 3.2 Initing weights\n");
     launchWeights(&network, WEIGHT_PATH, verbose);
 
-    for (unsigned int angle_index = 1; angle_index < 4; angle_index++)
+    unsigned int angle_index;
+    for (angle_index = 1; angle_index < 4; angle_index++)
     {
         saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
                     0);
-        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui, 16 / 17,
+        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui, 0.8,
                        "Cropped image");
         printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
@@ -136,7 +137,7 @@ void *OCR(void *Thread_args)
 
         // Segmentation
         // Initialize all case at NULL
-        SDL_Surface *all_cases[81];
+        SDL_Surface *all_cases[hexa ? 256 : 81];
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
@@ -151,28 +152,22 @@ void *OCR(void *Thread_args)
             {
                 val =
                     getNetworkOutput(&network, all_cases[i * dimension + j], 0);
-                if (hexa && val > 9)
+                if (!hexa && val > 9)
                 {
                     val = 0;
                 }
                 grid[i][j] = val;
-                printf("grid[%u][%u] = %u\n", i, j, val);
 
                 SDL_FreeSurface(all_cases[i * dimension + j]);
             }
         }
 
+        basicPrint(grid, dimension);
+
         // Solver
         if (!isSolvable(grid, dimension))
         {
             rotate(&cropped, four_angles[angle_index]);
-            if (angle_index == 4)
-            {
-                printf("No solution\n");
-                freeImage(&cropped, 0);
-                freeNetwork(&network);
-                pthread_exit(NULL);
-            }
             if (verbose)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
@@ -191,10 +186,19 @@ void *OCR(void *Thread_args)
         break;
     }
 
+    if (angle_index == 4)
+    {
+        printf("No solution\n");
+        freeImage(&cropped, 0);
+        freeNetwork(&network);
+        pthread_exit(NULL);
+    }
+
     printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
     printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, "    🔍 4.2 Solving grid\n");
-
+    
+    basicPrint(grid, dimension);
     solveSuduko(grid, 0, 0, dimension);
 
     if (!isSolved(grid, dimension))

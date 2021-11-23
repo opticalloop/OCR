@@ -27,7 +27,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines",
                 save || gui, 1);
-    changeImageGUI(output_folder, "2.3_Hough_all_lines.bmp", gui, 9 / 17,
+    changeImageGUI(output_folder, "2.3_Hough_all_lines.bmp", gui, 0.45,
                    "Hough all lines");
     printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
@@ -61,7 +61,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         saveVerbose(verbose, simplifiedImage, output_folder,
                     "2.4_Hough_simplified_lines", save || gui, 1);
         changeImageGUI(output_folder, "2.4_Hough_simplified_lines.bmp", gui,
-                       10 / 17, "Hough simplified lines");
+                       0.5, "Hough simplified lines");
     }
 
     // AUTO ROTATE
@@ -113,7 +113,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         saveVerbose(verbose, ___simplifiedImage, output_folder,
                     "2.5_Autorotated", save || gui, 1);
-        changeImageGUI(output_folder, "2.5_Autorotated.bmp", gui, 11 / 17,
+        changeImageGUI(output_folder, "2.5_Autorotated.bmp", gui, 0.55,
                        "Hough autorotated lines");
     }
 
@@ -137,7 +137,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         saveVerbose(verbose, squareImage, output_folder,
                     "2.6_Hough_squares_only", save || gui, 1);
         changeImageGUI(output_folder, "2.6_Hough_squares_only.bmp", gui,
-                       12 / 17, "Hough squares only");
+                       0.6, "Hough squares only");
     }
     else
     {
@@ -167,7 +167,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         saveVerbose(verbose, lastSquareImg, output_folder,
                     "2.7_Hough_last_square", save || gui, 1);
-        changeImageGUI(output_folder, "2.7_Hough_last_square.bmp", gui, 13 / 17,
+        changeImageGUI(output_folder, "2.7_Hough_last_square.bmp", gui, 0.65,
                        "Hough last square");
     }
 
