@@ -208,6 +208,10 @@ void *OCR(void *Thread_args)
 
     // Create, save and free the image
     Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+
+    freeGrid(grid, dimension);
+    freeGrid(copy, dimension);
+
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
     changeImageGUI(output_folder, "Result.bmp", gui, 1, "Result");
 
