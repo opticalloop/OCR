@@ -153,7 +153,7 @@ void split(Image *image, SDL_Surface *seg81[], int save, char *imagename)
                    imagebis.surface->h);
             newImage(&imagebis, 0);
 
-            resize(&imagebis, 28, 28);
+            resize(&imagebis, 28, 28, 0);
             updateSurface(&imagebis);
 
             seg81[iall] = imagebis.surface;
