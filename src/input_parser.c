@@ -185,8 +185,9 @@ static void analyzeOCR(int argc, char **argv)
             output_folder = argv[i];
         }
     }
-    pthread_t thread = *OCR_thread(input_path, output_path, verbose, save,
-                                   output_folder, 0, 0);
+    pthread_t thread;
+    SDL_Surface *img = load_image(input_path);
+    thread = OCR_thread(img, output_path, verbose, save, output_folder, 0, 0);
 }
 
 static void analyzeNN(int argc, char **argv)

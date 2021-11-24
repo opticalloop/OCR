@@ -8,10 +8,13 @@
 #include <string.h>
 
 #include "GUI/draw.h"
+#include "Imagery/Rotations_Resize/rotations.h"
 #include "ocr.h"
 
-void change_image(char *filename);
+void change_image(SDL_Surface *surface);
+
 void edit_progress_bar(float progress, char *text);
+
 void *init_gui();
 
 #endif

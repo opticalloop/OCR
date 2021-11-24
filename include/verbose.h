@@ -1,3 +1,6 @@
+#ifndef VERBOSE_H
+#define VERBOSE_H
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,5 +12,7 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
 
 void printVerbose(int verbose, char *message);
 
-void changeImageGUI(char *output_folder, char *output_path, int gui,
-                    double value, char *message);
+void changeImageGUI(Image *image, int gui, double value, char *message,
+                    int free);
+
+#endif

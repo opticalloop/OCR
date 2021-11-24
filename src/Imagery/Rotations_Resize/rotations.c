@@ -87,87 +87,90 @@ void rotate(Image *image, double angleDegree)
     free(_pixels);
 }
 
-double detectDiffAngle(Image *image, float precision)
+void rotateSurface(SDL_Surface *surface, double angleDegree)
 {
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
+    const unsigned int width = surface->w;
+    const unsigned int height = surface->h;
 
-    // Get diagonal
-    const unsigned int diagonal =
-        (unsigned int)sqrt(width * width + height * height);
+    const double middleX = ((double)width / 2.0);
+    const double middleY = ((double)height / 2.0);
 
-    double **accumulator;
+    const double angle = angleDegree * M_PI / 180.0;
 
-    double _precision = M_PI * (1 / precision);
+    // Create temporary surface
+    SDL_Surface *tempSurface =
+        SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+    SDL_BlitSurface(surface, NULL, tempSurface, NULL);
 
-    accumulator = malloc(sizeof(double *) * (_precision + 1));
-    if (accumulator == NULL)
-    {
-        errx(EXIT_FAILURE, "Error");
-    }
-
-    unsigned int i = 0;
-    for (; i < _precision; i++)
-    {
-        accumulator[i] = malloc(sizeof(double) * (diagonal + 1));
-        if (accumulator[i] == NULL)
-        {
-            errx(EXIT_FAILURE, "Error");
-        }
-    }
-
-    double maxAngle = 0.0;
-    double tempMaxAngle = 0.0;
+    double newX;
+    double newY;
+    // Four pixels around
+    unsigned int top;
+    unsigned int bottom;
+    unsigned int left;
+    unsigned int right;
+    Uint32 pixel;
+    Uint32 topLeft;
+    Uint32 topRight;
+    Uint32 bottomLeft;
+    Uint32 bottomRight;
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            // Only when encounter black pixel try the circle around
-            if (image->pixels[x][y].r != 0)
-            {
-                continue;
-            }
+            // Calculate new position
+            newX = ((double)(cos(angle) * ((double)x - middleX)
+                             - sin(angle) * ((double)y - middleY))
+                    + middleX);
+            newY = ((double)(cos(angle) * ((double)y - middleY)
+                             + sin(angle) * ((double)x - middleX))
+                    + middleY);
 
-            // From 0 to 180
-            double angle = 0;
-            for (; angle <= M_PI / 2; angle += precision)
-            {
-                int diff = (int)((x * sin(angle) + y * cos(angle)));
-                if (diff >= 0)
-                {
-                    int teta = (int)((angle * (1 / precision)
-                                      + (M_PI / 2) * (1 / precision)));
-                    accumulator[teta][diff]++;
+            // Get the four locations around pixels
+            // floor() : Round at inferior
+            top = floor(newY);
+            bottom = top + 1;
+            left = floor(newX);
+            right = left + 1;
 
-                    if (accumulator[teta][diff] > tempMaxAngle)
-                    {
-                        tempMaxAngle = accumulator[teta][diff];
-                        maxAngle = angle;
-                    }
-                }
+            // Check if any of the four locations are invalid. If so,
+            // skip interpolating this pixel
+            // Unsigned int : always > 0, so dont need to check if top and left
+            // are superior to 0
+            if (top < height && bottom < height && left < width
+                && right < width)
+            {
+                // Get 4 corners
+                topLeft = get_pixel(tempSurface, left, top);
+                topRight = get_pixel(tempSurface, right, top);
+                bottomLeft = get_pixel(tempSurface, left, bottom);
+                bottomRight = get_pixel(tempSurface, right, bottom);
+
+                // Get rgb values
+                Uint8 r1, g1, b1;
+                Uint8 r2, g2, b2;
+                Uint8 r3, g3, b3;
+                Uint8 r4, g4, b4;
+                SDL_GetRGB(topLeft, tempSurface->format, &r1, &g1, &b1);
+                SDL_GetRGB(topRight, tempSurface->format, &r2, &g2, &b2);
+                SDL_GetRGB(bottomLeft, tempSurface->format, &r3, &g3, &b3);
+                SDL_GetRGB(bottomRight, tempSurface->format, &r4, &g4, &b4);
+
+                unsigned int interpolated = bilinearly_interpolateSurface(
+                    top, bottom, left, right, newX, newY, r1, r2, r3, r4);
+
+                // Put pixel
+                pixel = SDL_MapRGB(surface->format, interpolated, interpolated,
+                                   interpolated);
             }
+            else
+            {
+                // Put black pixel
+                pixel = SDL_MapRGB(surface->format, 0, 0, 0);
+            }
+            put_pixel(surface, x, y, pixel);
         }
     }
-    // Free memory
-    for (unsigned int i = 0; i < _precision; i++)
-    {
-        free(accumulator[i]);
-    }
-    free(accumulator);
 
-    return maxAngle;
-}
-
-void autoRotate2(Image *image, float precision)
-{
-    double angle = detectDiffAngle(image, precision);
-    angle *= (180 / M_PI);
-    printf("Max angle %f\n", angle);
-
-    if (fabs(angle) <= 0.1)
-    {
-        return;
-    }
-
-    rotate(image, angle);
+    SDL_FreeSurface(tempSurface);
 }

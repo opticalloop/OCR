@@ -15,7 +15,7 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     SDL_BlitSurface(drawImage->surface, NULL, tempImage.surface, NULL);
 
     // Directly free
-    if (!(save || gui))
+    if (!save)
     {
         freeImage(drawImage, 0);
     }
@@ -23,12 +23,11 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     // Call major fonction
     LineList list =
-        houghtransform(image, drawImage, verbose, save || gui, output_folder);
+        houghtransform(image, drawImage, verbose, save, output_folder);
 
-    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines",
-                save || gui, 1);
-    changeImageGUI(output_folder, "2.3_Hough_all_lines.bmp", gui, 0.45,
-                   "Hough all lines");
+    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
+                0);
+    changeImageGUI(drawImage, gui, 0.45, "Hough all lines", 1);
     printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
@@ -59,9 +58,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         }
 
         saveVerbose(verbose, simplifiedImage, output_folder,
-                    "2.4_Hough_simplified_lines", save || gui, 1);
-        changeImageGUI(output_folder, "2.4_Hough_simplified_lines.bmp", gui,
-                       0.5, "Hough simplified lines");
+                    "2.4_Hough_simplified_lines", save, 0);
+        changeImageGUI(simplifiedImage, gui, 0.5, "Hough simplified lines", 1);
     }
 
     // AUTO ROTATE
@@ -112,9 +110,9 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         }
 
         saveVerbose(verbose, ___simplifiedImage, output_folder,
-                    "2.5_Autorotated", save || gui, 1);
-        changeImageGUI(output_folder, "2.5_Autorotated.bmp", gui, 0.55,
-                       "Hough autorotated lines");
+                    "2.5_Autorotated", save, 0);
+        changeImageGUI(___simplifiedImage, gui, 0.55, "Hough autorotated lines",
+                       1);
     }
 
     // FINDING SQUARES
@@ -135,9 +133,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         squares = findSquare(&resultingList, w, h, squareImage, save || gui);
         saveVerbose(verbose, squareImage, output_folder,
-                    "2.6_Hough_squares_only", save || gui, 1);
-        changeImageGUI(output_folder, "2.6_Hough_squares_only.bmp", gui, 0.6,
-                       "Hough squares only");
+                    "2.6_Hough_squares_only", save, 0);
+        changeImageGUI(squareImage, gui, 0.6, "Hough squares only", 1);
     }
     else
     {
@@ -166,9 +163,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
         drawSquare(&lastSquare, lastSquareImg, w, h, 2);
         saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.7_Hough_last_square", save || gui, 1);
-        changeImageGUI(output_folder, "2.7_Hough_last_square.bmp", gui, 0.65,
-                       "Hough last square");
+                    "2.7_Hough_last_square", save, 0);
+        changeImageGUI(lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
 
     // GETTING MAX SQUARE
@@ -532,10 +528,10 @@ unsigned int findTheta(LineList *lineList)
 {
     unsigned int histogram[181] = { 0 };
 
-    unsigned int value;
-    for (unsigned int i = 0; i < lineList->len; i++)
+    int value;
+    for (int i = 0; i < lineList->len; i++)
     {
-        value = (unsigned int)radian_To_Degree(lineList->lines[i].theta);
+        value = (int)radian_To_Degree(lineList->lines[i].theta);
         value++;
         printf("Value : %u\n", value);
 
@@ -570,7 +566,7 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
     double newX;
     double newY;
 
-    for (unsigned int i = 0; i < lineList->len; i++)
+    for (int i = 0; i < lineList->len; i++)
     {
         // Calculate new position start
         newX =

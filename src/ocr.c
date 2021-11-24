@@ -25,11 +25,11 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
+pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    Thread_argument arg = { image_path,    output_path, verbose, save,
+    Thread_argument arg = { surface,       output_path, verbose, save,
                             output_folder, gui,         hexa };
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
@@ -44,7 +44,7 @@ pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
 void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
-    char *image_path = arg.image_path; 
+    SDL_Surface *startSurface = arg.surface;
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;
@@ -61,12 +61,11 @@ void *OCR(void *Thread_args)
     // Create image
     printVerbose(verbose, "--> 💾 Creating image\n");
     Image image;
-    image.path = image_path;
-    image.surface = NULL;
+    image.path = "";
+    image.surface = startSurface;
 
     newImage(&image, 1);
 
-    
     if (image.width > 3000 || image.height > 3000)
     {
         printVerbose(verbose, "      📏 1.0 Simplifying image\n");
@@ -75,14 +74,13 @@ void *OCR(void *Thread_args)
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
 
-    if (!strcmp("src/Imagery/image_06.jpeg", image_path))
-        correctDistortion(&image);
+    // if (!strcmp("src/Imagery/image_06.jpeg", image_path))
+    //     correctDistortion(&image);
 
     // Preprocessing
     grayscale(&image);
     saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
-    changeImageGUI(output_folder, "1.0_Grayscale.bmp", gui, 0.05,
-                   "Grayscale image");
+    changeImageGUI(&image, gui, 0.05, "Grayscale image", 0);
 
     // Binarization
     Preprocessing(&image, output_folder, verbose, save, gui);
@@ -98,8 +96,7 @@ void *OCR(void *Thread_args)
     Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
-    changeImageGUI(output_folder, "2.1_Sobel_filter.bmp", gui, 0.4,
-                   "Sobel filter");
+    changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
@@ -116,7 +113,7 @@ void *OCR(void *Thread_args)
     Image cropped;
     cropped.surface = cropped_image;
     newImage(&cropped, 0);
-    
+
     // Reverse the image before segmenting
     reverse_color(&cropped);
     updateSurface(&cropped);
@@ -140,8 +137,7 @@ void *OCR(void *Thread_args)
     {
         saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
                     0);
-        changeImageGUI(output_folder, "2.8_Cropped_image.bmp", gui, 0.8,
-                       "Cropped image");
+        changeImageGUI(&cropped, gui, 0.8, "Cropped image", 0);
         printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
         // Segmentation
@@ -156,11 +152,11 @@ void *OCR(void *Thread_args)
         for (unsigned int i = 0; i < dimension; i++)
         {
             for (unsigned int j = 0; j < dimension; j++)
-            {  
+            {
                 // Get the value of the case
                 val =
                     getNetworkOutput(&network, all_cases[i * dimension + j], 0);
-                
+
                 if (!hexa && val > 9)
                 {
                     val = 0;
@@ -228,8 +224,8 @@ void *OCR(void *Thread_args)
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
 
-    saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
-    changeImageGUI(output_folder, "Result.bmp", gui, 1, "Result");
+    saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 0);
+    changeImageGUI(&sudoku_image, gui, 1, "Result", 1);
 
     pthread_exit(NULL); // Exit thread
 }
