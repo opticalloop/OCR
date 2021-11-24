@@ -19,6 +19,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     invert(image);
     image_normalize_brightness(image);
     saveVerbose(verbose, image, pathToSave, "1.1_Contrast_filter", save, 0);
+
     changeImageGUI(pathToSave, "1.1_Contrast_filter.bmp", gui, 0.1,
                    "Contrast filter");
 

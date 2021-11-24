@@ -156,15 +156,18 @@ void *OCR(void *Thread_args)
         for (unsigned int i = 0; i < dimension; i++)
         {
             for (unsigned int j = 0; j < dimension; j++)
-            {
+            {  
+                // Get the value of the case
                 val =
                     getNetworkOutput(&network, all_cases[i * dimension + j], 0);
+                
                 if (!hexa && val > 9)
                 {
                     val = 0;
                 }
                 grid[i][j] = val;
 
+                // Free the case
                 SDL_FreeSurface(all_cases[i * dimension + j]);
             }
         }
