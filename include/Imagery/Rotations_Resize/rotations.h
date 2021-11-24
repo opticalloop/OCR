@@ -19,4 +19,6 @@
 
 void rotate(Image *image, double angleDegree);
 
+void rotateSurface(SDL_Surface *surface, double angleDegree);
+
 #endif

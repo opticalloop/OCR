@@ -1,9 +1,9 @@
 CC = gcc -I../../include/
 
-CPPFLAGS = `pkg-config --cflags sdl` -MMD -D__NO_INLINE__
+CPPFLAGS = `pkg-config --cflags gtk+-3.0 sdl` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
-LDLFLAGS = -lm
-LDLIBS = `pkg-config --libs sdl SDL_image`
+LDLFLAGS = -lm -lpthread 
+LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
 
 BUILD := build
 EXEC := main
