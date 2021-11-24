@@ -33,20 +33,30 @@ typedef struct Thread_argument
     int hexa;
 } Thread_argument;
 
+/*
+    * OCR
+    *
+    * @param image_path : path of the image to be OCRed
+    * @param output_path : path of the output file
+    * @param verbose : verbose mode
+    * @param save : save mode
+    * @param output_folder : path of the output folder
+    * @param gui : gui mode
+    * @param hexa : hexa mode
+    *
+    * @return 0 if success, -1 if error
+    */
+
 pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa);
 
 /*
- *  Summary:
- *
- *  Params:
- *      *image_path:
- *      *output_path:
- *      verbose:
- *
- *  Return:
- *
- */
+    * OCR_thread_function
+    *
+    * @param arg : Thread_argument
+    *
+    * @return 0 if success, -1 if error
+    */
 void *OCR(void *Thread_args);
 
 #endif

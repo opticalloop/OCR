@@ -44,7 +44,7 @@ pthread_t *OCR_thread(char *image_path, char *output_path, int verbose,
 void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
-    char *image_path = arg.image_path;
+    char *image_path = arg.image_path; 
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;
@@ -66,6 +66,7 @@ void *OCR(void *Thread_args)
 
     newImage(&image, 1);
 
+    
     if (image.width > 3000 || image.height > 3000)
     {
         printVerbose(verbose, "      📏 1.0 Simplifying image\n");
@@ -74,7 +75,7 @@ void *OCR(void *Thread_args)
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
 
-    if (!strcmp("image_06.jpeg", image_path))
+    if (!strcmp("src/Imagery/image_06.jpeg", image_path))
         correctDistortion(&image);
 
     // Preprocessing
@@ -83,6 +84,7 @@ void *OCR(void *Thread_args)
     changeImageGUI(output_folder, "1.0_Grayscale.bmp", gui, 0.05,
                    "Grayscale image");
 
+    // Binarization
     Preprocessing(&image, output_folder, verbose, save, gui);
 
     // DETECTION
@@ -90,6 +92,7 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "\n    🔍 2 Grid detection (Hough Transform)\n");
     printVerbose(verbose, "    🎥 2.1 Applying sobel edge detection filter\n");
 
+    // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
 
     Image drawImage = copyImage(&image, 0);
@@ -102,6 +105,7 @@ void *OCR(void *Thread_args)
     // Four possible angle
     double four_angles[4] = { 0.0 };
 
+    // Detect the grid
     SDL_Surface *cropped_image = detection(&image, &drawImage, verbose, save,
                                            output_folder, four_angles, gui);
 
@@ -112,6 +116,10 @@ void *OCR(void *Thread_args)
     Image cropped;
     cropped.surface = cropped_image;
     newImage(&cropped, 0);
+    
+    // Reverse the image before segmenting
+    reverse_color(&cropped);
+    updateSurface(&cropped);
 
     unsigned int dimension = hexa ? 16 : 9;
     unsigned int **grid = allocGrid(dimension);
@@ -136,18 +144,12 @@ void *OCR(void *Thread_args)
                        "Cropped image");
         printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
 
-        // Reverse the image before segmenting
-        reverse_color(&cropped);
-        updateSurface(&cropped);
-
         // Segmentation
         // Initialize all case at NULL
         SDL_Surface *all_cases[hexa ? 256 : 81];
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
-        // saveVerbose(verbose, &cropped, output_folder, "3.0_Segmented_image",
-        // save, 0);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         int val;
@@ -205,8 +207,8 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, "    🔍 4.2 Solving grid\n");
 
-    basicPrint(grid, dimension);
     solveSuduko(grid, 0, 0, dimension);
+    basicPrint(grid, dimension);
 
     if (!isSolved(grid, dimension))
     {
@@ -220,11 +222,11 @@ void *OCR(void *Thread_args)
     // Create, save and free the image
     Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
 
-    freeGrid(grid, dimension);
-    freeGrid(copy, dimension);
+    freeGrid(grid, dimension); // Free grid
+    freeGrid(copy, dimension); // Free copy
 
     saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 1);
     changeImageGUI(output_folder, "Result.bmp", gui, 1, "Result");
 
-    pthread_exit(NULL);
+    pthread_exit(NULL); // Exit thread
 }
