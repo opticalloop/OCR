@@ -208,7 +208,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBoxText">
+                          <object class="GtkComboBoxText" id = "dim_input">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="active">0</property>

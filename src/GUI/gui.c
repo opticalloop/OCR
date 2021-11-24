@@ -7,6 +7,7 @@ GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
+int processing = 0;
 
 char *get_filename_ext(const char *filename)
 {
@@ -98,36 +99,49 @@ void stop_processing()
 
 void run_process(GtkButton *button, gpointer data)
 {
-    if (thread != NULL)
+    if (processing)
     {
-        // change button text
-        // gtk_button_set_label(button, "Start");
-
-        // // cancel thread
+        processing = 0;
+        
+        // Change button text
+        gtk_button_set_label(button, "Start");
+        
+        // // Cancel processing
         // pthread_cancel(*thread);
         // pthread_join(*thread, NULL);
-
         // thread = NULL;
     }
     else
     {
+        processing = 1;
         // change text on button
         gtk_button_set_label(button, "Cancel");
         // show progress bar
         GtkProgressBar *progress_bar =
             GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
         gtk_widget_show(GTK_WIDGET(progress_bar));
-        // run the process
         // TODO : Get signal from 9x9 button
-        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE, 0);
+        // Get signal from combo box
+        GtkComboBox *combo_box = GTK_COMBO_BOX(
+            gtk_builder_get_object(builder, "dim_input"));
+        // Get string from combo box
+        char *dim = gtk_combo_box_text_get_active_text(
+            GTK_COMBO_BOX_TEXT(combo_box));
+        printf("%s\n", dim);
+        thread = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
     }
 }
 
 void open_website()
 {
-    if (!system("firefox www.opticalloop.bugbear.com")) // TODO: change website
+    // Check if the browser is installed
+    if (g_find_program_in_path("firefox") != NULL)
     {
-        printf("Error opening website\n");
+        // Open the website
+        if (!system("firefox www.opticalloop.bugbear.com")) // TODO: change website
+        {
+            printf("Error opening website\n");
+        }
     }
 }
 
