@@ -66,6 +66,12 @@ void *OCR(void *Thread_args)
 
     newImage(&image, 1);
 
+    if (image.width > 3000 || image.height > 3000)
+    {
+        printVerbose(verbose, "      📏 1.0 Simplifying image\n");
+        image = resize(&image, image.width * 0.5, image.height * 0.5, 1);
+    }
+
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
 
     if (!strcmp("image_06.jpeg", image_path))
@@ -109,7 +115,6 @@ void *OCR(void *Thread_args)
 
     unsigned int dimension = hexa ? 16 : 9;
     unsigned int **grid = allocGrid(dimension);
-    unsigned int **copy = allocGrid(dimension);
 
     // Recognisation + Construction
     printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
@@ -178,9 +183,6 @@ void *OCR(void *Thread_args)
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
         }
 
-        // Copy array to have different color when saving the image
-        copyArray(grid, copy, dimension);
-
         freeImage(&cropped, 0);
         freeNetwork(&network);
         break;
@@ -189,15 +191,20 @@ void *OCR(void *Thread_args)
     if (angle_index == 4)
     {
         printf("No solution\n");
+        freeGrid(grid, dimension);
         freeImage(&cropped, 0);
         freeNetwork(&network);
         pthread_exit(NULL);
     }
 
+    unsigned int **copy = allocGrid(dimension);
+    // Copy array to have different color when saving the image
+    copyArray(grid, copy, dimension);
+
     printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
     printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, "    🔍 4.2 Solving grid\n");
-    
+
     basicPrint(grid, dimension);
     solveSuduko(grid, 0, 0, dimension);
 

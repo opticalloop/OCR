@@ -1,6 +1,7 @@
 #include "Imagery/Rotations_Resize/resize.h"
 
-Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
+Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
+             unsigned int matrix)
 {
     unsigned int width = image->width;
     unsigned int height = image->height;
@@ -14,7 +15,7 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight)
     newimage.path = "";
     newimage.surface = NULL;
 
-    newImage(&newimage, 0);
+    newImage(&newimage, matrix);
 
     for (unsigned int x = 0; x < newwidth; x++)
     {

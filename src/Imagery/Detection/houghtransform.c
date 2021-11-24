@@ -136,8 +136,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         squares = findSquare(&resultingList, w, h, squareImage, save || gui);
         saveVerbose(verbose, squareImage, output_folder,
                     "2.6_Hough_squares_only", save || gui, 1);
-        changeImageGUI(output_folder, "2.6_Hough_squares_only.bmp", gui,
-                       0.6, "Hough squares only");
+        changeImageGUI(output_folder, "2.6_Hough_squares_only.bmp", gui, 0.6,
+                       "Hough squares only");
     }
     else
     {

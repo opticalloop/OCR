@@ -36,7 +36,7 @@ void split9(Image *image, SDL_Surface *seg81[81], int save, char *imagename)
                 newImage(&imagebis, 0);
 
                 // imagebis free in resize
-                Image imageresized = resize(&imagebis, 28, 28);
+                Image imageresized = resize(&imagebis, 28, 28, 0);
 
                 clearsquare(&imageresized);
                 updateSurface(&imageresized);

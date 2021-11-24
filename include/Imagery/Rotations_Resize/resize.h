@@ -21,6 +21,7 @@
  *      Return a new image, with the goods dimensions.
  */
 
-Image resize(Image *image, unsigned int width, unsigned int height);
+Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
+             unsigned int matrix);
 
 #endif
