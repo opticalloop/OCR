@@ -60,6 +60,7 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 {
     // select filename and update image
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
+    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
     char *ext = get_filename_ext(filename);
     GtkButton *button = data;
 
@@ -79,11 +80,13 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
         gtk_widget_set_sensitive(GTK_WIDGET(button),
                                  TRUE); // enable button to start processing
+        gtk_widget_set_sensitive(GTK_WIDGET(box_1), TRUE); // disable box
     }
     else
     {
         gtk_widget_set_sensitive(GTK_WIDGET(button),
                                  FALSE); // if not image file disable button
+        gtk_widget_set_sensitive(GTK_WIDGET(box_1), FALSE); // disable box
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
                                       NULL); // reset filename
 
@@ -131,7 +134,6 @@ void run_process(GtkButton *button)
         is_weights_available = 1;
         fclose(file);
     }
-
 
     if (processing)
     {
@@ -189,6 +191,17 @@ void open_website()
     }
 }
 
+void quit()
+{
+    if (thread != NULL)
+    {
+        // cancel thread
+        pthread_cancel(*thread);
+        pthread_join(*thread, NULL);
+    }
+    gtk_main_quit();
+}
+
 void *init_gui()
 {
     builder = NULL;
@@ -236,6 +249,9 @@ void *init_gui()
         GTK_BUTTON(gtk_builder_get_object(builder, "start"));
     gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE); // disable button
 
+    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
+    gtk_widget_set_sensitive(GTK_WIDGET(box_1), FALSE); // disable box
+
     stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
     stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
@@ -251,17 +267,6 @@ void *init_gui()
     SDL_FreeSurface(image);
     quit();
     pthread_exit(NULL);
-}
-
-void quit()
-{
-    if (thread != NULL)
-    {
-        // cancel thread
-        pthread_cancel(*thread);
-        pthread_join(*thread, NULL);
-    }
-    gtk_main_quit();
 }
 
 void resetNeuralNetwork()

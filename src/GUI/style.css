@@ -55,7 +55,15 @@ window button {
     margin-top: 15px;
     margin-bottom: 15px;
 }
-
+.button_panel .button_category {
+    border: 2px solid #ff8800;
+    padding: 10px;
+    border-radius: 5px;
+}
+.button_panel .button_category .button_element {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
 .right_panel button {
     /* background-color: rgb(255, 136, 0); */
     border: 1px solid #ff8800;
