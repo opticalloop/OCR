@@ -264,3 +264,13 @@ void quit()
     gtk_main_quit();
 }
 
+void resetNeuralNetwork()
+{
+    // Delete file
+    char cmd[200];
+    snprintf(cmd, sizeof(cmd), "rm -f %s", WEIGHTS_PATH);
+    if (!system(cmd))
+    {
+        printf("Error deleting file\n");
+    }
+}
