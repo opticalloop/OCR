@@ -68,17 +68,11 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
         four_angles[0] = 0;
-        four_angles[1] = 90;
-        four_angles[2] = 180;
-        four_angles[3] = 270;
     }
     else
     {
         printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
         four_angles[0] = angleRounded;
-        four_angles[1] = angleRounded + 90;
-        four_angles[2] = angleRounded + 180;
-        four_angles[3] = angleRounded + 270;
         rotateAll(&tempImage, &resultingList, angleRounded);
 
     }
