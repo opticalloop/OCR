@@ -139,7 +139,7 @@ void *OCR(void *Thread_args)
         if (!isSolvable(grid))
         {
             rotate(&cropped, four_angles[angle_index]);
-            if (angle_index == 4)
+            if (angle_index == 1)
             {
                 printf("No solution\n");
                 freeImage(&cropped, 0);   
