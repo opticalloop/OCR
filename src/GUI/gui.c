@@ -1,4 +1,3 @@
-
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.txt"
@@ -218,6 +217,13 @@ void edit_rotation(GtkWidget *widget, gpointer data)
     // reset scale to value 0
     GtkScale *scale =
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
+
+    // if scale value is not 0
+    if (gtk_range_get_value(GTK_SCALE(scale)) != 0)
+    {
+        // TODO : reset image
+    }
+
     gtk_range_set_value(GTK_RANGE(scale), 0);
 
     // change page
@@ -235,22 +241,12 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
 
     set_buttons_options_status(TRUE); // enable buttons
 
-    // change image
-    GtkImage *image =
-        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image"));
-
     // get scale value
     GtkScale *scale =
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
     rotation_value = gtk_range_get_value(GTK_RANGE(scale));
-}
 
-void cancel_edit_rotation(GtkWidget *widget, gpointer data)
-{
-    GtkWidget *page = data;
-    change_panel(NULL, page);
-
-    set_buttons_options_status(TRUE); // enable buttons
+    change_image(image, "selected_image"); // change image of main page
 }
 
 void rotate_img(GtkWidget *widget, gpointer data)
@@ -264,6 +260,36 @@ void rotate_img(GtkWidget *widget, gpointer data)
     tmp_rotation_value = value; // save new value
     rotateSurface(image, value);
     change_image(image, "selected_image2");
+}
+
+void edit_resize(GtkWidget *widget, gpointer data)
+{
+    // change image
+    change_image(image, "selected_image3");
+
+    // change page
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(FALSE); // disable buttons
+}
+void cancel_edit_option(GtkWidget *widget, gpointer data)
+{
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(TRUE); // enable buttons
+}
+
+void on_resize_finished(GtkWidget *widget, gpointer data)
+{
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(TRUE); // enable buttons
+
+    // change image
+    change_image(image, "selected_image");
 }
 
 void *init_gui()

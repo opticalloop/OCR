@@ -285,7 +285,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <signal name="clicked" handler="change_panel" object="resizePage" swapped="no"/>
+                            <signal name="clicked" handler="edit_resize" object="resizePage" swapped="no"/>
                             <style>
                               <class name="button_element"/>
                             </style>
@@ -562,7 +562,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <signal name="clicked" handler="cancel_edit_rotation" object="page1" swapped="no"/>
+                            <signal name="clicked" handler="cancel_edit_option" object="page1" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -667,6 +667,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="cancel_edit_option" object="page1" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -680,6 +681,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_resize_finished" object="page1" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
