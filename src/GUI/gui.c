@@ -8,6 +8,7 @@ gchar *filename;
 GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
+GtkRange *rotation_range;
 pthread_t *thread;
 int processing = 0;
 int is_weights_available = 0;
@@ -189,6 +190,21 @@ void open_website()
     }
 }
 
+void edit_rotation()
+{
+    // Show widget
+    gtk_widget_show(GTK_WIDGET(rotation_range));
+}
+
+void rotate_img()
+{
+    // Get range value
+    float value = gtk_range_get_value(rotation_range);
+    rotateSurface(image, value);
+    change_image(image);
+
+}
+
 void *init_gui()
 {
     builder = NULL;
@@ -241,6 +257,14 @@ void *init_gui()
 
     GtkProgressBar *progress_bar =
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+    
+    // Rotation range
+    rotation_range = GTK_RANGE(gtk_builder_get_object(builder, "Rotation_scale"));
+    gtk_range_set_range(rotation_range, -180, 180);
+    gtk_range_set_show_fill_level(rotation_range, TRUE);
+    gtk_range_set_value(rotation_range, 0);
+    gtk_widget_hide(GTK_WIDGET(rotation_range));
+    
 
     // load UI
     gtk_widget_show_all(window); // show window
