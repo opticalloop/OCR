@@ -44,7 +44,13 @@ void change_image(SDL_Surface *surface, char *GtkimageID)
     g_object_unref(pixbuf);
     g_object_unref(resized_image);
 }
-
+void set_leftPannel_status(gboolean status)
+{
+    // set the left pannel status
+    GtkWidget *leftPannel =
+        GTK_WIDGET(gtk_builder_get_object(builder, "left_panel"));
+    gtk_widget_set_sensitive(leftPannel, status);
+}
 void set_buttons_options_status(gboolean status)
 {
     GtkButton *button_start =
@@ -231,7 +237,7 @@ void edit_rotation(GtkWidget *widget, gpointer data)
     GtkWidget *page = data;
     change_panel(NULL, page);
 
-    set_buttons_options_status(FALSE); // disable buttons
+    set_leftPannel_status(FALSE); // disable buttons
 }
 
 void on_rotation_finished(GtkWidget *widget, gpointer data)
@@ -239,7 +245,7 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
     GtkWidget *page = data;
     change_panel(NULL, page);
 
-    set_buttons_options_status(TRUE); // enable buttons
+    set_leftPannel_status(TRUE); // enable buttons
 
     // get scale value
     GtkScale *scale =
@@ -271,14 +277,14 @@ void edit_resize(GtkWidget *widget, gpointer data)
     GtkWidget *page = data;
     change_panel(NULL, page);
 
-    set_buttons_options_status(FALSE); // disable buttons
+    set_leftPannel_status(FALSE); // disable buttons
 }
 void cancel_edit_option(GtkWidget *widget, gpointer data)
 {
     GtkWidget *page = data;
     change_panel(NULL, page);
 
-    set_buttons_options_status(TRUE); // enable buttons
+    set_leftPannel_status(TRUE); // enable buttons
 }
 
 void on_resize_finished(GtkWidget *widget, gpointer data)
@@ -286,7 +292,7 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     GtkWidget *page = data;
     change_panel(NULL, page);
 
-    set_buttons_options_status(TRUE); // enable buttons
+    set_leftPannel_status(TRUE); // enable buttons
 
     // change image
     change_image(image, "selected_image");

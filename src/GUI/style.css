@@ -73,7 +73,7 @@ window button {
 
 
 
-progress, trough,text {
+progress trough text {
     
     min-height: 20px;
     border-radius: 5px;
@@ -85,7 +85,7 @@ progress {
     background-image: linear-gradient(to right, rgb(189, 120, 10) 100%, #ff8800 100%);
     background-repeat: no-repeat;
 }
-trough {
+progress trough {
     
     background-color: rgb(38, 38, 47);
     
@@ -106,3 +106,17 @@ filechooser {
 filechooser button {
     color: black;
 }
+scale {
+    margin-bottom: 15px;
+
+  
+}
+scale trough {
+    background-color: rgb(38, 38, 47);
+    padding: 2px;
+   
+}
+scale slider {
+    background-image: linear-gradient(to right, rgb(189, 120, 10) 100%, #ff8800 100%);
+}
+
