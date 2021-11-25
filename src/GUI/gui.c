@@ -1,6 +1,8 @@
 
 #include "GUI/gui.h"
 
+#define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.txt"
+
 GtkBuilder *builder;
 gchar *filename;
 GtkWidget *window = NULL;
@@ -118,6 +120,19 @@ void stop_processing()
 
 void run_process(GtkButton *button)
 {
+    // Check if file exist opening it
+    FILE *file = fopen(WEIGHTS_PATH, "r");
+    if (file == NULL)
+    {
+        is_weights_available = 0;
+    }
+    else
+    {
+        is_weights_available = 1;
+        fclose(file);
+    }
+
+
     if (processing)
     {
         processing = 0;
