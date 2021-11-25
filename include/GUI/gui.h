@@ -11,7 +11,7 @@
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "ocr.h"
 
-void change_image(SDL_Surface *surface);
+void change_image(SDL_Surface *surface, char *GtkimageID);
 
 void edit_progress_bar(float progress, char *text);
 

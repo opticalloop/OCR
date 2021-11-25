@@ -3,13 +3,11 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
-  <object class="GtkFileFilter" id="filefilter1">
-    <mime-types>
-      <mime-type>jpg</mime-type>
-      <mime-type>bmp</mime-type>
-      <mime-type>jpeg</mime-type>
-      <mime-type>png</mime-type>
-    </mime-types>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="lower">-360</property>
+    <property name="upper">360</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
@@ -270,7 +268,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <signal name="clicked" handler="change_panel" object="rotationPage" swapped="no"/>
+                            <signal name="clicked" handler="edit_rotation" object="rotationPage" swapped="no"/>
                             <style>
                               <class name="button_element"/>
                             </style>
@@ -542,7 +540,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     </child>
                   </object>
                   <packing>
-                    <property name="name">page2</property>
+                    <property name="name">page3</property>
                     <property name="title" translatable="yes">page0</property>
                     <property name="position">2</property>
                   </packing>
@@ -552,6 +550,48 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkButtonBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">12</property>
+                        <property name="layout_style">start</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">Cancel</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="cancel_edit_rotation" object="page1" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">OK</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_rotation_finished" object="page1" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
                     <child>
                       <object class="GtkImage" id="selected_image2">
                         <property name="visible">True</property>
@@ -566,14 +606,25 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">0</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkScale" id="scale_rotation">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">False</property>
+                        <property name="adjustment">adjustment1</property>
+                        <property name="round_digits">1</property>
+                        <signal name="value-changed" handler="rotate_img" object="selected_image2" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -601,14 +652,48 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">0</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkButtonBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">12</property>
+                        <property name="layout_style">start</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">Cancel</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">OK</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -636,5 +721,13 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>jpg</mime-type>
+      <mime-type>bmp</mime-type>
+      <mime-type>jpeg</mime-type>
+      <mime-type>png</mime-type>
+    </mime-types>
   </object>
 </interface>

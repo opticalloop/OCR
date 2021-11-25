@@ -8,10 +8,12 @@ gchar *filename;
 GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
-GtkRange *rotation_range;
 pthread_t *thread;
 int processing = 0;
 int is_weights_available = 0;
+float rotation_value = 0;
+float tmp_rotation_value = 0;
+
 SDL_Surface *image;
 
 char *get_filename_ext(const char *filename)
@@ -23,10 +25,10 @@ char *get_filename_ext(const char *filename)
     return dot + 1;
 }
 
-void change_image(SDL_Surface *surface)
+void change_image(SDL_Surface *surface, char *GtkimageID)
 {
-    GtkImage *imageWidget = GTK_IMAGE(
-        gtk_builder_get_object(builder, "selected_image")); // get image
+    GtkImage *imageWidget =
+        GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
     // convert SDL surface to GTK image
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_data(
         surface->pixels, GDK_COLORSPACE_RGB, FALSE, 8, surface->w, surface->h,
@@ -42,6 +44,17 @@ void change_image(SDL_Surface *surface)
     // free
     g_object_unref(pixbuf);
     g_object_unref(resized_image);
+}
+
+void set_buttons_options_status(gboolean status)
+{
+    GtkButton *button_start =
+        GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button_start),
+                             status); // disable button
+
+    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
+    gtk_widget_set_sensitive(GTK_WIDGET(box_1), status); // disable box
 }
 
 void edit_progress_bar(float progress, char *text)
@@ -71,7 +84,7 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     {
         // load image
         image = IMG_Load(filename);
-        change_image(image);
+        change_image(image, "selected_image");
 
         // update label
         GtkLabel *label =
@@ -79,17 +92,13 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         gtk_label_set_text(label, filename);
 
         gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
-        gtk_widget_set_sensitive(GTK_WIDGET(button),
-                                 TRUE); // enable button to start processing
-        gtk_widget_set_sensitive(GTK_WIDGET(box_1), TRUE); // disable box
+        set_buttons_options_status(TRUE); // enable buttons
     }
     else
     {
-        gtk_widget_set_sensitive(GTK_WIDGET(button),
-                                 FALSE); // if not image file disable button
-        gtk_widget_set_sensitive(GTK_WIDGET(box_1), FALSE); // disable box
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
-                                      NULL); // reset filename
+        set_buttons_options_status(FALSE); // disable buttons
+        // gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
+        //                               NULL); // reset filename
 
         // display error message
         GtkWidget *dialog = gtk_message_dialog_new(
@@ -202,18 +211,59 @@ void quit()
     }
     gtk_main_quit();
 }
-void edit_rotation()
+void edit_rotation(GtkWidget *widget, gpointer data)
 {
-    // Show widget
-    gtk_widget_show(GTK_WIDGET(rotation_range));
+    // change image
+    change_image(image, "selected_image2");
+    // reset scale to value 0
+    GtkScale *scale =
+        GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
+    gtk_range_set_value(GTK_RANGE(scale), 0);
+
+    // change page
+
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(FALSE); // disable buttons
 }
 
-void rotate_img()
+void on_rotation_finished(GtkWidget *widget, gpointer data)
+{
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(TRUE); // enable buttons
+
+    // change image
+    GtkImage *image =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image"));
+
+    // get scale value
+    GtkScale *scale =
+        GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
+    rotation_value = gtk_range_get_value(GTK_RANGE(scale));
+}
+
+void cancel_edit_rotation(GtkWidget *widget, gpointer data)
+{
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_buttons_options_status(TRUE); // enable buttons
+}
+
+void rotate_img(GtkWidget *widget, gpointer data)
 {
     // Get range value
-    float value = gtk_range_get_value(rotation_range);
+    float value = gtk_range_get_value(widget);
+    value -= tmp_rotation_value; // get difference between old and new value
+    // if (value < 0) // if value is negative
+    //     value = 360 + value; // convert to positive value
+
+    tmp_rotation_value = value; // save new value
     rotateSurface(image, value);
-    change_image(image);
+    change_image(image, "selected_image2");
 }
 
 void *init_gui()
@@ -259,26 +309,13 @@ void *init_gui()
                                               GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // load widgets
-    GtkButton *button_start =
-        GTK_BUTTON(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button_start), FALSE); // disable button
-
-    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
-    gtk_widget_set_sensitive(GTK_WIDGET(box_1), FALSE); // disable box
+    set_buttons_options_status(FALSE);
 
     stack = GTK_STACK(gtk_builder_get_object(builder, "window_pages"));
     stack_2 = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
     GtkProgressBar *progress_bar =
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
-
-    // Rotation range
-    rotation_range =
-        GTK_RANGE(gtk_builder_get_object(builder, "Rotation_scale"));
-    gtk_range_set_range(rotation_range, -180, 180);
-    gtk_range_set_show_fill_level(rotation_range, TRUE);
-    gtk_range_set_value(rotation_range, 0);
-    gtk_widget_hide(GTK_WIDGET(rotation_range));
 
     // load UI
     gtk_widget_show_all(window); // show window
