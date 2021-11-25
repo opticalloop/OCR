@@ -8,6 +8,7 @@ GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
 int processing = 0;
+int is_weights_available = 0;
 SDL_Surface *image;
 
 char *get_filename_ext(const char *filename)
@@ -127,7 +128,7 @@ void run_process(GtkButton *button)
         // pthread_join(*thread, NULL);
         // thread = NULL;
     }
-    else
+    else if (is_weights_available)
     {
         processing = 1;
         // change text on button
@@ -147,6 +148,16 @@ void run_process(GtkButton *button)
         // Run processing
         thread = OCR_thread(image, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
+    }
+    else
+    {
+        // display error message
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+            "No weights available. Please train the network first.");
+        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+        gtk_widget_destroy(dialog); // destroy dialog
     }
 }
 
@@ -237,3 +248,4 @@ void quit()
     }
     gtk_main_quit();
 }
+
