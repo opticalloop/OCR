@@ -1,6 +1,6 @@
 #include "GUI/gui.h"
 
-#define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.txt"
+#define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
 
 GtkBuilder *builder;
 gchar *filename;
@@ -270,6 +270,13 @@ void rotate_img(GtkWidget *widget, gpointer data)
 
 void edit_resize(GtkWidget *widget, gpointer data)
 {
+    SDL_Rect rect;
+    rect.x = 100;
+    rect.y = 100;
+    rect.w = 1000;
+    rect.h = 1000;
+    selectionFilter(image, &rect);
+
     // change image
     change_image(image, "selected_image3");
 

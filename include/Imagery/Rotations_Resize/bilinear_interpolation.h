@@ -25,11 +25,4 @@ double bilinearly_interpolate(unsigned int top, unsigned int bottom,
                               double horizontal_position,
                               double vertical_position, Pixel **pixels);
 
-double bilinearly_interpolateSurface(unsigned int top, unsigned int bottom,
-                                     unsigned int left, unsigned int right,
-                                     double horizontal_position,
-                                     double vertical_position, double top_left,
-                                     double top_right, double bottom_left,
-                                     double bottom_right);
-
 #endif
