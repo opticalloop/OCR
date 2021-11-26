@@ -132,15 +132,11 @@ void saveGrid(unsigned int **grid, char outputPath[], int verbose,
     fclose(f);
 }
 
-Image createSudokuImage(unsigned int **grid, unsigned int **copy,
+SDL_Surface *createSudokuImage(unsigned int **grid, unsigned int **copy,
                         char *folder_path, unsigned int dimension)
 {
-    Image image;
-    image.width = 266;
-    image.height = 266;
-    image.surface = NULL;
-    image.path = ""; // To create an RGB surface
-    newImage(&image, 0);
+    SDL_Surface *image = SDL_CreateRGBSurface(0, 266,266, 32, 0, 0,
+                                              0, 0);
 
     for (unsigned int x = 0; x < 266; x++)
     {
@@ -153,15 +149,10 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                     && y != 59 && y != 88 && y != 89 && y != 118 && y != 147
                     && y != 176 && y != 177 && y != 206 && y != 235))
             {
-                image.pixels[x][y].r = 255;
-                image.pixels[x][y].g = 255;
-                image.pixels[x][y].b = 255;
+                put_pixel(image, x, y, 0);
             }
         }
     }
-
-    // Update surface,
-    updateSurface(&image);
 
     // Coordonates
     unsigned int Array[9] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
@@ -179,8 +170,8 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
             val = grid[i][j];
             if (val != 0)
             {
-                rect.x = Array[j];
-                rect.y = Array[i];
+                rect.x = Array[i];
+                rect.y = Array[j];
 
                 SDL_Surface *surface;
                 // Get the image number and copy it
@@ -188,7 +179,7 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                     surface = getImage(val, IMAGE_DIRECTORY, copy[i][j]);
                 else
                     surface = getImage(val, folder_path, copy[i][j]);
-                SDL_BlitSurface(surface, NULL, image.surface, &rect);
+                SDL_BlitSurface(surface, NULL, image, &rect);
                 SDL_FreeSurface(surface);
             }
         }
@@ -208,6 +199,7 @@ SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green)
     {
         snprintf(str, sizeof(str), "%s/%u_black.jpg", directory, val);
     }
+    printf("%s\n", str);
     SDL_Surface *surface = load_image(str);
     return surface;
 }

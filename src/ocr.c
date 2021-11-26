@@ -100,7 +100,7 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-    double four_angles[4] = { 0.0 };
+    double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
     SDL_Surface *cropped_image = detection(&image, &drawImage, verbose, save,
@@ -161,6 +161,7 @@ void *OCR(void *Thread_args)
                 {
                     val = 0;
                 }
+                val = 0;
                 grid[i][j] = val;
 
                 // Free the case
@@ -219,13 +220,26 @@ void *OCR(void *Thread_args)
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    SDL_Surface *sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
 
-    saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 0);
-    changeImageGUI(&sudoku_image, gui, 1, "Result", 1);
+    // Save image
+    if (verbose)
+    {
+        printf("<-- 💾 Saving sudoku image to %s/grid.bmp\n", output_folder);
+ 
+    }
+    char out[200];
+    snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
+    SDL_SaveBMP(sudoku_image, out);
+    SDL_FreeSurface(sudoku_image);
 
+    if (gui)
+    {
+        change_image(sudoku_image, "selected_image");
+        edit_progress_bar(1, "Result");
+    }
     pthread_exit(NULL); // Exit thread
 }
