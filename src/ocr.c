@@ -178,7 +178,7 @@ void *OCR(void *Thread_args)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
                 printf("\n\n    ❓ Re-attemping with %f degree angle\n",
-                       four_angles[angle_index]);
+                       four_angles[angle_index] + four_angles[0]);
             }
             continue;
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
