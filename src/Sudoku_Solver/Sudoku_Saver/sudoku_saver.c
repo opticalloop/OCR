@@ -199,7 +199,6 @@ SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green)
     {
         snprintf(str, sizeof(str), "%s/%u_black.jpg", directory, val);
     }
-    printf("%s\n", str);
     SDL_Surface *surface = load_image(str);
     return surface;
 }

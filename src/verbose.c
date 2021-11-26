@@ -28,10 +28,10 @@ void changeImageGUI(Image *image, int gui, double value, char *message,
     {
         change_image(image->surface, "selected_image");
         edit_progress_bar(value, message);
-        if (free)
-        {
-            freeImage(image, 0);
-        }
+    }
+    if (free)
+    {
+        freeImage(image, 0);
     }
 }
 

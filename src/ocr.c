@@ -161,7 +161,6 @@ void *OCR(void *Thread_args)
                 {
                     val = 0;
                 }
-                val = 0;
                 grid[i][j] = val;
 
                 // Free the case
@@ -234,12 +233,12 @@ void *OCR(void *Thread_args)
     char out[200];
     snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
     SDL_SaveBMP(sudoku_image, out);
-    SDL_FreeSurface(sudoku_image);
 
     if (gui)
     {
         change_image(sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
+    SDL_FreeSurface(sudoku_image);
     pthread_exit(NULL); // Exit thread
 }
