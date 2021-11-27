@@ -14,6 +14,14 @@ float rotation_value = 0;
 float tmp_rotation_value = 0;
 
 SDL_Surface *image;
+SDL_Surface *temp_image;
+
+// Resize global variables
+int resizing = 0;
+int resized_x = -1;
+int resized_y = -1;
+int resized_w = -1;
+int resized_h = -1;
 
 char *get_filename_ext(const char *filename)
 {
@@ -90,6 +98,11 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         // load image
         image = IMG_Load(filename);
         change_image(image, "selected_image");
+
+        // Copy image to temp
+        temp_image =
+            SDL_CreateRGBSurface(0, image->w, image->h, 32, 0, 0, 0, 0);
+        SDL_BlitSurface(image, NULL, temp_image, NULL);
 
         // update label
         GtkLabel *label =
@@ -216,6 +229,19 @@ void quit()
     }
     gtk_main_quit();
 }
+
+void cancel_edit_option(GtkWidget *widget, gpointer data)
+{
+    resizing = 0;
+
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
+}
+
+// ------ ROTATION ------
+
 void edit_rotation(GtkWidget *widget, gpointer data)
 {
     // change image
@@ -224,13 +250,9 @@ void edit_rotation(GtkWidget *widget, gpointer data)
     GtkScale *scale =
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
 
-    // if scale value is not 0
-    if (gtk_range_get_value(GTK_SCALE(scale)) != 0)
-    {
-        // TODO : reset image
-    }
-
-    gtk_range_set_value(GTK_RANGE(scale), 0);
+    // If rotation value is not zero, the image have already been rotated
+    gtk_range_set_value(GTK_RANGE(scale),
+                        rotation_value != 0 ? rotation_value : 0);
 
     // change page
 
@@ -257,25 +279,24 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
 
 void rotate_img(GtkWidget *widget, gpointer data)
 {
+    // Copy temp to img
+    SDL_BlitSurface(temp_image, NULL, image, NULL);
+
     // Get range value
     float value = gtk_range_get_value(widget);
-    value -= tmp_rotation_value; // get difference between old and new value
-    // if (value < 0) // if value is negative
-    //     value = 360 + value; // convert to positive value
 
-    tmp_rotation_value = value; // save new value
     rotateSurface(image, value);
     change_image(image, "selected_image2");
 }
 
+// ------ /ROTATION ------
+
+// ------ RESIZE ------
+
 void edit_resize(GtkWidget *widget, gpointer data)
 {
-    SDL_Rect rect;
-    rect.x = 100;
-    rect.y = 100;
-    rect.w = 1000;
-    rect.h = 1000;
-    selectionFilter(image, &rect);
+    resizing = 1;
+    printf("Resizing\n");
 
     // change image
     change_image(image, "selected_image3");
@@ -286,16 +307,18 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     set_leftPannel_status(FALSE); // disable buttons
 }
-void cancel_edit_option(GtkWidget *widget, gpointer data)
-{
-    GtkWidget *page = data;
-    change_panel(NULL, page);
-
-    set_leftPannel_status(TRUE); // enable buttons
-}
 
 void on_resize_finished(GtkWidget *widget, gpointer data)
 {
+    resizing = 0;
+
+    SDL_Rect rect;
+    rect.x = resized_x;
+    rect.y = resized_y;
+    rect.w = resized_w;
+    rect.h = resized_h;
+    cropSurface(image, &rect);
+
     GtkWidget *page = data;
     change_panel(NULL, page);
 
@@ -304,6 +327,8 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     // change image
     change_image(image, "selected_image");
 }
+
+// ------ /RESIZE ------
 
 void *init_gui()
 {
@@ -363,6 +388,7 @@ void *init_gui()
 
     // End program
     SDL_FreeSurface(image);
+    SDL_FreeSurface(temp_image);
     quit();
     pthread_exit(NULL);
 }

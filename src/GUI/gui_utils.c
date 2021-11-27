@@ -1,6 +1,6 @@
 #include "GUI/gui_utils.h"
 
-double bilinearly_interpolateSurface(unsigned int top,unsigned int left,
+double bilinearly_interpolateSurface(unsigned int top, unsigned int left,
                                      double horizontal_position,
                                      double vertical_position, double top_left,
                                      double top_right, double bottom_left,
@@ -128,8 +128,7 @@ void selectionFilter(SDL_Surface *surface, SDL_Rect *selection)
     {
         for (unsigned int j = 0; j < height; j++)
         {
-            if (i < x || i > x + rect_width
-                || j < y || j > y + rect_height)
+            if (i < x || i > x + rect_width || j < y || j > y + rect_height)
             {
                 // Make pixel darker
                 pixel = get_pixel(surface, i, j);
@@ -139,4 +138,13 @@ void selectionFilter(SDL_Surface *surface, SDL_Rect *selection)
             }
         }
     }
+}
+
+void cropSurface(SDL_Surface *surface, SDL_Rect *selection)
+{
+    SDL_Surface *tempSurface =
+        SDL_CreateRGBSurface(0, selection->w, selection->h, 32, 0, 0, 0, 0);
+    SDL_BlitSurface(tempSurface, NULL, surface, NULL);
+    SDL_BlitSurface(surface, selection, tempSurface, NULL);
+    SDL_FreeSurface(tempSurface);
 }
