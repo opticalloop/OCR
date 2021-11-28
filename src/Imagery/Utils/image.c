@@ -221,7 +221,7 @@ Pixel InstantiatePixelZero()
     return pixel;
 }
 
-Pixel **copyPixelsArray(Image *image)
+Pixel **copyPixelsArray(Image *image, int matrix)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
@@ -248,35 +248,49 @@ Pixel **copyPixelsArray(Image *image)
             mask[i][j].r = image->pixels[i][j].r;
             mask[i][j].g = image->pixels[i][j].g;
             mask[i][j].b = image->pixels[i][j].b;
-            mask[i][j].matrix = NULL;
-            mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
-
-            if (mask[i][j].matrix == NULL)
+            if (matrix)
             {
-                errx(EXIT_FAILURE,
-                     "Error while allocating pixels pointers for the image "
-                     "(matrix)");
+                mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
+                if (mask[i][j].matrix == NULL)
+                {
+                    errx(EXIT_FAILURE,
+                        "Error while allocating pixels pointers for the image "
+                        "(matrix)");
+                }
             }
         }
     }
-    // fill the neighbours matrix
-    for (unsigned int i = 0; i < w; ++i)
+    if (matrix)
     {
-        for (unsigned int j = 0; j < h; ++j)
+        // fill the neighbours matrix
+        for (unsigned int i = 0; i < w; ++i)
         {
-            FillMatrix(mask, i, j, w, h);
+            for (unsigned int j = 0; j < h; ++j)
+            {
+                FillMatrix(mask, i, j, w, h);
+            }
         }
     }
     return mask;
 }
 
-Image copyImage(Image *image, int matrix)
+Image copyImage(Image *image, int matrix, int pixel)
 {
     Image res;
-    res.surface =
-        SDL_CreateRGBSurface(0, image->width, image->height, 32, 0, 0, 0, 0);
-    SDL_BlitSurface(image->surface, NULL, res.surface, NULL);
-    newImage(&res, matrix);
+    if (!pixel)
+    {
+        res.surface =
+            SDL_CreateRGBSurface(0, image->width, image->height, 32, 0, 0, 0, 0);
+        SDL_BlitSurface(image->surface, NULL, res.surface, NULL);
+        newImage(&res, matrix);
+    }
+    else
+    {
+        res.pixels = copyPixelsArray(image, matrix);
+        res.width = image->width;
+        res.height = image->height;
+    }
     return res;
 }
 

@@ -13,8 +13,8 @@ int is_weights_available = 0;
 float rotation_value = 0;
 float tmp_rotation_value = 0;
 
-SDL_Surface *image;
-SDL_Surface *temp_image;
+Image *image = NULL;
+Image *temp_image;
 
 // Resize global variables
 int resizing = 0;
@@ -32,14 +32,39 @@ char *get_filename_ext(const char *filename)
     return dot + 1;
 }
 
-void change_image(SDL_Surface *surface, char *GtkimageID)
+GdkPixbuf *image_to_pixbuf(Image *image)
+{
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(
+        GDK_COLORSPACE_RGB, TRUE, 8, image->width, image->height);
+
+    int width = gdk_pixbuf_get_width(pixbuf);
+    int height = gdk_pixbuf_get_height(pixbuf);
+
+    int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
+
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            guchar *p = pixels + y * rowstride + x * n_channels;
+            p[0] = image->pixels[x][y].r;
+            p[1] = image->pixels[x][y].g;
+            p[2] = image->pixels[x][y].b;
+            p[3] = 255;
+        }
+    }
+
+    return pixbuf;
+}
+
+void change_image(Image *_image, char *GtkimageID)
 {
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
-    // convert SDL surface to GTK image
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_data(
-        surface->pixels, GDK_COLORSPACE_RGB, FALSE, 8, surface->w, surface->h,
-        surface->pitch, NULL, NULL);
+    
+    GdkPixbuf *pixbuf = image_to_pixbuf(_image);
 
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
@@ -95,14 +120,15 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
         || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
     {
-        // load image
-        image = IMG_Load(filename);
-        change_image(image, "selected_image");
+        Image img_temp;
+        img_temp.surface = load_image(filename);
+        newImage(&img_temp, 0);
+        Image tmp = copyImage(&img_temp, 0, 1);
 
-        // Copy image to temp
-        temp_image =
-            SDL_CreateRGBSurface(0, image->w, image->h, 32, 0, 0, 0, 0);
-        SDL_BlitSurface(image, NULL, temp_image, NULL);
+        temp_image = &img_temp;
+        image = &tmp;
+
+        change_image(image, "selected_image");
 
         // update label
         GtkLabel *label =
@@ -191,7 +217,7 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         // Run processing
-        thread = OCR_thread(image, NULL, TRUE, TRUE, "tmp", TRUE,
+        thread = OCR_thread(image->surface, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
     }
     else
@@ -280,12 +306,19 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
 void rotate_img(GtkWidget *widget, gpointer data)
 {
     // Copy temp to img
-    SDL_BlitSurface(temp_image, NULL, image, NULL);
+    // Free image pixels
+    for (int i = 0; i < image->width; i++)
+    {
+        free(image->pixels[i]);
+    }
+    free(image->pixels);
+
+    image->pixels = copyPixelsArray(temp_image->pixels, 0);
 
     // Get range value
     float value = gtk_range_get_value(widget);
 
-    rotateSurface(image, value);
+    rotate(image, value);
     change_image(image, "selected_image2");
 }
 
@@ -317,7 +350,7 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     rect.y = resized_y;
     rect.w = resized_w;
     rect.h = resized_h;
-    cropSurface(image, &rect);
+    cropSurface(image->surface, &rect);
 
     GtkWidget *page = data;
     change_panel(NULL, page);
@@ -387,8 +420,8 @@ void *init_gui()
     gtk_main(); // start main loop
 
     // End program
-    SDL_FreeSurface(image);
-    SDL_FreeSurface(temp_image);
+    freeImage(image, 0);
+    freeImage(temp_image, 0);
     quit();
     pthread_exit(NULL);
 }

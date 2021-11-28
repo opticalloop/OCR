@@ -123,9 +123,9 @@ Pixel InstantiatePixelZero();
  *  Return:
  *
  */
-Pixel **copyPixelsArray(Image *image);
+Pixel **copyPixelsArray(Image *image, int matrix);
 
-Image copyImage(Image *image, int matrix);
+Image copyImage(Image *image, int matrix, int pixel);
 
 /*
  *  Summary:

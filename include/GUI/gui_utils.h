@@ -12,8 +12,6 @@ double bilinearly_interpolateSurface(unsigned int top, unsigned int left,
                                      double top_right, double bottom_left,
                                      double bottom_right);
 
-void rotateSurface(SDL_Surface *surface, double angleDegree);
-
 typedef struct thread_data
 {
     unsigned int x;
