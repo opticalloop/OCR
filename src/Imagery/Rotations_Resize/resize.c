@@ -9,13 +9,14 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
     double xscale = newwidth / (double)width;
     double yscale = newheight / (double)height;
 
-    Image newimage;
-    newimage.width = newwidth;
-    newimage.height = newheight;
-    newimage.path = "";
-    newimage.surface = NULL;
+    SDL_Surface *surface = SDL_CreateRGBSurface(0, 1, 1, 32, 0, 0, 0, 0);
+    surface->w = newwidth;
+    surface->h = newheight;
+    surface->pitch = -1;
 
-    newImage(&newimage, matrix);
+    Image newimage = newImage(surface, matrix);
+
+    SDL_FreeSurface(surface);
 
     for (unsigned int x = 0; x < newwidth; x++)
     {

@@ -9,8 +9,8 @@
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder, double four_angles[4], int gui);
+Image detection(Image *image, Image *drawImage, int verbose, int save,
+                char *output_folder, double four_angles[4], int gui);
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                         char *output_folder);

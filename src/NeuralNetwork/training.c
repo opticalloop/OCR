@@ -38,7 +38,7 @@ void checkInputs(double inputs[NBINPUTS])
     }
 }
 
-void imageToBinary(SDL_Surface *surface, int inputs[])
+void imageToBinary(Image *image, int inputs[])
 {
     SDL_Color rgb;
     Uint32 pixel;
@@ -46,12 +46,11 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
     {
         for (unsigned int j = 0; j < 28; j++)
         {
-            // Get pixel colors
-            pixel = get_pixel(surface, i, j);
-            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
-
             // Black and white
-            if ((rgb.r + rgb.g + rgb.b) / 3 > 128)
+            if ((image->pixels[i][j].r + image->pixels[i][j].g
+                 + image->pixels[i][j].b)
+                    / 3
+                > 128)
             {
                 // White are 0
                 inputs[j * 28 + i] = 0;
@@ -264,7 +263,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     freeNetwork(network);
 }
 
-int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
+int getNetworkOutput(Network *network, Image *image, int verbose)
 {
     if (verbose)
     {
@@ -294,16 +293,14 @@ int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
     return result;
 }
 
-int isFullWhite(SDL_Surface *surface)
+int isFullWhite(Image *image)
 {
     Uint32 pixel;
-    for (unsigned int i = 0; i < surface->w; i++)
+    for (unsigned int i = 0; i < image->width; i++)
     {
-        for (unsigned int j = 0; j < surface->h; j++)
+        for (unsigned int j = 0; j < image->height; j++)
         {
-            // Get pixel from surface
-            pixel = get_pixel(surface, i, j);
-            if (pixel == 0)
+            if (image->pixels[i][j].r == 0)
             {
                 return 0;
             }

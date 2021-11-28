@@ -34,8 +34,8 @@ char *get_filename_ext(const char *filename)
 
 GdkPixbuf *image_to_pixbuf(Image *image)
 {
-    GdkPixbuf *pixbuf = gdk_pixbuf_new(
-        GDK_COLORSPACE_RGB, TRUE, 8, image->width, image->height);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8,
+                                       image->width, image->height);
 
     int width = gdk_pixbuf_get_width(pixbuf);
     int height = gdk_pixbuf_get_height(pixbuf);
@@ -63,7 +63,7 @@ void change_image(Image *_image, char *GtkimageID)
 {
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
-    
+
     GdkPixbuf *pixbuf = image_to_pixbuf(_image);
 
     // resize the image
@@ -120,12 +120,11 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
         || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
     {
-        Image img_temp;
-        img_temp.surface = load_image(filename);
-        newImage(&img_temp, 0);
-        Image tmp = copyImage(&img_temp, 0, 1);
-
+        SDL_Surface *surface = IMG_Load(filename);
+        Image img_temp = newImage(surface, 0);
         temp_image = &img_temp;
+
+        Image tmp = copyImage(&img_temp, 0);
         image = &tmp;
 
         change_image(image, "selected_image");
@@ -217,7 +216,7 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         // Run processing
-        thread = OCR_thread(image->surface, NULL, TRUE, TRUE, "tmp", TRUE,
+        thread = OCR_thread(image, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
     }
     else
@@ -307,13 +306,9 @@ void rotate_img(GtkWidget *widget, gpointer data)
 {
     // Copy temp to img
     // Free image pixels
-    for (int i = 0; i < image->width; i++)
-    {
-        free(image->pixels[i]);
-    }
-    free(image->pixels);
+    freeImage(image, 0);
 
-    image->pixels = copyPixelsArray(temp_image->pixels, 0);
+    image->pixels = copyPixelsArray(temp_image, 0);
 
     // Get range value
     float value = gtk_range_get_value(widget);
@@ -350,7 +345,8 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     rect.y = resized_y;
     rect.w = resized_w;
     rect.h = resized_h;
-    cropSurface(image->surface, &rect);
+    Image img = cropImage(image, &rect);
+    image = &img;
 
     GtkWidget *page = data;
     change_panel(NULL, page);
