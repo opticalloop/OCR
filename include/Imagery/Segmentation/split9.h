@@ -24,6 +24,6 @@
  *      Nothing save is done directly and array is modify directly in the
  * function
  */
-void split9(Image *image, SDL_Surface *seg81[], int save, char *imagename);
+void split9(Image *image, Image seg81[81], int save, char *imagename);
 
 #endif

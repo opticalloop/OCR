@@ -1,29 +1,30 @@
 #include "Sudoku_Solver/Sudoku_Saver/sudoku_saver.h"
 
-void copyArray(unsigned int grid[dim][dim], unsigned int destination[dim][dim])
+void copyArray(unsigned int **grid, unsigned int **destination,
+               unsigned int dimension)
 {
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             destination[i][j] = grid[i][j];
         }
     }
 }
 
-void basicPrint(unsigned int grid[dim][dim])
+void basicPrint(unsigned int **grid, unsigned int dimension)
 {
     printf("\n");
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        if (i % ((unsigned int)sqrt(dim)) == 0 && i != 0)
+        if (i % ((unsigned int)sqrt(dimension)) == 0 && i != 0)
         {
             printf("\n");
         }
 
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
-            if (j % ((unsigned int)sqrt(dim)) == 0 && j != 0)
+            if (j % ((unsigned int)sqrt(dimension)) == 0 && j != 0)
             {
                 printf(" ");
             }
@@ -34,7 +35,8 @@ void basicPrint(unsigned int grid[dim][dim])
     }
 }
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
+void readGrid(unsigned int **grid, char inputPath[], int verbose,
+              unsigned int dimension)
 {
     FILE *fp;
 
@@ -52,7 +54,7 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
     }
 
     char ch = 0;
-    unsigned int tempGrid[dim * dim];
+    unsigned int tempGrid[dimension * dimension];
     unsigned int index = 0;
 
     while ((ch = fgetc(fp)) != EOF)
@@ -76,18 +78,19 @@ void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose)
         index++;
     }
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
-            grid[i][j] = tempGrid[i * dim + j];
+            grid[i][j] = tempGrid[i * dimension + j];
         }
     }
 
     fclose(fp);
 }
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
+void saveGrid(unsigned int **grid, char outputPath[], int verbose,
+              unsigned int dimension)
 {
     FILE *f = fopen(outputPath, "w");
     if (f == NULL)
@@ -97,14 +100,12 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
 
     if (verbose)
     {
-        printf("<-- 📂 Saving grid to ");
-        printf("%s", outputPath);
-        printf("\n");
+        printf("<-- 💾 Saving grid to %s\n", outputPath);
     }
 
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             if (grid[i][j] == 0)
             {
@@ -131,15 +132,11 @@ void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose)
     fclose(f);
 }
 
-Image createSudokuImage(unsigned int grid[dim][dim],
-                        unsigned int copy[dim][dim])
+Image createSudokuImage(unsigned int **grid, unsigned int **copy,
+                        char *folder_path, unsigned int dimension)
 {
-    Image image;
-    image.width = 266;
-    image.height = 266;
-    image.surface = NULL;
-    image.path = ""; // To create an RGB surface
-    newImage(&image);
+    SDL_Surface *surface;
+    Image image = newImage(NULL, 0, 266, 266);
 
     for (unsigned int x = 0; x < 266; x++)
     {
@@ -159,21 +156,18 @@ Image createSudokuImage(unsigned int grid[dim][dim],
         }
     }
 
-    // Update surface,
-    updateSurface(&image);
-
     // Coordonates
-    unsigned int Array[dim] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
+    unsigned int Array[9] = { 2, 31, 60, 90, 119, 148, 178, 207, 236 };
     unsigned int val;
 
     // SDL_Rect to copy to the actual image
     SDL_Rect rect;
     rect.w = IMAGE_SIZE;
     rect.h = IMAGE_SIZE;
-
-    for (unsigned int i = 0; i < dim; i++)
+    Image temp;
+    for (unsigned int i = 0; i < dimension; i++)
     {
-        for (unsigned int j = 0; j < dim; j++)
+        for (unsigned int j = 0; j < dimension; j++)
         {
             val = grid[i][j];
             if (val != 0)
@@ -182,10 +176,12 @@ Image createSudokuImage(unsigned int grid[dim][dim],
                 rect.y = Array[i];
 
                 // Get the image number and copy it
-                SDL_Surface *surface =
-                    getImage(val, IMAGE_DIRECTORY, copy[i][j]);
-                SDL_BlitSurface(surface, NULL, image.surface, &rect);
-                SDL_FreeSurface(surface);
+                if (!strcmp(folder_path, ""))
+                    temp = getImage(val, IMAGE_DIRECTORY, copy[i][j]);
+                else
+                    temp = getImage(val, folder_path, copy[i][j]);
+                pasteOnImage(&image, &temp, &rect);
+                freeImage(&temp, 0);
             }
         }
     }
@@ -193,7 +189,7 @@ Image createSudokuImage(unsigned int grid[dim][dim],
     return image;
 }
 
-SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green)
+Image getImage(unsigned int val, char *directory, unsigned int green)
 {
     char str[1000];
     if (!green)
@@ -205,5 +201,6 @@ SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green)
         snprintf(str, sizeof(str), "%s/%u_black.jpg", directory, val);
     }
     SDL_Surface *surface = load_image(str);
-    return surface;
+    Image res = newImage(surface, 0, 28, 28);
+    return res;
 }

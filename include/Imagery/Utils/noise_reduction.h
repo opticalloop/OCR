@@ -1,7 +1,3 @@
-//
-// Created by dov on 11/09/2021.
-//
-
 #ifndef OCR_NOISE_REDUCTION_H
 #define OCR_NOISE_REDUCTION_H
 
@@ -11,6 +7,13 @@
 
 #include "Imagery/Utils/array_sort.h"
 #include "Imagery/Utils/image.h"
+#include "verbose.h"
+
+enum Filter
+{
+    Median,
+    Binomial
+};
 
 /*
  * Summary:
@@ -22,7 +25,20 @@
  * Return:
  *      void
  */
-void Preprocessing(Image *image, char pathToSave[], int verbose);
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
+                   int gui);
+
+void applyFilter(Pixel **mask, Image *image, unsigned int (*f)(Pixel *pixel),
+                 enum Filter filter, unsigned int width, unsigned int height);
+
+int isWhiteImage(Image *image);
+
+void invert(Image *image);
+
+void NegativePictureIfNormal(Image *image);
+
+void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
+                      unsigned int h);
 
 /*
  * Summary:
@@ -36,7 +52,7 @@ void Preprocessing(Image *image, char pathToSave[], int verbose);
  * BinominalFilter
  */
 
-unsigned int AverageFilter(Pixel *matrix, float *binomialFilter);
+unsigned int AverageFilter(Pixel *matrix);
 
 /*
  * Summary:
@@ -48,48 +64,6 @@ unsigned int AverageFilter(Pixel *matrix, float *binomialFilter);
  *  Median value of the pixel, based on Median Formula
  */
 unsigned int MedianFilter(Pixel *matrix);
-
-/*
- * Summary:
- *
- * Params :
- *      *pixel : the image
- *
- * Return :
- *      median value of the pixel, based on Median Formula
- */
-unsigned int ConstrastFilter(Pixel *pixel, unsigned int *histogram, int max);
-
-/*
- * Summary:
- *      fill the histogram array based on image
- *
- * Params :
- *      *histogram : the image
- *      **pixels : image matrix
- *      w : width of the image
- *      h : height of the image
- *
- * Return:
- *      void
- */
-void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
-                  unsigned h);
-
-/*
- * Summary:
- *      Apply Otsu Filter on a matrix
- * Params :
- *      **pixels : image matrix
- *      w : width of the image
- *      h : height of the image
- *      *histogram : the image histogram
- *
- * Return:
- *
- */
-void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
-                unsigned int *histogram);
 
 /*
  * Summary:
@@ -111,4 +85,21 @@ double Thresholding(unsigned int *histogram);
  *      void
  */
 void NegativePictureIfNormal(Image *image);
-#endif // OCR_NOISE_REDUCTION_H
+
+void adaptativeThreshold(Image *image, const double t);
+
+void dilate(Image *image);
+
+void erode(Image *image);
+
+float max_color(Image *image);
+
+void image_normalize_brightness(Image *image);
+
+void image_levels(Image *mat, size_t n);
+
+float noiseLevel(Image *image);
+
+unsigned int clamp(unsigned int value, unsigned int min, unsigned int max);
+
+#endif

@@ -1,0 +1,122 @@
+/* button separator{
+    background-color: rgb(255, 136, 0);
+} */
+window{
+    color: white;
+}
+window button {
+    color: white;
+}
+.left_panel button {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #ff8800;
+    border-radius: 15px;
+    background:rgb(38, 38, 47);
+}
+.left_panel button:hover {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #794000;
+    background:rgb(189, 120, 10);
+}
+.left_panel button:disabled {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #794000;
+}
+.left_panel {
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    padding: 30px;
+
+}
+ .loading-page {
+   /* background-color: rgb(38, 38, 47); */
+    margin-left:  200px;
+    margin-right:  200px;  
+    animation-name: spin;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    /* animation-iteration-count: infinite; */
+    
+}
+.right_panel {
+    background-color: rgb(16, 16, 42);
+    /* border-radius: 10px; */
+    padding: 30px;
+}
+.sudoku_image {
+
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.button_panel .button_element {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.button_panel .button_category {
+    border: 2px solid #ff8800;
+    padding: 10px;
+    border-radius: 5px;
+}
+.button_panel .button_category .button_element {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.right_panel button {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #ff8800;
+    border-radius: 15px;
+    background:rgb(38, 38, 47);
+}
+
+
+
+progress trough text {
+    
+    min-height: 20px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+
+
+  }
+progress {
+    background-image: linear-gradient(to right, rgb(189, 120, 10) 100%, #ff8800 100%);
+    background-repeat: no-repeat;
+}
+progress trough {
+    
+    background-color: rgb(38, 38, 47);
+    
+}
+text {
+    padding: 8px;
+}
+progress, text {
+    color: white;
+    font-size: 15px;
+    
+    margin-top: 15px;
+}
+
+filechooser {
+    color: black;
+}
+filechooser button {
+    color: black;
+}
+scale {
+    margin-bottom: 15px;
+
+  
+}
+scale trough {
+    background-color: rgb(38, 38, 47);
+    padding: 2px;
+   
+}
+scale slider {
+    background-image: linear-gradient(to right, rgb(189, 120, 10) 100%, #ff8800 100%);
+}
+

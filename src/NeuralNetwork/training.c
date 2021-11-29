@@ -203,6 +203,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     double expected[NBOUTPUTS];
 
     // Init 0 expectation
+
     int zero_intput[NBINPUTS] = { 0.0 };
     double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
                                         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -240,6 +241,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
+
                 gradientDescent(network, 0.01);
 
                 if (i == epoch && verbose)

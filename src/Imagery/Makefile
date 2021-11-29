@@ -1,12 +1,15 @@
 CC = gcc -I../../include/
 
-CPPFLAGS = `pkg-config --cflags sdl` -MMD -D__NO_INLINE__
+CPPFLAGS = `pkg-config --cflags gtk+-3.0 sdl` -MMD -D__NO_INLINE__
 CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address 
-LDLFLAGS = -lm
-LDLIBS = `pkg-config --libs sdl SDL_image`
+LDLFLAGS = -lm -lpthread 
+LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
 
 BUILD := build
 EXEC := main
+
+VERBOSE_SRC = ../verbose.c
+VERBOSE_OBJ = $(VERBOSE_SRC:%.c=$(BUILD)/%.o)
 
 SRC =  $(shell find -name "*.c")
 OBJ = $(SRC:%.c=$(BUILD)/%.o)
@@ -20,8 +23,9 @@ clear:
 init: 
 	$(shell mkdir -p $(BUILD))
 	$(shell mkdir -p $(SRC:%=$(BUILD)/%))
+	$(shell mkdir -p $(VERBOSE_SRC:%.c=$(BUILD)/%))
 
-imagery: $(OBJ)
+imagery: $(OBJ) $(VERBOSE_OBJ)
 	gcc -o $(EXEC) $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
 $(BUILD)/%.o : %.c
@@ -30,3 +34,4 @@ $(BUILD)/%.o : %.c
 clean:
 	rm -rf $(BUILD)
 	$(RM) $(EXEC)
+	rm -f verbose.d verbose.o

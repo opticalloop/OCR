@@ -19,8 +19,11 @@ int main(int argc, char **argv)
         errx(1,
              "Usage : ./solver input_path [options]\n"
              "options:\n"
-             "   -v --verbose : print details\n");
+             "   -v --verbose : print details"
+             "   -hexa : solve hexadecimal sudoku\n");
     }
+
+    unsigned int dim = 9;
 
     int verbose = 0;
 
@@ -29,27 +32,18 @@ int main(int argc, char **argv)
         verbose = 1;
     }
 
-    unsigned int grid[dim][dim] = {
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    unsigned int **grid = allocGrid(dim);
 
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-    };
-
-    readGrid(grid, argv[1], verbose);
+    readGrid(grid, argv[1], verbose, dim);
 
     // basicPrint(grid);
 
     // Copy array to have different color when saving the image
-    unsigned int copy[dim][dim];
-    copyArray(grid, copy);
+    unsigned int **copy = allocGrid(dim);
+    copyArray(grid, copy, dim);
 
     // Check if the soduko is solvable
-    if (!isSolvable(grid))
+    if (!isSolvable(grid, dim))
     {
         errx(EXIT_FAILURE, "Grid can't be solved\n");
     }
@@ -62,11 +56,11 @@ int main(int argc, char **argv)
 
     // Solve the sudoku and save the time
     time_t t1 = time(NULL);
-    solveSuduko(grid, 0, 0);
+    solveSuduko(grid, 0, 0, dim);
     time_t t2 = time(NULL);
     double diff = difftime(t1, t2);
 
-    if (!isSolved(grid))
+    if (!isSolved(grid, dim))
     {
         errx(EXIT_FAILURE, "⛔ Error solving the grid");
     }
@@ -80,7 +74,10 @@ int main(int argc, char **argv)
     saveGrid(grid, output_path, verbose);
 
     // Create, save and free the image
-    Image image = createSudokuImage(grid, copy);
+    Image image = createSudokuImage(grid, copy, "", dim);
+
+    freeGrid(grid, dim);
+    freeGrid(copy, dim);
 
     char str[1000];
     snprintf(str, sizeof(str), "%s_result.bmp", argv[1]);
@@ -88,7 +85,7 @@ int main(int argc, char **argv)
     {
         errx(EXIT_FAILURE, "Error while saving file");
     }
-    freeImage(&image);
+    freeImage(&image, 0);
 
     return 0;
 }
