@@ -8,6 +8,7 @@ GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
+pthread_t *thread_2;
 int processing = 0;
 int is_weights_available = 0;
 float rotation_value = 0;
@@ -303,6 +304,54 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
 
     // change image
     change_image(image, "selected_image");
+}
+
+void start_nn(GtkWidget *widget, gpointer data)
+{
+    // get spin button value
+    GtkSpinButton *epoch_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "epoch_input"));
+    int epoch_input_value = gtk_spin_button_get_value_as_int(epoch_input);
+
+    GtkSpinButton *hidden_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "hidden_input"));
+    int hidden_input_value = gtk_spin_button_get_value_as_int(hidden_input);
+
+    GtkSpinButton *node_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "node_input"));
+    int node_input_value = gtk_spin_button_get_value_as_int(node_input);
+
+    // start training
+    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
+}
+
+void cancel_nn(GtkWidget *widget, gpointer data)
+{
+    if (thread_2 != NULL)
+    {
+        // ask user if he wants to cancel
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            "Are you sure you want to cancel?");
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (response == GTK_RESPONSE_YES)
+        {
+            // cancel thread
+            pthread_cancel(*thread_2);
+            pthread_join(*thread_2, NULL);
+        }
+        else
+        {
+            return;
+        }
+    }
+    GtkWidget *page = data;
+    show_page(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
 }
 
 void *init_gui()
