@@ -1,6 +1,7 @@
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
+#define SAVE_PATH "temp.bmp"
 
 GtkBuilder *builder;
 gchar *filename;
@@ -13,7 +14,7 @@ int is_weights_available = 0;
 float rotation_value = 0;
 float tmp_rotation_value = 0;
 
-Image *image = NULL;
+Image *image;
 Image *temp_image;
 
 // Resize global variables
@@ -136,6 +137,8 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
         set_buttons_options_status(TRUE); // enable buttons
+
+        saveImage(image, SAVE_PATH);
     }
     else
     {
@@ -215,16 +218,10 @@ void run_process(GtkButton *button)
         char *dim =
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
-        printf("COPYING IMAGE\n");
-        printf("FINISHED COPYING IMAGE\n");
-
-        char path[100];
-        snprintf(path, sizeof(path), "%s/%s", get_current_dir_name(), "temp");
-        saveImage(image, path);
-
+        printf("Processing...\n");
         // Run processing
         thread =
-            OCR_thread(path, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
+            OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
     }
     else
     {
