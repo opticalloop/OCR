@@ -87,10 +87,7 @@ void saveWeights(Network *network, char *path)
         for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
         {
             // writeToFile(file, (double)j, "# ");
-            fputs("\n#", file);
-            // Write biais
-            writeToFile(file, network->layers[i].neurons[j].bias, "");
-            fputs("\n", file);
+            fputs("\n#\n", file);
             for (unsigned int k = 0;
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
@@ -182,25 +179,10 @@ void launchWeights(Network *network, char *path, int verbose)
                 weightIndex = 0;
             }
             // New neuron
-            // Go get biais
-            else
+            else if (chr == '\n')
             {
-                // Reset string
-                memset(tempStr, 0, sizeof(tempStr));
-
-                // Parse until \n
-                while (chr != EOF && chr != '\n')
-                {
-                    strncat(tempStr, &chr, 1);
-                    chr = getc(file);
-                }
-
                 neuronIndex++;
                 weightIndex = 0;
-
-                // Set biais
-                network->layers[layerIndex].neurons[neuronIndex].bias =
-                    atof(tempStr);
             }
         }
         else if (chr == ' ' || chr == '\n')

@@ -40,8 +40,6 @@ void checkInputs(double inputs[NBINPUTS])
 
 void imageToBinary(Image *image, int inputs[])
 {
-    SDL_Color rgb;
-    Uint32 pixel;
     for (unsigned int i = 0; i < 28; i++)
     {
         for (unsigned int j = 0; j < 28; j++)
@@ -137,8 +135,10 @@ void generateDataFile(void)
 
         // Get image binary arrays
         SDL_Surface *surface = load_image(str);
-        imageToBinary(surface, input);
+        Image img = newImage(surface, 0, surface->w, surface->h);
         SDL_FreeSurface(surface);
+        imageToBinary(&img, input);
+        freeImage(&img, 0);
 
         // Get expected value
         int num = in_file->d_name[strlen(in_file->d_name) - 5] - '0';
@@ -308,7 +308,6 @@ int getNetworkOutput(Network *network, Image *image, int verbose)
 
 int isFullWhite(Image *image)
 {
-    Uint32 pixel;
     for (unsigned int i = 0; i < image->width; i++)
     {
         for (unsigned int j = 0; j < image->height; j++)
