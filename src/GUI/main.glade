@@ -27,15 +27,6 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkFileFilter" id="filefilter1">
-    <mime-types>
-      <mime-type>jpg</mime-type>
-      <mime-type>bmp</mime-type>
-      <mime-type>jpeg</mime-type>
-      <mime-type>png</mime-type>
-    </mime-types>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <signal name="destroy" handler="quit" swapped="no"/>
@@ -1051,37 +1042,14 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkTextView">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <child>
-                  <object class="GtkTextView">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="hexpand">True</property>
-                    <property name="editable">False</property>
-                    <property name="wrap_mode">word</property>
-                    <property name="buffer">textbuffer1</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkScrollbar">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="orientation">vertical</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
+                <property name="can_focus">True</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="editable">False</property>
+                <property name="wrap_mode">word</property>
+                <property name="buffer">textbuffer1</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1102,4 +1070,13 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
       </object>
     </child>
   </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>jpg</mime-type>
+      <mime-type>bmp</mime-type>
+      <mime-type>jpeg</mime-type>
+      <mime-type>png</mime-type>
+    </mime-types>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer1"/>
 </interface>

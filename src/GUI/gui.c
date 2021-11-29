@@ -486,6 +486,28 @@ void *init_gui()
     quit();
     pthread_exit(NULL);
 }
+void edit_terminal(char *string)
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // add string to text buffer
+    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+
+    // scroll to bottom
+    GtkAdjustment *adjustment =
+        gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(text_view));
+    gtk_adjustment_set_value(adjustment, gtk_adjustment_get_upper(adjustment));
+
+    // set cursor to end
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(text_buffer, &iter);
+    gtk_text_buffer_place_cursor(text_buffer, &iter);
+}
 
 void resetNeuralNetwork()
 {

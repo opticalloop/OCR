@@ -15,7 +15,7 @@
 void change_image(Image *_image, char *GtkimageID);
 
 void edit_progress_bar(float progress, char *text);
-
+void edit_terminal(char *string);
 void *init_gui();
 
 #endif
