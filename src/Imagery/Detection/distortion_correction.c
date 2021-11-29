@@ -5,12 +5,9 @@ void correctDistortion(Image *image)
     const unsigned int width = image->width;
     const unsigned int height = image->height;
 
-    Image tempImage;
-    tempImage.surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-    SDL_BlitSurface(image->surface, NULL, tempImage.surface, NULL);
-    tempImage.path = image->path;
+    Image tempImage = copyImage(image, 0);
 
-    newImage(&tempImage, 0);
+    newImage(&tempImage, 0, width, height);
 
     // for (unsigned int i = 0; i < width; i++)
     // {

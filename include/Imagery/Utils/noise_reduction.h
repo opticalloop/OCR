@@ -25,10 +25,11 @@ enum Filter
  * Return:
  *      void
  */
-void Preprocessing(Image *image, char pathToSave[], int verbose, int save);
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
+                   int gui);
 
-void applyFilter(Pixel **mask, Image *image, unsigned int(*f)(Pixel *pixel), enum Filter filter,
-                unsigned int width, unsigned int height);
+void applyFilter(Pixel **mask, Image *image, unsigned int (*f)(Pixel *pixel),
+                 enum Filter filter, unsigned int width, unsigned int height);
 
 int isWhiteImage(Image *image);
 
@@ -37,7 +38,7 @@ void invert(Image *image);
 void NegativePictureIfNormal(Image *image);
 
 void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
-                             unsigned int h);
+                      unsigned int h);
 
 /*
  * Summary:
@@ -63,7 +64,6 @@ unsigned int AverageFilter(Pixel *matrix);
  *  Median value of the pixel, based on Median Formula
  */
 unsigned int MedianFilter(Pixel *matrix);
-
 
 /*
  * Summary:
@@ -100,7 +100,6 @@ void image_levels(Image *mat, size_t n);
 
 float noiseLevel(Image *image);
 
-unsigned int clamp(unsigned int value, unsigned int min,
-                          unsigned int max);
+unsigned int clamp(unsigned int value, unsigned int min, unsigned int max);
 
 #endif

@@ -1,30 +1,29 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.4
+#define THRESHOLD 0.3
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder, double four_angles[4])
+Image detection(Image *image, Image *drawImage, int verbose, int save,
+                char *output_folder, double four_angles[4], int gui)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
 
     // Surface without sobel filter
-    Image tempImage;
-    tempImage.surface = SDL_CreateRGBSurface(0, image->width, image->height, 24, 0, 0, 0, 0);
-    SDL_BlitSurface(drawImage->surface, NULL, tempImage.surface, NULL);
+    Image tempImage = copyImage(image, 0);
 
     // Directly free
     if (!save)
     {
         freeImage(drawImage, 0);
     }
-    newImage(&tempImage, 0);
 
     // Call major fonction
     LineList list =
         houghtransform(image, drawImage, verbose, save, output_folder);
 
-    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save, 1);
+    saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
+                0);
+    changeImageGUI(drawImage, gui, 0.45, "Hough all lines", 1);
     printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
@@ -34,27 +33,23 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
 
-    if (save)
+    if (save || gui)
     {
         // Draw simplifieds lines
-        Image _simplifiedImage;
-        _simplifiedImage.path = image->path;
-        _simplifiedImage.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, _simplifiedImage.surface, NULL);
-        Image *simplifiedImage = &_simplifiedImage;
-        newImage(simplifiedImage, 0);
+        Image _simplifiedImage = copyImage(&tempImage, 0);
 
         const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
         for (unsigned int i = 0; i < len; i++)
         {
             Line line = resultingList.lines[i];
-            draw_line(simplifiedImage, w, h, &line, &color, 2, 1);
+            draw_line(&_simplifiedImage, w, h, &line, &color, 2, 1);
         }
 
-        saveVerbose(verbose, simplifiedImage, output_folder,
-                    "2.4_Hough_simplified_lines", save, 1);
+        saveVerbose(verbose, &_simplifiedImage, output_folder,
+                    "2.4_Hough_simplified_lines", save, 0);
+        changeImageGUI(&_simplifiedImage, gui, 0.5, "Hough simplified lines",
+                       1);
     }
 
     // AUTO ROTATE
@@ -63,7 +58,8 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
                resultingList.maxTheta);
-    if ((angleRounded >= 88 && angleRounded <= 92) || (angleRounded >= 0 && angleRounded <= 3))
+    if ((angleRounded >= 88 && angleRounded <= 92)
+        || (angleRounded >= 0 && angleRounded <= 3))
 
     {
         printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
@@ -74,32 +70,26 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
         printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
         four_angles[0] = angleRounded;
         rotateAll(&tempImage, &resultingList, angleRounded);
-
     }
-    
 
     // Draw auto rotated image
-    if (save)
+    if (save || gui)
     {
         // Draw simplifieds lines
-        Image __simplifiedImage;
-        __simplifiedImage.path = image->path;
-        __simplifiedImage.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, __simplifiedImage.surface, NULL);
-        Image *___simplifiedImage = &__simplifiedImage;
-        newImage(___simplifiedImage, 0);
+        Image __simplifiedImage = copyImage(&tempImage, 0);
 
         const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
         for (unsigned int i = 0; i < len; i++)
         {
             Line line = resultingList.lines[i];
-            draw_line(___simplifiedImage, w, h, &line, &color, 2, 1);
+            draw_line(&__simplifiedImage, w, h, &line, &color, 2, 1);
         }
 
-        saveVerbose(verbose, ___simplifiedImage, output_folder,
-                    "2.5_Autorotated", save, 1);
+        saveVerbose(verbose, &__simplifiedImage, output_folder,
+                    "2.5_Autorotated", save, 0);
+        changeImageGUI(&__simplifiedImage, gui, 0.55, "Hough autorotated lines",
+                       1);
     }
 
     // FINDING SQUARES
@@ -108,23 +98,18 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     // FIND ALL SQUARES
     SquareList squares;
-    if (save)
+    if (save || gui)
     {
-        Image _squareImage;
-        _squareImage.path = image->path;
-        _squareImage.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, _squareImage.surface, NULL);
-        Image *squareImage = &_squareImage;
-        newImage(squareImage, 0);
+        Image _squareImage = copyImage(&tempImage, 0);
 
-        squares = findSquare(&resultingList, w, h, squareImage, save);
-        saveVerbose(verbose, squareImage, output_folder,
-                    "2.6_Hough_squares_only", save, 1);
+        squares = findSquare(&resultingList, w, h, &_squareImage, save);
+        saveVerbose(verbose, &_squareImage, output_folder,
+                    "2.6_Hough_squares_only", save, 0);
+        changeImageGUI(&_squareImage, gui, 0.6, "Hough squares only", 1);
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, NULL, save);
+        squares = findSquare(&resultingList, w, h, NULL, save || gui);
     }
 
     if (verbose)
@@ -137,19 +122,14 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
 
     Square lastSquare = sortSquares(&squares, image);
 
-    if (save)
+    if (save || gui)
     {
-        Image _lastSquareImg;
-        _lastSquareImg.path = image->path;
-        _lastSquareImg.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(tempImage.surface, NULL, _lastSquareImg.surface, NULL);
-        Image *lastSquareImg = &_lastSquareImg;
-        newImage(lastSquareImg, 0);
+        Image _lastSquareImg = copyImage(&tempImage, 0);
 
-        drawSquare(&lastSquare, lastSquareImg, w, h, 2);
-        saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.7_Hough_last_square", save, 1);
+        drawSquare(&lastSquare, &_lastSquareImg, w, h, 2);
+        saveVerbose(verbose, &_lastSquareImg, output_folder,
+                    "2.7_Hough_last_square", save, 0);
+        changeImageGUI(&_lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
 
     // GETTING MAX SQUARE
@@ -160,8 +140,6 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     int l1 = getLineLength(&(lastSquare.top));
     int l3 = getLineLength(&(lastSquare.right));
 
-    // Croping image and getting final result
-    SDL_Surface *surface = SDL_CreateRGBSurface(0, l1, l3, 24, 0, 0, 0, 0);
     SDL_Rect rect;
     Dot dot = getBetterCorner(&lastSquare);
     rect.x = dot.X;
@@ -169,16 +147,16 @@ SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
     rect.w = l1;
     rect.h = l3;
 
-    // Save square to surface
-    SDL_BlitSurface(tempImage.surface, &rect, surface, NULL);
-    freeImage(&tempImage, 0);
-
-    // Free squares
+    // Free square
     free(squares.squares);
 
     free(resultingList.lines);
 
-    return surface;
+    // Save square to surface
+    Image res = cropImage(image, &rect);
+    freeImage(&tempImage, 0);
+
+    return res;
 }
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
@@ -259,9 +237,9 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     free(saveSin);
 
     // 5000 * 5000, don't draw it !a
-    if (draw)
-        accToBmp(accumulator, nbTheta + 1, nbRho + 1, max, verbose,
-                 output_folder);
+    // if (draw)
+    //     accToBmp(accumulator, nbTheta + 1, nbRho + 1, max, verbose,
+    //              output_folder);
 
     // Finding edges
     // Computing threshold
@@ -489,14 +467,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
               unsigned int max, int verbose, char *output_folder)
 {
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
-    image.surface = NULL;
-    image.pixels = NULL;
-    newImage(&image, 0);
+    Image image = newImage(NULL, 0, width, height);
     for (size_t y = 0; y < height; y++)
     {
         for (size_t x = 0; x < width; x++)
@@ -513,10 +484,10 @@ unsigned int findTheta(LineList *lineList)
 {
     unsigned int histogram[181] = { 0 };
 
-    unsigned int value;
-    for (unsigned int i = 0; i < lineList->len; i++)
+    int value;
+    for (int i = 0; i < lineList->len; i++)
     {
-        value = (unsigned int)radian_To_Degree(lineList->lines[i].theta);
+        value = (int)radian_To_Degree(lineList->lines[i].theta);
         value++;
         printf("Value : %u\n", value);
 
@@ -551,7 +522,7 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
     double newX;
     double newY;
 
-    for (unsigned int i = 0; i < lineList->len; i++)
+    for (int i = 0; i < lineList->len; i++)
     {
         // Calculate new position start
         newX =
@@ -585,7 +556,6 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
         lineList->lines[i].xEnd = (int)newX;
         lineList->lines[i].yEnd = (int)newY;
     }
-    updateSurface(image);
 }
 
 double degrees_ToRadians(double degrees)

@@ -62,7 +62,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
 
             frontPropagation(network, input);
             errorRate = backPropagation(network, expected);
-            gradientDescent(network);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {

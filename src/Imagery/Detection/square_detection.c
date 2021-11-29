@@ -141,10 +141,11 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
                 + ordOrigin1;
 
             // In degree
-            int angleDiff =
-                abs(radian_To_Degree(line1->theta) - radian_To_Degree(line2->theta));
-            
-            if (x >= 0 && x < width && y >= 0 && y < height && angleDiff > 85 && angleDiff < 95)
+            int angleDiff = abs(radian_To_Degree(line1->theta)
+                                - radian_To_Degree(line2->theta));
+
+            if (x >= 0 && x < width && y >= 0 && y < height && angleDiff > 85
+                && angleDiff < 95)
             {
                 dot.X = x;
                 dot.Y = y;
