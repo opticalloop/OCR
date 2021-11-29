@@ -390,6 +390,11 @@ void start_nn(GtkWidget *widget, gpointer data)
         GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "node_input"));
     int node_input_value = gtk_spin_button_get_value_as_int(node_input);
 
+    // get path from file chooser
+    GtkFileChooser *file_chooser =
+        GTK_FILE_CHOOSER(gtk_builder_get_object(builder, "file_chooser2"));
+    char *path = gtk_file_chooser_get_filename(file_chooser);
+
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
     // TODO : add training function in thread
