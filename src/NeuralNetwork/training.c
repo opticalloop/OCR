@@ -69,18 +69,27 @@ void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS],
 {
     char ch;
     unsigned int input_index = 0;
+    for (int i = 0; i < NBOUTPUTS; i++)
+    {
+        expected[i] = 0.0;
+    }
     while ((ch = fgetc(file)) != EOF)
     {
         // Get expected value
         if (ch == '#')
         {
             ch = fgetc(file);
-            for (int i = 0; i < NBOUTPUTS; i++)
+            int expected_value;
+
+            if (ch >= '0' && ch <= '9')
             {
-                expected[i] = 0;
+                expected_value = ch - '0';
             }
-            int expected_value = ch - '0';
-            expected[expected_value] = 1;
+            else
+            {
+                expected_value = ch - 'A' + 10;
+            }
+            expected[expected_value] = 1.0;
         }
         else if (ch == '\n')
         {
@@ -194,9 +203,10 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     double expected[NBOUTPUTS];
 
     // Init 0 expectation
-    int zero_intput[NBINPUTS] = { 0 };
+
+    int zero_intput[NBINPUTS] = { 0.0 };
     double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0, 0.0, 0.0 };
+                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -207,7 +217,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     {
         train_count = 0;
         errorRate = 0.0;
-        if (i == epoch && verbose)
+        if (verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
@@ -218,7 +228,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
@@ -227,11 +237,12 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             }
 
             // Train for the blank image
-            if (train_count % 9 == 0)
+            if (train_count % NBOUTPUTS == 0)
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
-                gradientDescent(network);
+
+                gradientDescent(network, 0.01);
 
                 if (i == epoch && verbose)
                 {
