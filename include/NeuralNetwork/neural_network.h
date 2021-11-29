@@ -174,7 +174,7 @@ double backPropagation(Network *network, double expected[]);
  *      Directly updated the network weights, so void
  */
 
-void gradientDescent(Network *network);
+void gradientDescent(Network *network, double learningRate);
 
 // ------ /Network ------
 
@@ -201,6 +201,8 @@ double sigmoid(double x);
  */
 
 double sigmoidPrime(double x);
+
+double softmax(double x);
 
 /*
  *  Summary:
