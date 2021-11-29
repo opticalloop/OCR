@@ -49,11 +49,10 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
     }
 }
 
-Image newImage(SDL_Surface *surface, int matrix)
+Image newImage(SDL_Surface *surface, int matrix, unsigned int width,
+               unsigned height)
 {
     Image image;
-    const unsigned int width = surface->w;
-    const unsigned int height = surface->h;
 
     image.width = width;
     image.height = height;
@@ -85,9 +84,10 @@ Image newImage(SDL_Surface *surface, int matrix)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            if (surface->pitch == -1)
+            if (surface == NULL)
             {
                 updatePixelToSameValue(&image.pixels[x][y], 255);
+                averageColor += 255;
             }
             else
             {
@@ -100,6 +100,7 @@ Image newImage(SDL_Surface *surface, int matrix)
                 image.pixels[x][y].r = rgb.r;
                 image.pixels[x][y].g = rgb.g;
                 image.pixels[x][y].b = rgb.b;
+                averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
             }
 
             if (matrix)
@@ -112,8 +113,6 @@ Image newImage(SDL_Surface *surface, int matrix)
                          "(matrix creation)");
                 }
             }
-
-            averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
     }
     averageColor /= (width * height);

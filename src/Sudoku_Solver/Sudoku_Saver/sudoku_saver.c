@@ -136,10 +136,7 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                         char *folder_path, unsigned int dimension)
 {
     SDL_Surface *surface;
-    surface->w = 266;
-    surface->h = 266;
-    surface->pitch = -1;
-    Image image = newImage(surface, 0);
+    Image image = newImage(NULL, 0, 266, 266);
 
     for (unsigned int x = 0; x < 266; x++)
     {
@@ -204,6 +201,6 @@ Image getImage(unsigned int val, char *directory, unsigned int green)
         snprintf(str, sizeof(str), "%s/%u_black.jpg", directory, val);
     }
     SDL_Surface *surface = load_image(str);
-    Image res = newImage(surface, 0);
+    Image res = newImage(surface, 0, 28, 28);
     return res;
 }

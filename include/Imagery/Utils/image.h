@@ -31,7 +31,8 @@ typedef struct Image
  *  Return:
  *
  */
-Image newImage(SDL_Surface *surface, int matrix);
+Image newImage(SDL_Surface *surface, int matrix, unsigned int width,
+               unsigned int height);
 
 /*
  *  Summary:

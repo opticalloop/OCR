@@ -467,7 +467,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
               unsigned int max, int verbose, char *output_folder)
 {
-    Image image = newImage(NULL, 0);
+    Image image = newImage(NULL, 0, width, height);
     for (size_t y = 0; y < height; y++)
     {
         for (size_t x = 0; x < width; x++)

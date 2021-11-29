@@ -9,6 +9,7 @@
 
 #include "Imagery/Rotations_Resize/bilinear_interpolation.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Utils/noise_reduction.h"
 
 /*
  * @brief Rotate an image

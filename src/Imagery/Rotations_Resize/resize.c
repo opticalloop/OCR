@@ -14,7 +14,7 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
     surface->h = newheight;
     surface->pitch = -1;
 
-    Image newimage = newImage(surface, matrix);
+    Image newimage = newImage(surface, matrix, width, height);
 
     SDL_FreeSurface(surface);
 

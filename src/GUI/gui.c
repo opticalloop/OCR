@@ -121,7 +121,7 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
     {
         SDL_Surface *surface = IMG_Load(filename);
-        Image img_temp = newImage(surface, 0);
+        Image img_temp = newImage(surface, 0, surface->w, surface->h);
         temp_image = &img_temp;
 
         Image tmp = copyImage(&img_temp, 0);
@@ -215,9 +215,16 @@ void run_process(GtkButton *button)
         char *dim =
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
+        printf("COPYING IMAGE\n");
+        printf("FINISHED COPYING IMAGE\n");
+
+        char path[100];
+        snprintf(path, sizeof(path), "%s/%s", get_current_dir_name(), "temp");
+        saveImage(image, path);
+
         // Run processing
-        thread = OCR_thread(image, NULL, TRUE, TRUE, "tmp", TRUE,
-                            strcmp(dim, "9x9"));
+        thread =
+            OCR_thread(path, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
     }
     else
     {

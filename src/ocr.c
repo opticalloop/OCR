@@ -25,11 +25,13 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t *OCR_thread(Image *image, char *output_path, int verbose, int save,
-                      char *output_folder, int gui, int hexa)
+pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
+                      int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    Thread_argument arg = { .image = image,
+    SDL_Surface *surface = IMG_Load(intput_path);
+    Image img = newImage(surface, 1, surface->w, surface->h);
+    Thread_argument arg = { .image = img,
                             .output_path = output_path,
                             .verbose = verbose,
                             .save = save,
@@ -49,7 +51,7 @@ pthread_t *OCR_thread(Image *image, char *output_path, int verbose, int save,
 void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
-    Image image = *(arg.image);
+    Image image = arg.image;
     char *image_path = image.path;
     char *output_path = arg.output_path;
     int verbose = arg.verbose;

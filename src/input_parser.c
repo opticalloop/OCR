@@ -187,7 +187,7 @@ static void analyzeOCR(int argc, char **argv)
     }
     pthread_t thread;
     SDL_Surface *img = load_image(input_path);
-    Image image = newImage(img, 1);
+    Image image = newImage(img, 1, img->w, img->h);
     thread =
         OCR_thread(&image, output_path, verbose, save, output_folder, 0, 0);
 }
