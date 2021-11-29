@@ -16,7 +16,7 @@
 #include "NeuralNetwork/neural_network.h"
 #include "NeuralNetwork/save_load.h"
 
-#define NBIMAGES 61054
+#define NBIMAGES 2100
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 16
 
