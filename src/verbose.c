@@ -26,7 +26,7 @@ void changeImageGUI(Image *image, int gui, double value, char *message,
 {
     if (gui)
     {
-        change_image(image->surface, "selected_image");
+        change_image(image, "selected_image");
         edit_progress_bar(value, message);
     }
     if (free)

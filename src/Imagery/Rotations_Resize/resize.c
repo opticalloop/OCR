@@ -9,13 +9,7 @@ Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
     double xscale = newwidth / (double)width;
     double yscale = newheight / (double)height;
 
-    Image newimage;
-    newimage.width = newwidth;
-    newimage.height = newheight;
-    newimage.path = "";
-    newimage.surface = NULL;
-
-    newImage(&newimage, matrix);
+    Image newimage = newImage(NULL, matrix, newwidth, newheight);
 
     for (unsigned int x = 0; x < newwidth; x++)
     {

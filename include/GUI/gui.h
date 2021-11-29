@@ -9,9 +9,10 @@
 
 #include "GUI/draw.h"
 #include "GUI/gui_utils.h"
+#include "Imagery/Utils/op.h"
 #include "ocr.h"
 
-void change_image(SDL_Surface *surface, char *GtkimageID);
+void change_image(Image *_image, char *GtkimageID);
 
 void edit_progress_bar(float progress, char *text);
 

@@ -1,6 +1,7 @@
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
+#define SAVE_PATH "temp.bmp"
 
 GtkBuilder *builder;
 gchar *filename;
@@ -14,7 +15,15 @@ int is_weights_available = 0;
 float rotation_value = 0;
 float tmp_rotation_value = 0;
 
-SDL_Surface *image;
+Image *image;
+Image *temp_image;
+
+// Resize global variables
+int resizing = 0;
+int resized_x = -1;
+int resized_y = -1;
+int resized_w = -1;
+int resized_h = -1;
 
 char *get_filename_ext(const char *filename)
 {
@@ -25,14 +34,37 @@ char *get_filename_ext(const char *filename)
     return dot + 1;
 }
 
-void change_image(SDL_Surface *surface, char *GtkimageID)
+GdkPixbuf *image_to_pixbuf(Image *image)
+{
+    GdkPixbuf *pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8,
+                                       image->width, image->height);
+
+    int width = gdk_pixbuf_get_width(pixbuf);
+    int height = gdk_pixbuf_get_height(pixbuf);
+
+    int n_channels = gdk_pixbuf_get_n_channels(pixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
+
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            guchar *p = pixels + y * rowstride + x * n_channels;
+            p[0] = image->pixels[x][y].r;
+            p[1] = image->pixels[x][y].g;
+            p[2] = image->pixels[x][y].b;
+            p[3] = 255;
+        }
+    }
+
+    return pixbuf;
+}
+
+void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
 {
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
-    // convert SDL surface to GTK image
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_data(
-        surface->pixels, GDK_COLORSPACE_RGB, FALSE, 8, surface->w, surface->h,
-        surface->pitch, NULL, NULL);
 
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
@@ -45,6 +77,14 @@ void change_image(SDL_Surface *surface, char *GtkimageID)
     g_object_unref(pixbuf);
     g_object_unref(resized_image);
 }
+
+void change_image(Image *_image, char *GtkimageID)
+{
+    GdkPixbuf *pixbuf = image_to_pixbuf(_image);
+
+    set_selected_image(pixbuf, GtkimageID);
+}
+
 void set_leftPannel_status(gboolean status)
 {
     // set the left pannel status
@@ -52,6 +92,7 @@ void set_leftPannel_status(gboolean status)
         GTK_WIDGET(gtk_builder_get_object(builder, "left_panel"));
     gtk_widget_set_sensitive(leftPannel, status);
 }
+
 void set_buttons_options_status(gboolean status)
 {
     GtkButton *button_start =
@@ -88,8 +129,13 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
         || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
     {
-        // load image
-        image = IMG_Load(filename);
+        SDL_Surface *surface = IMG_Load(filename);
+        Image img_temp = newImage(surface, 0, surface->w, surface->h);
+        temp_image = &img_temp;
+
+        Image tmp = copyImage(&img_temp, 0);
+        image = &tmp;
+
         change_image(image, "selected_image");
 
         // update label
@@ -99,6 +145,8 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
         set_buttons_options_status(TRUE); // enable buttons
+
+        saveImage(image, SAVE_PATH);
     }
     else
     {
@@ -178,8 +226,9 @@ void run_process(GtkButton *button)
         char *dim =
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
+        printf("Processing...\n");
         // Run processing
-        thread = OCR_thread(image, NULL, TRUE, TRUE, "tmp", TRUE,
+        thread = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
     }
     else
@@ -217,21 +266,35 @@ void quit()
     }
     gtk_main_quit();
 }
+
+void cancel_edit_option(GtkWidget *widget, gpointer data)
+{
+    resizing = 0;
+
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
+}
+
+// ------ ROTATION ------
+
 void edit_rotation(GtkWidget *widget, gpointer data)
 {
-    // change image
-    change_image(image, "selected_image2");
+    // Load image
+    GtkImage *image =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image2"));
+    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
+
+    set_selected_image(pixbuf, "selected_image2");
+
     // reset scale to value 0
     GtkScale *scale =
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
 
-    // if scale value is not 0
-    if (gtk_range_get_value(GTK_SCALE(scale)) != 0)
-    {
-        // TODO : reset image
-    }
-
-    gtk_range_set_value(GTK_RANGE(scale), 0);
+    // If rotation value is not zero, the image have already been rotated
+    gtk_range_set_value(GTK_RANGE(scale),
+                        rotation_value != 0 ? rotation_value : 0);
 
     // change page
 
@@ -254,29 +317,32 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
     rotation_value = gtk_range_get_value(GTK_RANGE(scale));
 
     change_image(image, "selected_image"); // change image of main page
+    saveImage(SAVE_PATH, image); // save image
 }
 
 void rotate_img(GtkWidget *widget, gpointer data)
 {
+    // Copy temp to img
+    // Free image pixels
+    freeImage(image, 0);
+
+    image->pixels = copyPixelsArray(temp_image, 0);
+
     // Get range value
     float value = gtk_range_get_value(widget);
-    value -= tmp_rotation_value; // get difference between old and new value
-    // if (value < 0) // if value is negative
-    //     value = 360 + value; // convert to positive value
 
-    tmp_rotation_value = value; // save new value
-    rotateSurface(image, value);
+    rotate(image, value);
     change_image(image, "selected_image2");
 }
 
+// ------ /ROTATION ------
+
+// ------ RESIZE ------
+
 void edit_resize(GtkWidget *widget, gpointer data)
 {
-    SDL_Rect rect;
-    rect.x = 100;
-    rect.y = 100;
-    rect.w = 1000;
-    rect.h = 1000;
-    selectionFilter(image, &rect);
+    resizing = 1;
+    printf("Resizing\n");
 
     // change image
     change_image(image, "selected_image3");
@@ -287,16 +353,19 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     set_leftPannel_status(FALSE); // disable buttons
 }
-void cancel_edit_option(GtkWidget *widget, gpointer data)
-{
-    GtkWidget *page = data;
-    change_panel(NULL, page);
-
-    set_leftPannel_status(TRUE); // enable buttons
-}
 
 void on_resize_finished(GtkWidget *widget, gpointer data)
 {
+    resizing = 0;
+
+    SDL_Rect rect;
+    rect.x = resized_x;
+    rect.y = resized_y;
+    rect.w = resized_w;
+    rect.h = resized_h;
+    Image img = cropImage(image, &rect);
+    image = &img;
+
     GtkWidget *page = data;
     change_panel(NULL, page);
 
@@ -323,6 +392,7 @@ void start_nn(GtkWidget *widget, gpointer data)
 
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
+    // TODO : add training function in thread
 }
 
 void cancel_nn(GtkWidget *widget, gpointer data)
@@ -411,7 +481,8 @@ void *init_gui()
     gtk_main(); // start main loop
 
     // End program
-    SDL_FreeSurface(image);
+    freeImage(image, 0);
+    freeImage(temp_image, 0);
     quit();
     pthread_exit(NULL);
 }

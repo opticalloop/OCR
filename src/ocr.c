@@ -25,12 +25,19 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
+pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    Thread_argument arg = { surface,       output_path, verbose, save,
-                            output_folder, gui,         hexa };
+    SDL_Surface *surface = IMG_Load(intput_path);
+    Image img = newImage(surface, 1, surface->w, surface->h);
+    Thread_argument arg = { .image = img,
+                            .output_path = output_path,
+                            .verbose = verbose,
+                            .save = save,
+                            .output_folder = output_folder,
+                            .gui = gui,
+                            .hexa = hexa };
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
     if (gui == 0)
@@ -44,7 +51,8 @@ pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
 void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
-    SDL_Surface *startSurface = arg.surface;
+    Image image = arg.image;
+    char *image_path = image.path;
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;
@@ -60,17 +68,13 @@ void *OCR(void *Thread_args)
 
     // Create image
     printVerbose(verbose, "--> 💾 Creating image\n");
-    Image image;
-    image.path = "";
-    image.surface = startSurface;
 
-    newImage(&image, 1);
-
-    if (image.width > 3000 || image.height > 3000)
-    {
-        printVerbose(verbose, "      📏 1.0 Simplifying image\n");
-        image = resize(&image, image.width * 0.5, image.height * 0.5, 1);
-    }
+    // if (image.width > 3000 || image.height > 3000)
+    // {
+    //     printVerbose(verbose, "      📏 1.0 Simplifying image\n");
+    //     Image img = copyImage(&image, 1);
+    //     image = resize(&img, image.width * 0.5, image.height * 0.5, 1);
+    // }
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
 
@@ -100,23 +104,17 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-    double four_angles[4] = { 0.0 };
+    double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
-    SDL_Surface *cropped_image = detection(&image, &drawImage, verbose, save,
-                                           output_folder, four_angles, gui);
+    Image cropped = detection(&image, &drawImage, verbose, save, output_folder,
+                              four_angles, gui);
 
     // Free image
     freeImage(&image, 1);
 
-    // Create cropped image
-    Image cropped;
-    cropped.surface = cropped_image;
-    newImage(&cropped, 0);
-
     // Reverse the image before segmenting
     reverse_color(&cropped);
-    updateSurface(&cropped);
 
     unsigned int dimension = hexa ? 16 : 9;
     unsigned int **grid = allocGrid(dimension);
@@ -142,7 +140,7 @@ void *OCR(void *Thread_args)
 
         // Segmentation
         // Initialize all case at NULL
-        SDL_Surface *all_cases[hexa ? 256 : 81];
+        Image all_cases[hexa ? 256 : 81];
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
         split9(&cropped, all_cases, save, output_folder);
@@ -154,8 +152,8 @@ void *OCR(void *Thread_args)
             for (unsigned int j = 0; j < dimension; j++)
             {
                 // Get the value of the case
-                val =
-                    getNetworkOutput(&network, all_cases[i * dimension + j], 0);
+                val = getNetworkOutput(&network,
+                                       &(all_cases[i * dimension + j]), 0);
 
                 if (!hexa && val > 9)
                 {
@@ -164,7 +162,7 @@ void *OCR(void *Thread_args)
                 grid[i][j] = val;
 
                 // Free the case
-                SDL_FreeSurface(all_cases[i * dimension + j]);
+                freeImage(&(all_cases[i * dimension + j]), 0);
             }
         }
 

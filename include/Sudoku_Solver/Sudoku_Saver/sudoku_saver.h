@@ -26,6 +26,6 @@ void saveGrid(unsigned int **grid, char outputPath[], int verbose,
 Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                         char *folder_path, unsigned int dimension);
 
-SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green);
+Image getImage(unsigned int val, char *directory, unsigned int green);
 
 #endif

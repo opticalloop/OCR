@@ -11,31 +11,13 @@ void rotate(Image *image, double angleDegree)
     const double angle = angleDegree * M_PI / 180.0;
 
     // Create two dimensional array of pixels
-    Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
-    if (_pixels == NULL)
-    {
-        errx(EXIT_FAILURE, "Error while allocating memory");
-    }
-
-    unsigned int x = 0;
-    for (; x < width; x++)
-    {
-        _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
-        if (_pixels[x] == NULL)
-        {
-            errx(EXIT_FAILURE, "Error while allocating memory");
-        }
-    }
-    // '\0'
-    _pixels[x] = NULL;
-
+    Pixel **_pixels = copyPixelsArray(image, 0);
     // Copy of all pixel
     for (unsigned int x = 0; x < width; x++)
     {
         for (unsigned int y = 0; y < height; y++)
         {
             // Consider that the image is in grayscale
-            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
             updatePixelToSameValue(&(image->pixels[x][y]), 0);
         }
     }

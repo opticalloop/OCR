@@ -24,7 +24,7 @@
 
 typedef struct Thread_argument
 {
-    SDL_Surface *surface;
+    Image image;
     char *output_path;
     int verbose;
     int save;
@@ -47,7 +47,7 @@ typedef struct Thread_argument
  * @return 0 if success, -1 if error
  */
 
-pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
+pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa);
 
 /*

@@ -38,7 +38,7 @@ void checkInputs(double inputs[NBINPUTS])
     }
 }
 
-void imageToBinary(SDL_Surface *surface, int inputs[])
+void imageToBinary(Image *image, int inputs[])
 {
     SDL_Color rgb;
     Uint32 pixel;
@@ -46,12 +46,11 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
     {
         for (unsigned int j = 0; j < 28; j++)
         {
-            // Get pixel colors
-            pixel = get_pixel(surface, i, j);
-            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
-
             // Black and white
-            if ((rgb.r + rgb.g + rgb.b) / 3 > 128)
+            if ((image->pixels[i][j].r + image->pixels[i][j].g
+                 + image->pixels[i][j].b)
+                    / 3
+                > 128)
             {
                 // White are 0
                 inputs[j * 28 + i] = 0;
@@ -70,18 +69,27 @@ void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS],
 {
     char ch;
     unsigned int input_index = 0;
+    for (int i = 0; i < NBOUTPUTS; i++)
+    {
+        expected[i] = 0.0;
+    }
     while ((ch = fgetc(file)) != EOF)
     {
         // Get expected value
         if (ch == '#')
         {
             ch = fgetc(file);
-            for (int i = 0; i < NBOUTPUTS; i++)
+            int expected_value;
+
+            if (ch >= '0' && ch <= '9')
             {
-                expected[i] = 0;
+                expected_value = ch - '0';
             }
-            int expected_value = ch - '0';
-            expected[expected_value] = 1;
+            else
+            {
+                expected_value = ch - 'A' + 10;
+            }
+            expected[expected_value] = 1.0;
         }
         else if (ch == '\n')
         {
@@ -195,9 +203,10 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     double expected[NBOUTPUTS];
 
     // Init 0 expectation
-    int zero_intput[NBINPUTS] = { 0 };
+
+    int zero_intput[NBINPUTS] = { 0.0 };
     double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0, 0.0, 0.0 };
+                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -208,7 +217,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     {
         train_count = 0;
         errorRate = 0.0;
-        if (i == epoch && verbose)
+        if (verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
@@ -219,7 +228,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
@@ -228,11 +237,12 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             }
 
             // Train for the blank image
-            if (train_count % 9 == 0)
+            if (train_count % NBOUTPUTS == 0)
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
-                gradientDescent(network);
+
+                gradientDescent(network, 0.01);
 
                 if (i == epoch && verbose)
                 {
@@ -264,7 +274,7 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     freeNetwork(network);
 }
 
-int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
+int getNetworkOutput(Network *network, Image *image, int verbose)
 {
     if (verbose)
     {
@@ -294,16 +304,14 @@ int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
     return result;
 }
 
-int isFullWhite(SDL_Surface *surface)
+int isFullWhite(Image *image)
 {
     Uint32 pixel;
-    for (unsigned int i = 0; i < surface->w; i++)
+    for (unsigned int i = 0; i < image->width; i++)
     {
-        for (unsigned int j = 0; j < surface->h; j++)
+        for (unsigned int j = 0; j < image->height; j++)
         {
-            // Get pixel from surface
-            pixel = get_pixel(surface, i, j);
-            if (pixel == 0)
+            if (image->pixels[i][j].r == 0)
             {
                 return 0;
             }
