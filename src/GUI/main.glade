@@ -27,6 +27,15 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>jpg</mime-type>
+      <mime-type>bmp</mime-type>
+      <mime-type>jpeg</mime-type>
+      <mime-type>png</mime-type>
+    </mime-types>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <signal name="destroy" handler="quit" swapped="no"/>
@@ -1016,6 +1025,20 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkFileChooserButton" id="file_chooser2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="action">save</property>
+                    <property name="title" translatable="yes">Save File</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkButton">
                     <property name="label" translatable="yes">Run training</property>
                     <property name="visible">True</property>
@@ -1042,7 +1065,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
               </packing>
             </child>
             <child>
-              <object class="GtkTextView">
+              <object class="GtkTextView" id="terminal_text">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="hexpand">True</property>
@@ -1070,13 +1093,4 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
       </object>
     </child>
   </object>
-  <object class="GtkFileFilter" id="filefilter1">
-    <mime-types>
-      <mime-type>jpg</mime-type>
-      <mime-type>bmp</mime-type>
-      <mime-type>jpeg</mime-type>
-      <mime-type>png</mime-type>
-    </mime-types>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1"/>
 </interface>
