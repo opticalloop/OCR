@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 
     int preprocessing = 0;
     char *p_output_folder = "";
+    int hexa = 1;
 
     int _rotate = 0;
     double degree = 0;
@@ -88,6 +89,10 @@ int main(int argc, char *argv[])
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
             verbose = 1;
+        }
+        else if (!strcmp(argv[i], "-hexa"))
+        {
+            hexa = 0;
         }
         else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--rotate"))
         {
@@ -216,10 +221,17 @@ int main(int argc, char *argv[])
 
     if (segment)
     {
-        SDL_Surface *seg81[81];
-        split(&img, seg81, 1, s_output_folder);
-        updateSurface(&img);
-        freeList(seg81, 81);
+        if(hexa){
+            Image *seg[81];
+            split(&img, seg[81], 1, s_output_folder,hexa);
+            updateSurface(&img);
+            freeList(seg, 81);
+        }else{
+            Image *seg[256];
+            split(&img, seg[256], 1, s_output_folder,hexa);
+            updateSurface(&img);
+            freeList(seg, 256);
+        }
     }
 
     saveImage(&img, output_path);

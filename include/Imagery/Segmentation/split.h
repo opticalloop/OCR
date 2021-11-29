@@ -8,29 +8,10 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Rotations_Resize/resize.h"
+#include "Imagery/Segmentation/clearsquare.h"
+#include "Imagery/Segmentation/split.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/op.h"
-
-typedef struct
-{
-    unsigned int xstart;
-    unsigned int ystart;
-    unsigned int xend;
-    unsigned int yend;
-} Coordinates;
-
-/*
- *  Summary:
- *      Verify if the y line is balck or not
- *
- *  Params:
- *      *image: Image where we want to check
- *      y: the line to check
- *
- *  Return:
- *      1 if the line is black 0 if not
- */
-int isBlackLine(Image *image, unsigned int y);
 
 /*
  *  Summary:
@@ -62,24 +43,19 @@ void displayblock(Image *image, unsigned int xstart, unsigned int ystart,
  *      Nothing it save directly in a folder
  *
  */
-void savesquare(Image *image, unsigned int iall, char *imagename);
-
-/*
-Not sure we're going to use it
- */
-void split(Image *image, SDL_Surface *seg81[], int save, char *imagename);
+void savesquare(Image *image, unsigned int iall, char *imagename, int hexa);
 
 /*
  *  Summary:
- *      Free a list of SDL_Surface*
+ *      Split the image in 81 blocks
+ *
  *  Params:
- *      *surface: list to free
- *      len: len of the list
+ *      *image: The image split
  *
  *  Return:
- *      Nothing
+ *      Nothing save is done directly and array is modify directly in the
+ * function
  */
-
-void freeList(SDL_Surface *surface[], unsigned int len);
+void split(Image *image, Image *seg[], int save, char *imagename, int hexa);
 
 #endif
