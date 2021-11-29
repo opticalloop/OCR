@@ -60,12 +60,10 @@ GdkPixbuf *image_to_pixbuf(Image *image)
     return pixbuf;
 }
 
-void change_image(Image *_image, char *GtkimageID)
+void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
 {
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
-
-    GdkPixbuf *pixbuf = image_to_pixbuf(_image);
 
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
@@ -78,6 +76,14 @@ void change_image(Image *_image, char *GtkimageID)
     g_object_unref(pixbuf);
     g_object_unref(resized_image);
 }
+
+void change_image(Image *_image, char *GtkimageID)
+{
+    GdkPixbuf *pixbuf = image_to_pixbuf(_image);
+
+    set_selected_image(pixbuf, GtkimageID);
+}
+
 void set_leftPannel_status(gboolean status)
 {
     // set the left pannel status
@@ -85,6 +91,7 @@ void set_leftPannel_status(gboolean status)
         GTK_WIDGET(gtk_builder_get_object(builder, "left_panel"));
     gtk_widget_set_sensitive(leftPannel, status);
 }
+
 void set_buttons_options_status(gboolean status)
 {
     GtkButton *button_start =
@@ -220,8 +227,8 @@ void run_process(GtkButton *button)
 
         printf("Processing...\n");
         // Run processing
-        thread =
-            OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE, strcmp(dim, "9x9"));
+        thread = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+                            strcmp(dim, "9x9"));
     }
     else
     {
@@ -273,8 +280,13 @@ void cancel_edit_option(GtkWidget *widget, gpointer data)
 
 void edit_rotation(GtkWidget *widget, gpointer data)
 {
-    // change image
-    change_image(image, "selected_image2");
+    // Load image
+    GtkImage *image =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image2"));
+    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
+
+    set_selected_image(pixbuf, "selected_image2");
+
     // reset scale to value 0
     GtkScale *scale =
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
@@ -304,6 +316,7 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
     rotation_value = gtk_range_get_value(GTK_RANGE(scale));
 
     change_image(image, "selected_image"); // change image of main page
+    saveImage(SAVE_PATH, image); // save image
 }
 
 void rotate_img(GtkWidget *widget, gpointer data)
