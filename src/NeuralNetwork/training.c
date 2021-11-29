@@ -38,7 +38,7 @@ void checkInputs(double inputs[NBINPUTS])
     }
 }
 
-void imageToBinary(SDL_Surface *surface, int inputs[])
+void imageToBinary(Image *image, int inputs[])
 {
     SDL_Color rgb;
     Uint32 pixel;
@@ -46,12 +46,11 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
     {
         for (unsigned int j = 0; j < 28; j++)
         {
-            // Get pixel colors
-            pixel = get_pixel(surface, i, j);
-            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
-
             // Black and white
-            if ((rgb.r + rgb.g + rgb.b) / 3 > 128)
+            if ((image->pixels[i][j].r + image->pixels[i][j].g
+                 + image->pixels[i][j].b)
+                    / 3
+                > 128)
             {
                 // White are 0
                 inputs[j * 28 + i] = 0;
@@ -65,7 +64,8 @@ void imageToBinary(SDL_Surface *surface, int inputs[])
     }
 }
 
-void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS], char *lastChr)
+void createData(FILE *file, int inputs[NBINPUTS], double expected[NBOUTPUTS],
+                char *lastChr)
 {
     char ch;
     unsigned int input_index = 0;
@@ -124,7 +124,6 @@ void generateDataFile(void)
     {
         errx(1, "Error : Failed to open input directory\n");
     }
-    int count = 0;
     while ((in_file = readdir(directory)) != NULL)
     {
         if (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
@@ -142,11 +141,11 @@ void generateDataFile(void)
         SDL_FreeSurface(surface);
 
         // Get expected value
-        char ch = in_file->d_name[strlen(in_file->d_name) - 5];
-        
+        int num = in_file->d_name[strlen(in_file->d_name) - 5] - '0';
+
         // Write expected value
         char strTemp[50];
-        sprintf(strTemp, "%c", ch);
+        sprintf(strTemp, "%d", num);
         fputs("#", file);
         fputs(strTemp, file);
 
@@ -158,9 +157,6 @@ void generateDataFile(void)
             fputs(strTemp, file);
         }
         fputs("\n", file);
-        count++;
-        if (count % 100 == 0)
-            printf("%d/%d\n", count, NBIMAGES);
     }
     closedir(directory);
     fclose(file);
@@ -207,9 +203,9 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     double expected[NBOUTPUTS];
 
     // Init 0 expectation
-    int zero_intput[NBINPUTS] = {0};
-    double zero_expected[NBOUTPUTS] = {0.0};
-    zero_expected[0] = 1.0;
+    int zero_intput[NBINPUTS] = { 0.0 };
+    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -220,18 +216,18 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     {
         train_count = 0;
         errorRate = 0.0;
-        if (i == epoch && verbose)
+        if (verbose)
         {
             printf("\n    📊 ###### EPOCH %u ######\n", i);
         }
-    	file = fopen(DATA_FILE_PATH, "r");
-        for (;lastchr != EOF; train_count++)
+        file = fopen(DATA_FILE_PATH, "r");
+        for (; lastchr != EOF; train_count++)
         {
             createData(file, input, expected, &lastchr);
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
@@ -244,24 +240,23 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
             {
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
-                gradientDescent(network);
-            
-                 if (i == epoch && verbose)
+                gradientDescent(network, 0.01);
+
+                if (i == epoch && verbose)
                 {
                     printResult(zero_expected,
-                            network->layers[nbHiddenLayers + 1].neurons);
+                                network->layers[nbHiddenLayers + 1].neurons);
                 }
-            }            
+            }
         }
         fclose(file);
         lastchr = ' ';
-        
+
         if (verbose)
         {
-            printf("    ❗ (%u/%u) Error rate = %f\n", i, epoch, errorRate / NBIMAGES);
+            printf("    ❗ Error rate = %f\n", errorRate / NBIMAGES);
         }
     }
-
 
     if (strcmp(save_path, ""))
     {
@@ -277,11 +272,15 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     freeNetwork(network);
 }
 
-int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
+int getNetworkOutput(Network *network, Image *image, int verbose)
 {
     if (verbose)
     {
         printf("    📈 Getting network output\n");
+    }
+    if (isFullWhite(image))
+    {
+        return 0;
     }
     int inputs[NBINPUTS];
     imageToBinary(image, inputs);
@@ -301,4 +300,20 @@ int getNetworkOutput(Network *network, SDL_Surface *image, int verbose)
         }
     }
     return result;
+}
+
+int isFullWhite(Image *image)
+{
+    Uint32 pixel;
+    for (unsigned int i = 0; i < image->width; i++)
+    {
+        for (unsigned int j = 0; j < image->height; j++)
+        {
+            if (image->pixels[i][j].r == 0)
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
