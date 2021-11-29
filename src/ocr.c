@@ -104,7 +104,9 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
+
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
+
 
     // Detect the grid
     Image cropped = detection(&image, &drawImage, verbose, save, output_folder,
