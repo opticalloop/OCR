@@ -102,17 +102,16 @@ void saveWeights(Network *network, char *path)
     fclose(file);
 }
 
-void launchWeights(Network *network, char *path, int verbose)
+void launchWeights(Network *network, char *path, int verbose, int gui)
 {
     if (access(path, F_OK) != 0)
     {
         errx(EXIT_FAILURE, "Weights file doesn't exist");
     }
 
-    if (verbose)
-    {
-        printf("--> 💾 Initing weights from %s\n", path);
-    }
+    char text[200];
+    snprintf(text, sizeof(text), "--> 💾 Initing weights from %s\n", path);
+    printVerbose(verbose, gui, text);
 
     // Open file
     FILE *file;

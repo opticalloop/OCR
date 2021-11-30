@@ -401,10 +401,10 @@ void start_nn(GtkWidget *widget, gpointer data)
     int check_button_value = gtk_toggle_button_get_active(check_button);
 
     // start training
-    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
-    // TODO : add training function in thread
-    // thread_neural_network = train(epoch_input_value, hidden_input_value,
-    //                               node_input_value, "", path);
+    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+    pthread_t t = train_thread(epoch_input_value, hidden_input_value,
+                               node_input_value, 1, "", "src/NeuralNetwork/data.txt", 1);
+    thread_neural_network = &t;
 }
 
 void cancel_nn(GtkWidget *widget, gpointer data)
