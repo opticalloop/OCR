@@ -418,8 +418,14 @@ void start_nn(GtkWidget *widget, gpointer data)
 
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+<<<<<<< HEAD
     pthread_t t = train_thread(epoch_input_value, hidden_input_value,
                                node_input_value, 1, check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
+=======
+    pthread_t t =
+        train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
+                     "", "src/NeuralNetwork/data.txt", 1);
+>>>>>>> 03c6d272dff6b09126cd529e147dad35403cc10e
     thread_neural_network = &t;
 }
 
