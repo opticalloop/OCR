@@ -1025,12 +1025,12 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton" id="file_chooser2">
+                  <object class="GtkCheckButton" id="train_image">
+                    <property name="label" translatable="yes">Train actual image</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="hexpand">True</property>
-                    <property name="action">save</property>
-                    <property name="title" translatable="yes">Save File</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>

@@ -395,6 +395,11 @@ void start_nn(GtkWidget *widget, gpointer data)
         GTK_FILE_CHOOSER(gtk_builder_get_object(builder, "file_chooser2"));
     char *path = gtk_file_chooser_get_filename(file_chooser);
 
+    // get check button value
+    GtkCheckButton *check_button =
+        GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "train_image"));
+    int check_button_value = gtk_toggle_button_get_active(check_button);
+
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
     pthread_t t = train_thread(epoch_input_value, hidden_input_value,
