@@ -11,6 +11,7 @@
 #include "GUI/gui_utils.h"
 #include "Imagery/Utils/op.h"
 #include "ocr.h"
+#include "NeuralNetwork/training.h"
 
 void change_image(Image *_image, char *GtkimageID);
 

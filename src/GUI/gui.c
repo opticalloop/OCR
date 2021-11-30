@@ -9,7 +9,7 @@ GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
-pthread_t *thread_2;
+pthread_t *thread_neural_network;
 int processing = 0;
 int is_weights_available = 0;
 float rotation_value = 0;
@@ -398,11 +398,13 @@ void start_nn(GtkWidget *widget, gpointer data)
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
     // TODO : add training function in thread
+    // thread_neural_network = train(epoch_input_value, hidden_input_value,
+    //                               node_input_value, "", path);
 }
 
 void cancel_nn(GtkWidget *widget, gpointer data)
 {
-    if (thread_2 != NULL)
+    if (thread_neural_network != NULL)
     {
         // ask user if he wants to cancel
         GtkWidget *dialog = gtk_message_dialog_new(
@@ -415,8 +417,8 @@ void cancel_nn(GtkWidget *widget, gpointer data)
         if (response == GTK_RESPONSE_YES)
         {
             // cancel thread
-            pthread_cancel(*thread_2);
-            pthread_join(*thread_2, NULL);
+            pthread_cancel(*thread_neural_network);
+            pthread_join(*thread_neural_network, NULL);
         }
         else
         {
