@@ -3,12 +3,11 @@
 #define true 1
 #define false 0
 
-#define dim 9
-
-unsigned int isRowSolved(unsigned int grid[dim][dim], unsigned int y)
+unsigned int isRowSolved(unsigned int **grid, unsigned int y,
+                         unsigned int dimension)
 {
     unsigned int val;
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
         val = grid[y][i];
 
@@ -32,10 +31,11 @@ unsigned int isRowSolved(unsigned int grid[dim][dim], unsigned int y)
     return true;
 }
 
-unsigned int isColumnSolved(unsigned int grid[dim][dim], unsigned int x)
+unsigned int isColumnSolved(unsigned int **grid, unsigned int x,
+                            unsigned int dimension)
 {
     unsigned int val;
-    for (unsigned int i = 0; i < dim; i++)
+    for (unsigned int i = 0; i < dimension; i++)
     {
         val = grid[i][x];
 
@@ -59,25 +59,26 @@ unsigned int isColumnSolved(unsigned int grid[dim][dim], unsigned int x)
     return true;
 }
 
-unsigned int isSquareSolved(unsigned int grid[dim][dim], unsigned int x,
-                            unsigned int y)
+unsigned int isSquareSolved(unsigned int **grid, unsigned int x, unsigned int y,
+                            unsigned int dimension)
 {
-    x -= x % 3;
-    y -= y % 3;
+    int increment = (int)sqrt(dimension);
+    x -= x % increment;
+    y -= y % increment;
 
     unsigned int val;
-    for (unsigned int i = 0; i < 3; i++)
+    for (unsigned int i = 0; i < increment; i++)
     {
-        for (unsigned int j = 0; j < 3; j++)
+        for (unsigned int j = 0; j < increment; j++)
         {
             val = grid[x + i][y + j];
 
             if (val != 0)
             {
                 // Check if val is in the square
-                for (unsigned int k = x + i; k < 3; k++)
+                for (unsigned int k = x + i; k < increment; k++)
                 {
-                    for (unsigned int l = y + j + 1; l < 3; l++)
+                    for (unsigned int l = y + j + 1; l < increment; l++)
                     {
                         if (grid[k][l] == val)
                         {
@@ -97,24 +98,26 @@ unsigned int isSquareSolved(unsigned int grid[dim][dim], unsigned int x,
     return true;
 }
 
-unsigned int isSolved(unsigned int grid[dim][dim])
+unsigned int isSolved(unsigned int **grid, unsigned int dimension)
 {
-    for (unsigned int x = 0; x < dim; x++)
+    for (unsigned int x = 0; x < dimension; x++)
     {
-        for (unsigned int y = 0; y < dim; y++)
+        for (unsigned int y = 0; y < dimension; y++)
         {
-            if (isRowSolved(grid, x) == false)
+            if (isRowSolved(grid, x, dimension) == false)
             {
                 return false;
             }
 
-            if (isColumnSolved(grid, y) == false)
+            if (isColumnSolved(grid, y, dimension) == false)
             {
                 return false;
             }
 
             // Check square only when enter it
-            if (x % 3 == 0 && y % 3 == 0 && isSquareSolved(grid, x, y) == false)
+            if (x % ((unsigned int)sqrt(dimension)) == 0
+                && y % ((unsigned int)sqrt(dimension)) == 0
+                && isSquareSolved(grid, x, y, dimension) == false)
             {
                 return false;
             }

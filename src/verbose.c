@@ -21,6 +21,20 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
     }
 }
 
+void changeImageGUI(Image *image, int gui, double value, char *message,
+                    int free)
+{
+    if (gui)
+    {
+        change_image(image, "selected_image");
+        edit_progress_bar(value, message);
+    }
+    if (free)
+    {
+        freeImage(image, 0);
+    }
+}
+
 void printVerbose(int verbose, char *message)
 {
     if (verbose)

@@ -60,3 +60,8 @@ Imagery/*.bmp
 Digits-Only/
 
 src/Imagery/img_0*/
+
+main.glade~
+main
+tmp
+grid.result

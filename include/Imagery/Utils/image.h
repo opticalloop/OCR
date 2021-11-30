@@ -20,7 +20,6 @@ typedef struct Image
     double averageColor;
     Pixel **pixels;
     char *path;
-    SDL_Surface *surface;
 } Image;
 
 /*
@@ -32,7 +31,8 @@ typedef struct Image
  *  Return:
  *
  */
-void newImage(Image *image, int matrix);
+Image newImage(SDL_Surface *surface, int matrix, unsigned int width,
+               unsigned int height);
 
 /*
  *  Summary:
@@ -54,19 +54,7 @@ void displayImage(Image *image);
  *  Return:
  *
  */
-void updateSurface(Image *image);
-
-/*
- *  Summary:
- *
- *  Params:
- *      *image:
- *      **pixels:
- *
- *  Return:
- *
- */
-void updateSurfacePixels(Image *image, Pixel **pixels);
+SDL_Surface *createSurface(Image *image);
 
 /*
  *  Summary:
@@ -123,7 +111,7 @@ Pixel InstantiatePixelZero();
  *  Return:
  *
  */
-Pixel **copyPixelsArray(Image *image);
+Pixel **copyPixelsArray(Image *image, int matrix);
 
 Image copyImage(Image *image, int matrix);
 
@@ -150,4 +138,9 @@ void freeMatrixArray(Pixel **mask, int w, int h);
  *
  */
 void updateNeigbourgs(Image *image);
+
+Image cropImage(Image *image, SDL_Rect *rect);
+
+void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect);
+
 #endif

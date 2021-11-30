@@ -1,3 +1,6 @@
+#ifndef TRAINING_H
+#define TRAINING_H
+
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
@@ -55,7 +58,7 @@ void checkInputs(double inputs[NBINPUTS]);
  *      Fill the array inputs so void
  */
 
-void imageToBinary(SDL_Surface *surface, int inputs[]);
+void imageToBinary(Image *image, int inputs[]);
 
 /*
  * Summary:
@@ -101,4 +104,8 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
  *      Number shown in the image
  */
 
-int getNetworkOutput(Network *network, SDL_Surface *image, int verbose);
+int getNetworkOutput(Network *network, Image *image, int verbose);
+
+int isFullWhite(Image *image);
+
+#endif
