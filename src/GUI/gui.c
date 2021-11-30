@@ -525,19 +525,16 @@ void edit_terminal(char *string)
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
 
-    for (size_t i = 0; i < 60; i++)
+    // add string to text buffer
+    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
+    gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
+
+    if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
     {
-        // add string to text buffer
-        gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
-
-        GtkTextIter start, end;
-        gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
-        gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
-
-        if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
-        {
-            gtk_text_buffer_delete(text_buffer, &start, &end);
-        }
+        gtk_text_buffer_delete(text_buffer, &start, &end);
     }
 }
 
