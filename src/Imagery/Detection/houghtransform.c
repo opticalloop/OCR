@@ -136,27 +136,18 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     printVerbose(verbose, "    📋 2.7 Computing cropped image\n");
 
-    // Get square dimension
-    int l1 = getLineLength(&(lastSquare.top));
-    int l3 = getLineLength(&(lastSquare.right));
-
-    SDL_Rect rect;
-    Dot dot = getBetterCorner(&lastSquare);
-    rect.x = dot.X;
-    rect.y = dot.Y;
-    rect.w = l1;
-    rect.h = l3;
-
     // Free square
     free(squares.squares);
 
     free(resultingList.lines);
 
+    // Correc perspective and crop
+    Image img = correct_perspective(image, &lastSquare, verbose, output_folder);
+
     // Save square to surface
-    Image res = cropImage(image, &rect);
     freeImage(&tempImage, 0);
 
-    return res;
+    return img;
 }
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,

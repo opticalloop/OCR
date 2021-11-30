@@ -107,7 +107,6 @@ void *OCR(void *Thread_args)
 
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
-
     // Detect the grid
     Image cropped = detection(&image, &drawImage, verbose, save, output_folder,
                               four_angles, gui);

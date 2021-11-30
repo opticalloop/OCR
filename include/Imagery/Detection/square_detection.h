@@ -31,4 +31,8 @@ void drawSquare(Square *square, Image *image, int width, int height,
 
 Dot getBetterCorner(Square *square);
 
+// void compute_Square(Square *square);
+
+double getPerimeter(Square *square);
+
 #endif
