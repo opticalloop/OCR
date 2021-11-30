@@ -1,6 +1,7 @@
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
+#define DATA_PATH "src/NeuralNetwork/data.txt"
 #define SAVE_PATH "temp.bmp"
 
 GtkBuilder *builder;
@@ -390,21 +391,41 @@ void start_nn(GtkWidget *widget, gpointer data)
         GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "node_input"));
     int node_input_value = gtk_spin_button_get_value_as_int(node_input);
 
-    // get path from file chooser
-    GtkFileChooser *file_chooser =
-        GTK_FILE_CHOOSER(gtk_builder_get_object(builder, "file_chooser2"));
-    char *path = gtk_file_chooser_get_filename(file_chooser);
-
     // get check button value
     GtkCheckButton *check_button =
         GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "train_image"));
     int check_button_value = gtk_toggle_button_get_active(check_button);
 
+    // Check if file exists
+    FILE *file;
+    file = fopen(WEIGHTS_PATH, "r");
+    if (file != NULL && !check_button_value)
+    {
+        fclose(file);
+        // ask user if he wants to cancel
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            "At the end of the process the current neural network will be overriden. \nDo you want to continue?");
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (response != GTK_RESPONSE_YES)
+        {
+            return;
+        }
+    }
+
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+<<<<<<< HEAD
+    pthread_t t = train_thread(epoch_input_value, hidden_input_value,
+                               node_input_value, 1, check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
+=======
     pthread_t t =
         train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
                      "", "src/NeuralNetwork/data.txt", 1);
+>>>>>>> 03c6d272dff6b09126cd529e147dad35403cc10e
     thread_neural_network = &t;
 }
 

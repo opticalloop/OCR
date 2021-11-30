@@ -43,24 +43,7 @@ static void writeToFile(FILE *path, double number, char *extra)
 void saveWeights(Network *network, char *path)
 {
     // Check if file already exist
-    if (access(path, F_OK) == 0)
-    {
-        printf("Specified file path to save the neural network already exist\n"
-               "Do you want to overwrite it ? [Y/n] : ");
 
-        // Get input result, should be y or n (caps doens't import)
-        char answer = toupper(getchar());
-        while (answer != 'Y' && answer != 'N')
-        {
-            printf("\n Answer by entering Y or N : ");
-            answer = toupper(getchar());
-        }
-        if (answer == 'N')
-        {
-            printf("Returned");
-            return;
-        }
-    }
 
     // Open file
     FILE *file;
