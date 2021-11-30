@@ -366,7 +366,7 @@ static void analyzeNN(int argc, char **argv)
 
         printVerbose(verbose, 0, "    🔨 Creating network\n");
 
-        launchWeights(&network, WEIGHT_PATH, verbose);
+        // launchWeights(&network, WEIGHT_PATH, verbose);
 
         if (verbose)
         {
@@ -387,7 +387,7 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
+        // train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
     }
     else if (xor)
     {

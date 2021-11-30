@@ -130,7 +130,7 @@ void *OCR(void *Thread_args)
     network.sizeOutput = NBOUTPUTS;
 
     printVerbose(verbose, 0, "    📑 3.2 Initing weights\n");
-    launchWeights(&network, WEIGHT_PATH, verbose);
+    launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
     for (angle_index = 1; angle_index < 4; angle_index++)
