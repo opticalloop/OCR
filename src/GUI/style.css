@@ -38,6 +38,12 @@ window button {
     /* animation-iteration-count: infinite; */
     
 }
+
+.terminal{
+    background-color: rgb(38, 38, 47);
+    border-radius: 10px;
+    color: white;
+}
 .right_panel {
     background-color: rgb(16, 16, 42);
     /* border-radius: 10px; */

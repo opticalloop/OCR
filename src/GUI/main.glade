@@ -1073,6 +1073,9 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                 <property name="editable">False</property>
                 <property name="wrap_mode">word</property>
                 <property name="buffer">textbuffer1</property>
+                <style>
+                  <class name="terminal"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

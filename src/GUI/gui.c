@@ -383,7 +383,7 @@ void start_nn(GtkWidget *widget, gpointer data)
     int epoch_input_value = gtk_spin_button_get_value_as_int(epoch_input);
 
     GtkSpinButton *hidden_input =
-        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "hidden_input"));
+        GTK_SPIN_BUTTON(gtk_builder_get_oject(builder, "hidden_input"));
     int hidden_input_value = gtk_spin_button_get_value_as_int(hidden_input);
 
     GtkSpinButton *node_input =
