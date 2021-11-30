@@ -508,18 +508,20 @@ void edit_terminal(char *string)
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
 
-    // add string to text buffer
-    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+    for (size_t i = 0; i < 60; i++)
+    {
+        // add string to text buffer
+        gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
 
-    // scroll to bottom
-    GtkAdjustment *adjustment =
-        gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(text_view));
-    gtk_adjustment_set_value(adjustment, gtk_adjustment_get_upper(adjustment));
+        GtkTextIter start, end;
+        gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
+        gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
 
-    // set cursor to end
-    GtkTextIter iter;
-    gtk_text_buffer_get_end_iter(text_buffer, &iter);
-    gtk_text_buffer_place_cursor(text_buffer, &iter);
+        if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
+        {
+            gtk_text_buffer_delete(text_buffer, &start, &end);
+        }
+    }
 }
 
 void resetNeuralNetwork()
