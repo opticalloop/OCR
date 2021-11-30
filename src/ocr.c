@@ -174,7 +174,6 @@ void *OCR(void *Thread_args)
         if (!isSolvable(grid, dimension))
         {
             rotate(&cropped, four_angles[angle_index]);
-<<<<<<< HEAD
             if (angle_index == 1)
             {
                 printf("No solution\n");
@@ -182,8 +181,6 @@ void *OCR(void *Thread_args)
                 freeNetwork(&network);
                 pthread_exit(NULL);
             }
-=======
->>>>>>> 2bd493321b0d84ad3456c73ee07ca7ad5a25e001
             if (verbose)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
