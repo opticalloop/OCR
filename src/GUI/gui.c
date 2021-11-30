@@ -383,7 +383,7 @@ void start_nn(GtkWidget *widget, gpointer data)
     int epoch_input_value = gtk_spin_button_get_value_as_int(epoch_input);
 
     GtkSpinButton *hidden_input =
-        GTK_SPIN_BUTTON(gtk_builder_get_oject(builder, "hidden_input"));
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "hidden_input"));
     int hidden_input_value = gtk_spin_button_get_value_as_int(hidden_input);
 
     GtkSpinButton *node_input =
@@ -402,8 +402,9 @@ void start_nn(GtkWidget *widget, gpointer data)
 
     // start training
     // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
-    pthread_t t = train_thread(epoch_input_value, hidden_input_value,
-                               node_input_value, 1, "", "src/NeuralNetwork/data.txt", 1);
+    pthread_t t =
+        train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
+                     "", "src/NeuralNetwork/data.txt", 1);
     thread_neural_network = &t;
 }
 
