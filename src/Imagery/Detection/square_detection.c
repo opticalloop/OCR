@@ -125,15 +125,15 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     if ((line1->xEnd - line1->xStart) != 0
         && (line2->xEnd - line2->xStart) != 0)
     {
-        int directCoeff1 =
-            (line1->yEnd - line1->yStart) / (line1->xEnd - line1->xStart);
-        int directCoeff2 =
-            (line2->yEnd - line2->yStart) / (line2->xEnd - line2->xStart);
+        double directCoeff1 =
+            ((double)line1->yEnd - (double)line1->yStart) / ((double)line1->xEnd - (double)line1->xStart);
+        double directCoeff2 =
+            ((double)line2->yEnd - (double)line2->yStart) / ((double)line2->xEnd - (double)line2->xStart);
 
-        int ordOrigin1 = line1->yStart - directCoeff1 * line1->xStart;
-        int ordOrigin2 = line2->yStart - directCoeff2 * line2->xStart;
+        double ordOrigin1 = (double)line1->yStart - (double)directCoeff1 * (double)line1->xStart;
+        double ordOrigin2 = (double)line2->yStart - (double)directCoeff2 * (double)line2->xStart;
 
-        if ((directCoeff1 - directCoeff2) != 0)
+        if (((int) directCoeff1 - (int) directCoeff2) != 0)
         {
             int x = (ordOrigin1 - ordOrigin2) / (directCoeff2 - directCoeff1);
             int y = directCoeff1 * (ordOrigin2 - ordOrigin1)
@@ -379,7 +379,7 @@ int canBeSudokuGrid(Square *square, Image *image)
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness)
 {
-    Pixel color = { .r = 0, .g = 255, .b = 0 };
+    Pixel color = { .r = 255, .g = 0, .b = 255 };
     draw_line(image, width, height, &(square->left), &color, thickness, 1);
     draw_line(image, width, height, &(square->bottom), &color, thickness, 1);
     draw_line(image, width, height, &(square->top), &color, thickness, 1);

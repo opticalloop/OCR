@@ -9,7 +9,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     const unsigned int h = image->height;
 
     // Surface without sobel filter
-    Image tempImage = copyImage(image, 0);
+    Image tempImage = copyImage(drawImage, 0);
 
     // Directly free
     if (!save)
@@ -132,17 +132,12 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
         changeImageGUI(&_lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
 
-    // GETTING MAX SQUARE
-
-    printVerbose(verbose, "    📋 2.7 Computing cropped image\n");
-
     // Free square
     free(squares.squares);
-
     free(resultingList.lines);
 
     // Correc perspective and crop
-    Image img = correct_perspective(image, &lastSquare, verbose, output_folder);
+    Image img = correct_perspective(&tempImage, &lastSquare, verbose, output_folder);
 
     // Save square to surface
     freeImage(&tempImage, 0);

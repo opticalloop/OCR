@@ -94,10 +94,10 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "\n    🔍 2 Grid detection (Hough Transform)\n");
     printVerbose(verbose, "    🎥 2.1 Applying sobel edge detection filter\n");
 
+    Image drawImage = copyImage(&image, 0);
+
     // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
-
-    Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);

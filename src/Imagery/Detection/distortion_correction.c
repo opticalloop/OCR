@@ -68,7 +68,7 @@ Image correct_perspective(Image *image, Square *selected_square,
                           int verbose_mode, char *verbose_path)
 {
     if (verbose_mode)
-        printf("    🗺️ Correcting perspective and cropping...\n");
+        printf("    🗺️ 2.7 Correcting perspective and cropping...\n");
 
     int source[4][2] = {
         { selected_square->top.xStart, selected_square->top.yStart },
