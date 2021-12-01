@@ -259,10 +259,11 @@ void gradientDescent(Network *network, double learningRate)
             for (unsigned int k = 0; k < previousLayer->nbNeurons; k++)
             {
                 // For each weights on the neuron of the previous layer
-                neuron->weights[k] +=
-                    neuron->delta * previousLayer->neurons[k].value * learningRate;
-                
-                neuron->bias += neuron->delta * previousLayer->neurons[k].value * learningRate;
+                neuron->weights[k] += neuron->delta
+                    * previousLayer->neurons[k].value * learningRate;
+
+                neuron->bias += neuron->delta * previousLayer->neurons[k].value
+                    * learningRate;
             }
         }
     }

@@ -8,12 +8,12 @@
 int main(int argc, char **argv)
 {
     // generateDataFile();
-    train(100, 1, 15, 1, "", argv[1]);
+    train(10, 1, 15, 1, "", argv[1]);
 
     Network network;
     network.sizeInput = NBINPUTS;
     network.sizeOutput = NBOUTPUTS;
-    
+
     launchWeights(&network, argv[1], 1);
 
     // Network n;
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     // Network *network = &n;
     // launchWeights(network, "w3.data", 1);
 
-     // Directory where all images are
+    // Directory where all images are
     DIR *directory;
     struct dirent *in_file;
 
@@ -55,11 +55,10 @@ int main(int argc, char **argv)
 
         char ch = in_file->d_name[strlen(in_file->d_name) - 5];
         printf("Input : %c\n", ch);
-        
+
         int res = getNetworkOutput(&network, &img, 0);
         printf("Ouput : %d\n\n", res);
         freeImage(&img, 0);
-
     }
     closedir(directory);
 
@@ -71,16 +70,14 @@ int main(int argc, char **argv)
 
     for (unsigned int i = 1; i < NBOUTPUTS; i++)
     {
-        if (network.layers[(network.nbLayers - 2) + 1].neurons[i].value
-            > temp)
+        if (network.layers[(network.nbLayers - 2) + 1].neurons[i].value > temp)
         {
-            temp =
-                network.layers[(network.nbLayers - 2) + 1].neurons[i].value;
+            temp = network.layers[(network.nbLayers - 2) + 1].neurons[i].value;
             result = i;
         }
     }
     printf("Ouput : %d\n\n", result);
-    
+
     freeNetwork(&network);
 
     return 0;

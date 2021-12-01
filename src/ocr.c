@@ -94,10 +94,10 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, "\n    🔍 2 Grid detection (Hough Transform)\n");
     printVerbose(verbose, "    🎥 2.1 Applying sobel edge detection filter\n");
 
+    Image drawImage = copyImage(&image, 0);
+
     // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
-
-    Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
@@ -106,7 +106,6 @@ void *OCR(void *Thread_args)
     // Four possible angle
 
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
-
 
     // Detect the grid
     Image cropped = detection(&image, &drawImage, verbose, save, output_folder,
@@ -142,10 +141,12 @@ void *OCR(void *Thread_args)
 
         // Segmentation
         // Initialize all case at NULL
-        Image all_cases[hexa ? 256 : 81];
+        Image all_cases[dimension * dimension];
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-        split9(&cropped, all_cases, save, output_folder);
+        
+        // Segmentation
+        split(&cropped, all_cases, save, output_folder, hexa);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         int val;

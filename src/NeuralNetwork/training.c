@@ -205,8 +205,10 @@ void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
     // Init 0 expectation
 
     int zero_intput[NBINPUTS] = { 0.0 };
-    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    double zero_expected[NBOUTPUTS] = {
+        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+    };
 
     // Open file where data is
     FILE *file;
