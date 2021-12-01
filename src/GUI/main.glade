@@ -376,6 +376,7 @@ Network</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="reset_terminal" swapped="no"/>
                         <signal name="clicked" handler="show_page" object="neuralNetwork" swapped="no"/>
                       </object>
                       <packing>

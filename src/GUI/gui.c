@@ -516,6 +516,18 @@ void *init_gui()
     quit();
     pthread_exit(NULL);
 }
+void reset_terminal()
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // clear text buffer
+    gtk_text_buffer_set_text(text_buffer, "", -1);
+}
 void edit_terminal(char *string)
 {
     // get text view
