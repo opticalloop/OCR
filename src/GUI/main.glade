@@ -376,7 +376,6 @@ Network</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
-                        <signal name="clicked" handler="reset_terminal" swapped="no"/>
                         <signal name="clicked" handler="show_page" object="neuralNetwork" swapped="no"/>
                       </object>
                       <packing>
@@ -1039,6 +1038,19 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Reset</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">5</property>
                   </packing>
                 </child>
                 <child>
