@@ -10,7 +10,7 @@
 void saveVerbose(int verbose, Image *image, char *output_folder,
                  char *output_path, int save, int free);
 
-void printVerbose(int verbose, char *message);
+void printVerbose(int verbose,int gui, char *message);
 
 void changeImageGUI(Image *image, int gui, double value, char *message,
                     int free);
