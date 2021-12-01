@@ -40,8 +40,6 @@ void checkInputs(double inputs[NBINPUTS])
 
 void imageToBinary(Image *image, int inputs[])
 {
-    SDL_Color rgb;
-    Uint32 pixel;
     for (unsigned int i = 0; i < 28; i++)
     {
         for (unsigned int j = 0; j < 28; j++)
@@ -140,6 +138,7 @@ void generateDataFile(void)
         Image img = newImage(surface, 0, surface->w, surface->h);
         SDL_FreeSurface(surface);
         imageToBinary(&img, input);
+        freeImage(&img, 0);
 
         // Get expected value
         int num = in_file->d_name[strlen(in_file->d_name) - 5] - '0';
@@ -230,8 +229,10 @@ void *train(void * args)
     // Init 0 expectation
 
     int zero_intput[NBINPUTS] = { 0.0 };
-    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    double zero_expected[NBOUTPUTS] = {
+        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+    };
 
     // Open file where data is
     FILE *file;
@@ -244,6 +245,7 @@ void *train(void * args)
         errorRate = 0.0;
 
         snprintf(print_message, sizeof(print_message), "\n    📊 ###### EPOCH %u ######\n", i);
+        printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
 
         file = fopen(DATA_FILE_PATH, "r");
@@ -278,9 +280,9 @@ void *train(void * args)
         }
         fclose(file);
         lastchr = ' ';
-
         
         snprintf(print_message, sizeof(print_message), "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+        printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
     }
 
@@ -329,7 +331,6 @@ int getNetworkOutput(Network *network, Image *image, int verbose)
 
 int isFullWhite(Image *image)
 {
-    Uint32 pixel;
     for (unsigned int i = 0; i < image->width; i++)
     {
         for (unsigned int j = 0; j < image->height; j++)

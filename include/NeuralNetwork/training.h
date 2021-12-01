@@ -18,9 +18,9 @@
 #include "NeuralNetwork/save_load.h"
 #include "verbose.h"
 
-#define NBIMAGES 61054
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 16
+#define NBIMAGES 68000
 
 typedef struct Training_data
 {
