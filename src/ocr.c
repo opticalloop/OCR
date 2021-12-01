@@ -147,7 +147,7 @@ void *OCR(void *Thread_args)
         {
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
 
-        
+        }
         // Segmentation
         split(&cropped, all_cases, save, output_folder, hexa);
 
