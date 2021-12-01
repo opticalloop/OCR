@@ -141,10 +141,12 @@ void *OCR(void *Thread_args)
 
         // Segmentation
         // Initialize all case at NULL
-        Image all_cases[hexa ? 256 : 81];
+        Image all_cases[dimension * dimension];
         if (verbose && save)
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-        split9(&cropped, all_cases, save, output_folder);
+        
+        // Segmentation
+        split(&cropped, all_cases, save, output_folder, hexa);
 
         printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
         int val;

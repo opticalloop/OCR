@@ -8,7 +8,7 @@
 int main(int argc, char **argv)
 {
     // generateDataFile();
-    train(100, 1, 15, 1, "", argv[1]);
+    train(10, 1, 15, 1, "", argv[1]);
 
     Network network;
     network.sizeInput = NBINPUTS;
