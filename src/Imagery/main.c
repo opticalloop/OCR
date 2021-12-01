@@ -43,7 +43,11 @@ int main(int argc, char *argv[])
     int segment = 0;
     char *s_output_folder = "";
 
-    Image* image 
+    SDL_Surface* surface = load_image(input_path);
+    Image _image = newImage(surface,0, surface->w, surface->h);
+    
+    newImage(image);
+    grayscale(image);
     if(hexa){
         Image seg[81];
         split(&img, seg[81], 1, s_output_folder,hexa);
