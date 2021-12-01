@@ -1,8 +1,5 @@
 #include "Imagery/Detection/distortion_correction.h"
 
-#define _MAX 9
-#define N 9
-
 /**
  * @brief Cross product of two vectors array
  *
@@ -43,13 +40,7 @@ void compute_perspective_matrix(int source[][2], double dest[][2],
 
     double R[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 1 };
 
-    double P_inv[9][9] = {
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-    };
+    double P_inv[9][9] = { 0 };
 
     // Invert matrix P
     inverse_mat(P, P_inv, 9);
@@ -105,7 +96,7 @@ Image correct_perspective(Image *image, Square *selected_square,
 
     double **transformation_matrix = alloc_matrix(3);
 
-    double **transformation_matrix_inv =  alloc_matrix(3)
+    double **transformation_matrix_inv =  alloc_matrix(3);
 
     compute_perspective_matrix(source, destination, transformation_matrix,
                                transformation_matrix_inv);

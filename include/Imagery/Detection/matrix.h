@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define _MAX 9
+#define N 9
+
 /**
  * @brief 
  * 
@@ -13,7 +16,7 @@
  * @param sizeMatrix 
  */
 
-void inverse_mat(double cinMatrix[30][30], double coutMatrix[30][30],
+void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
                  int sizeMatrix);
 
 /**

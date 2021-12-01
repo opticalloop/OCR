@@ -571,27 +571,27 @@ void compute_Square(Square *square)
     square->top.xEnd = topRight.X;
     square->top.yEnd = topRight.Y;
 
-    printf("Top: (%d, %d)\n", square->top.xStart, square->top.yStart);
+    // printf("Top: (%d, %d)\n", square->top.xStart, square->top.yStart);
 
     square->right.xStart = topRight.X;
     square->right.yStart = topRight.Y;
     square->right.xEnd = bottomRight.X;
     square->right.yEnd = bottomRight.Y;
 
-    printf("Right: (%d, %d)\n", square->right.xStart, square->right.yStart);
+    // printf("Right: (%d, %d)\n", square->right.xStart, square->right.yStart);
 
     square->bottom.xStart = bottomRight.X;
     square->bottom.yStart = bottomRight.Y;
     square->bottom.xEnd = bottomLeft.X;
     square->bottom.yEnd = bottomLeft.Y;
 
-    printf("Bottom: (%d, %d)\n", square->bottom.xStart, square->bottom.yStart);
+    // printf("Bottom: (%d, %d)\n", square->bottom.xStart, square->bottom.yStart);
 
     square->left.xStart = bottomLeft.X;
     square->left.yStart = bottomLeft.Y;
     square->left.xEnd = topLeft.X;
     square->left.yEnd = topLeft.Y;
 
-    printf("Left: (%d, %d)\n\n", square->left.xStart, square->left.yStart);
+    // printf("Left: (%d, %d)\n\n", square->left.xStart, square->left.yStart);
 
 }
