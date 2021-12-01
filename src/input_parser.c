@@ -191,7 +191,7 @@ static void analyzeOCR(int argc, char **argv)
     saveImage(&image, "temp.bmp");
     freeImage(&image, 0);
     thread =
-        OCR_thread("temp.bmp", output_path, verbose, save, output_folder, 0, 0);
+        OCR_thread("temp.bmp", output_path, verbose, save, output_folder, 0, 1);
 }
 
 static void analyzeNN(int argc, char **argv)

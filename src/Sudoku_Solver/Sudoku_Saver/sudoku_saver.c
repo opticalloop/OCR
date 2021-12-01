@@ -28,7 +28,14 @@ void basicPrint(unsigned int **grid, unsigned int dimension)
             {
                 printf(" ");
             }
-            printf("%d ", grid[i][j]);
+            if (grid[i][j] > 9)
+            {
+                printf("%d", grid[i][j]);
+            }
+            else
+            {
+                printf(" %d", grid[i][j]);
+            }
         }
 
         printf("\n");
@@ -135,7 +142,6 @@ void saveGrid(unsigned int **grid, char outputPath[], int verbose,
 Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                         char *folder_path, unsigned int dimension)
 {
-    SDL_Surface *surface;
     Image image = newImage(NULL, 0, 266, 266);
 
     for (unsigned int x = 0; x < 266; x++)
@@ -180,7 +186,7 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                     temp = getImage(val, IMAGE_DIRECTORY, copy[i][j]);
                 else
                     temp = getImage(val, folder_path, copy[i][j]);
-                pasteOnImage(&image, &temp, &rect);
+                pasteOnImage(&temp, &image, &rect);
                 freeImage(&temp, 0);
             }
         }
@@ -202,5 +208,6 @@ Image getImage(unsigned int val, char *directory, unsigned int green)
     }
     SDL_Surface *surface = load_image(str);
     Image res = newImage(surface, 0, 28, 28);
+    SDL_FreeSurface(surface);
     return res;
 }

@@ -38,6 +38,7 @@ pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
                             .output_folder = output_folder,
                             .gui = gui,
                             .hexa = hexa };
+    SDL_FreeSurface(surface);
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
     if (gui == 0)
@@ -181,6 +182,7 @@ void *OCR(void *Thread_args)
             if (angle_index == 1)
             {
                 printf("No solution\n");
+                freeGrid(grid, dimension); // Free grid
                 freeImage(&cropped, 0);   
                 freeNetwork(&network);
                 pthread_exit(NULL);

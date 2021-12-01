@@ -171,8 +171,7 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
                 neuronIndex++;
                 weightIndex = 0;
             
-                // Parse bias
-                chr = getc(file);
+                // Parse bias   
                 while (chr != EOF && chr != '\n')
                 {
                     strncat(tempStr, &chr, 1);
@@ -182,6 +181,7 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
                 {
                     network->layers[layerIndex].neurons[neuronIndex].bias =
                         atof(tempStr);
+                    // printf("%f\n", network->layers[layerIndex].neurons[neuronIndex].bias);
                 }
                 else
                 {
@@ -196,8 +196,8 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
         }
         else if (chr == '|')
         {
-            //     printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-            //            neuronIndex, weightIndex, atof(tempStr));
+                //  printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+                //      neuronIndex, weightIndex, atof(tempStr));
 
             // Save weights
             network->layers[layerIndex]
