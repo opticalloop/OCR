@@ -18,6 +18,7 @@ window button {
     border: 1px solid #794000;
     background:rgb(189, 120, 10);
 }
+
 .left_panel button:disabled {
     /* background-color: rgb(255, 136, 0); */
     border: 1px solid #794000;
@@ -44,6 +45,11 @@ window button {
     background-color: rgb(16, 16, 42);
     /* border-radius: 10px; */
     padding: 30px;
+}
+.right_panel button:hover {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #794000;
+    background:rgb(189, 120, 10);
 }
 .right_panel spinbutton {
     background-color: rgb(38, 38, 47);

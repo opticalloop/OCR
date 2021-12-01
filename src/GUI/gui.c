@@ -425,6 +425,9 @@ void start_nn(GtkWidget *widget, gpointer data)
     thread_neural_network = &t;
 }
 
+void reset_nn()
+{}
+
 void cancel_nn(GtkWidget *widget, gpointer data)
 {
     if (thread_neural_network != NULL)
