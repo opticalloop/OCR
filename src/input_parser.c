@@ -187,9 +187,11 @@ static void analyzeOCR(int argc, char **argv)
     }
     pthread_t thread;
     SDL_Surface *img = load_image(input_path);
-    Image image = newImage(img, 1, img->w, img->h);
+    Image image = newImage(img, 0, img->w, img->h);
+    saveImage(&image, "img");
+    freeImage(&image, 0);
     thread =
-        OCR_thread(&image, output_path, verbose, save, output_folder, 0, 0);
+        OCR_thread("img", output_path, verbose, save, output_folder, 0, 0);
 }
 
 static void analyzeNN(int argc, char **argv)
@@ -364,9 +366,9 @@ static void analyzeNN(int argc, char **argv)
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
 
-        printVerbose(verbose, "    🔨 Creating network\n");
+        printVerbose(verbose, 0, "    🔨 Creating network\n");
 
-        launchWeights(&network, WEIGHT_PATH, verbose);
+        // launchWeights(&network, WEIGHT_PATH, verbose);
 
         if (verbose)
         {
@@ -387,7 +389,7 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
+        // train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
     }
     else if (xor)
     {

@@ -11,11 +11,12 @@
 #include "GUI/gui_utils.h"
 #include "Imagery/Utils/op.h"
 #include "ocr.h"
+#include "NeuralNetwork/training.h"
 
 void change_image(Image *_image, char *GtkimageID);
 
 void edit_progress_bar(float progress, char *text);
-
+void edit_terminal(char *string);
 void *init_gui();
 
 #endif

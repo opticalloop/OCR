@@ -67,7 +67,7 @@ void *OCR(void *Thread_args)
     }
 
     // Create image
-    printVerbose(verbose, "--> 💾 Creating image\n");
+    printVerbose(verbose, 0, "--> 💾 Creating image\n");
 
     // if (image.width > 3000 || image.height > 3000)
     // {
@@ -84,15 +84,16 @@ void *OCR(void *Thread_args)
     // Preprocessing
     grayscale(&image);
     saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
-    changeImageGUI(&image, gui, 0.05, "Grayscale image", 0);
+    changeImageGUI(&image, 0, 0.05, "Grayscale image", 0);
 
     // Binarization
     Preprocessing(&image, output_folder, verbose, save, gui);
 
     // DETECTION
 
-    printVerbose(verbose, "\n    🔍 2 Grid detection (Hough Transform)\n");
-    printVerbose(verbose, "    🎥 2.1 Applying sobel edge detection filter\n");
+    printVerbose(verbose, 0, "\n    🔍 2 Grid detection (Hough Transform)\n");
+    printVerbose(verbose, 0,
+                 "    🎥 2.1 Applying sobel edge detection filter\n");
 
     // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
@@ -101,9 +102,10 @@ void *OCR(void *Thread_args)
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
-    printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
+    printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
+
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
@@ -120,32 +122,35 @@ void *OCR(void *Thread_args)
     unsigned int **grid = allocGrid(dimension);
 
     // Recognisation + Construction
-    printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
-    printVerbose(verbose, "    📊 3.1 Creating neural network\n");
+    printVerbose(verbose, 0, "\n    ❓ 3 Initing digit recognition\n");
+    printVerbose(verbose, 0, "    📊 3.1 Creating neural network\n");
 
     Network network;
     network.sizeInput = NBINPUTS;
     network.sizeOutput = NBOUTPUTS;
 
-    printVerbose(verbose, "    📑 3.2 Initing weights\n");
-    launchWeights(&network, WEIGHT_PATH, verbose);
+    printVerbose(verbose, 0, "    📑 3.2 Initing weights\n");
+    launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
     for (angle_index = 1; angle_index < 4; angle_index++)
     {
         saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
                     0);
-        changeImageGUI(&cropped, gui, 0.8, "Cropped image", 0);
-        printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
+        changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
+        printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
 
         // Segmentation
         // Initialize all case at NULL
         Image all_cases[hexa ? 256 : 81];
         if (verbose && save)
+        {
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
+        }
+
         split9(&cropped, all_cases, save, output_folder);
 
-        printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
+        printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
         int val;
         for (unsigned int i = 0; i < dimension; i++)
         {
@@ -200,9 +205,9 @@ void *OCR(void *Thread_args)
     // Copy array to have different color when saving the image
     copyArray(grid, copy, dimension);
 
-    printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
-    printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
-    printVerbose(verbose, "    🔍 4.2 Solving grid\n");
+    printVerbose(verbose, 0, "    ✅ 3.5 Grid is solvable\n");
+    printVerbose(verbose, 0, "\n    🎲 4 Solving sudoku grid\n");
+    printVerbose(verbose, 0, "    🔍 4.2 Solving grid\n");
 
     solveSuduko(grid, 0, 0, dimension);
     basicPrint(grid, dimension);
@@ -211,7 +216,7 @@ void *OCR(void *Thread_args)
     {
         errx(EXIT_FAILURE, "    ⛔ Error while solving grid");
     }
-    printVerbose(verbose, "    ✅ 4.3 Grid is solved\n");
+    printVerbose(verbose, 0, "    ✅ 4.3 Grid is solved\n");
 
     // SaveResult
     saveGrid(grid, "grid.result", verbose, dimension);

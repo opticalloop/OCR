@@ -1,6 +1,7 @@
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
+#define DATA_PATH "src/NeuralNetwork/data.txt"
 #define SAVE_PATH "temp.bmp"
 
 GtkBuilder *builder;
@@ -9,6 +10,7 @@ GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
+pthread_t *thread_neural_network;
 int processing = 0;
 int is_weights_available = 0;
 float rotation_value = 0;
@@ -374,7 +376,83 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     change_image(image, "selected_image");
 }
 
-// ------ /RESIZE ------
+void start_nn(GtkWidget *widget, gpointer data)
+{
+    // get spin button value
+    GtkSpinButton *epoch_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "epoch_input"));
+    int epoch_input_value = gtk_spin_button_get_value_as_int(epoch_input);
+
+    GtkSpinButton *hidden_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "hidden_input"));
+    int hidden_input_value = gtk_spin_button_get_value_as_int(hidden_input);
+
+    GtkSpinButton *node_input =
+        GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "node_input"));
+    int node_input_value = gtk_spin_button_get_value_as_int(node_input);
+
+    // get check button value
+    GtkCheckButton *check_button =
+        GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "train_image"));
+    int check_button_value = gtk_toggle_button_get_active(check_button);
+
+    // Check if file exists
+    FILE *file;
+    file = fopen(WEIGHTS_PATH, "r");
+    if (file != NULL && !check_button_value)
+    {
+        fclose(file);
+        // ask user if he wants to cancel
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            "At the end of the process the current neural network will be "
+            "overriden. \nDo you want to continue?");
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (response != GTK_RESPONSE_YES)
+        {
+            return;
+        }
+    }
+
+    // start training
+    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+    pthread_t t =
+        train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
+                     check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
+    thread_neural_network = &t;
+}
+
+void cancel_nn(GtkWidget *widget, gpointer data)
+{
+    if (thread_neural_network != NULL)
+    {
+        // ask user if he wants to cancel
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            "Are you sure you want to cancel?");
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (response == GTK_RESPONSE_YES)
+        {
+            // cancel thread
+            pthread_cancel(*thread_neural_network);
+            pthread_join(*thread_neural_network, NULL);
+        }
+        else
+        {
+            return;
+        }
+    }
+    GtkWidget *page = data;
+    show_page(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
+}
 
 void *init_gui()
 {
@@ -437,6 +515,39 @@ void *init_gui()
     freeImage(temp_image, 0);
     quit();
     pthread_exit(NULL);
+}
+void reset_terminal()
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // clear text buffer
+    gtk_text_buffer_set_text(text_buffer, "", -1);
+}
+void edit_terminal(char *string)
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // add string to text buffer
+    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
+    gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
+
+    if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
+    {
+        gtk_text_buffer_delete(text_buffer, &start, &end);
+    }
 }
 
 void resetNeuralNetwork()
