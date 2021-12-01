@@ -95,10 +95,10 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, 0,
                  "    🎥 2.1 Applying sobel edge detection filter\n");
 
+    Image drawImage = copyImage(&image, 0);
+
     // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
-
-    Image drawImage = copyImage(&image, 0);
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
@@ -142,13 +142,14 @@ void *OCR(void *Thread_args)
 
         // Segmentation
         // Initialize all case at NULL
-        Image all_cases[hexa ? 256 : 81];
+        Image all_cases[dimension * dimension];
         if (verbose && save)
         {
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-        }
 
-        split9(&cropped, all_cases, save, output_folder);
+        
+        // Segmentation
+        split(&cropped, all_cases, save, output_folder, hexa);
 
         printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
         int val;
@@ -177,6 +178,13 @@ void *OCR(void *Thread_args)
         if (!isSolvable(grid, dimension))
         {
             rotate(&cropped, four_angles[angle_index]);
+            if (angle_index == 1)
+            {
+                printf("No solution\n");
+                freeImage(&cropped, 0);   
+                freeNetwork(&network);
+                pthread_exit(NULL);
+            }
             if (verbose)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
