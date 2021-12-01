@@ -136,7 +136,7 @@ void *OCR(void *Thread_args)
     unsigned int angle_index;
     for (angle_index = 1; angle_index < 4; angle_index++)
     {
-        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
+        saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
                     0);
         changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
         printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
