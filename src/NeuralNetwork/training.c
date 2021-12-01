@@ -244,6 +244,7 @@ void *train(void * args)
         errorRate = 0.0;
 
         snprintf(print_message, sizeof(print_message), "\n    📊 ###### EPOCH %u ######\n", i);
+        printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
 
         file = fopen(DATA_FILE_PATH, "r");
@@ -278,9 +279,9 @@ void *train(void * args)
         }
         fclose(file);
         lastchr = ' ';
-
         
         snprintf(print_message, sizeof(print_message), "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+        printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
     }
 
