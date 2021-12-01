@@ -87,7 +87,12 @@ void saveWeights(Network *network, char *path)
         for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
         {
             // writeToFile(file, (double)j, "# ");
-            fputs("\n#\n", file);
+            fputs("\n#", file);
+            
+            // Write biais
+            writeToFile(file, network->layers[i].neurons[j].bias, "");
+            fputs("\n", file);
+
             for (unsigned int k = 0;
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
@@ -179,10 +184,28 @@ void launchWeights(Network *network, char *path, int verbose)
                 weightIndex = 0;
             }
             // New neuron
-            else if (chr == '\n')
+            else
             {
                 neuronIndex++;
                 weightIndex = 0;
+            
+                // Parse bias
+                chr = getc(file);
+                while (chr != EOF && chr != '\n')
+                {
+                    strncat(tempStr, &chr, 1);
+                    chr = getc(file);
+                }
+                if (chr != EOF)
+                {
+                    network->layers[layerIndex].neurons[neuronIndex].bias =
+                        atof(tempStr);
+                }
+                else
+                {
+                    errx(EXIT_FAILURE, "File too short");
+                }
+                memset(tempStr, 0, sizeof(tempStr));
             }
         }
         else if (chr == ' ' || chr == '\n')
