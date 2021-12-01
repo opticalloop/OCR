@@ -1,6 +1,4 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "Imagery/Detection/matrix.h"
 
 //---------------------------------------------------
 //	calculate minor of matrix OR build new matrix : k-had = minor
@@ -145,4 +143,100 @@ void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
     determinte = (double)Determinte(cinMatrix, sizeMatrix);
 
     Inverse(cinMatrix, sizeMatrix, determinte, coutMatrix, transposeMatrix);
+}
+
+
+
+void free_mat(double **mat, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        free(mat[i]);
+    }
+    free(mat);
+}
+
+/**
+ * @brief In place multiplication of transform matrix A by B
+ */
+void multiply_mat(double **A, double **B, int size)
+{
+    double **C = calloc(size, sizeof(double *));
+    for (int i = 0; i < size; i++)
+        C[i] = calloc(size, sizeof(double));
+
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            for (int k = 0; k < size; k++)
+                C[i][j] += A[i][k] * B[k][j];
+
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            A[i][j] = C[i][j];
+
+    for (int i = 0; i < size; i++)
+        free(C[i]);
+    free(C);
+}
+
+/**
+ * @brief Inverts a 3x3 matrix
+ */
+void inverse_3x3_matrix(double **M, double **M_inv)
+{
+    double MM = M[0][0] * M[1][1] * M[2][2] + M[0][1] * M[1][2] * M[2][0]
+        + M[0][2] * M[2][1] * M[1][0] - M[0][2] * M[1][1] * M[2][0]
+        - M[0][1] * M[1][0] * M[2][2] - M[0][0] * M[2][1] * M[1][2];
+
+    double AM[3][3] = { { M[1][1] * M[2][2] - M[1][2] * M[2][1],
+                          M[0][2] * M[2][1] - M[0][1] * M[2][2],
+                          M[0][1] * M[1][2] - M[0][2] * M[1][1] },
+                        { M[1][2] * M[2][0] - M[1][0] * M[2][2],
+                          M[0][0] * M[2][2] - M[0][2] * M[2][0],
+                          M[0][2] * M[1][0] - M[0][0] * M[1][2] },
+                        { M[1][0] * M[2][1] - M[1][1] * M[2][0],
+                          M[0][1] * M[2][0] - M[0][0] * M[2][1],
+                          M[0][0] * M[1][1] - M[0][1] * M[1][0] } };
+
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            M_inv[i][j] = AM[i][j] / MM;
+}
+
+/**
+ * @brief Multiply a size*size matrix by a column vector
+ */
+void multiply_mat_vector(double M[][_MAX], double v[_MAX], double v_out[_MAX],
+                         int size)
+{
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            v_out[i] += M[i][j] * v[j];
+}
+
+void multiply_mat_vector_pt(double **M, double *v, double *v_out, int size)
+{
+    for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++)
+            v_out[i] += M[i][j] * v[j];
+}
+
+double **alloc_matrix(int size)
+{
+    double **mat = calloc(size, sizeof(double *));
+    if (mat == NULL)
+    {
+        printf("Error allocating memory for matrix\n");
+        exit(1);
+    }
+    for (int i = 0; i < size; i++)
+    {
+        mat[i] = calloc(size, sizeof(double));
+        if (mat[i] == NULL)
+        {
+            printf("Error allocating memory for matrix\n");
+            exit(1);
+        }
+    }
+    return mat;
 }
