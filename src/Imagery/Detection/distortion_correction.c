@@ -151,13 +151,13 @@ Image correct_perspective(Image *image, Square *selected_square,
                           int verbose_mode, char *verbose_path)
 {
     if (verbose_mode)
-        printf("   🗺️ Correcting perspective and cropping...\n");
+        printf("    🗺️ Correcting perspective and cropping...\n");
 
     int source[4][2] = {
         { selected_square->top.xStart, selected_square->top.yStart },
-        { selected_square->left.xStart, selected_square->left.yStart },
         { selected_square->right.xStart, selected_square->right.yStart },
-        { selected_square->bottom.xStart, selected_square->bottom.yStart }
+        { selected_square->bottom.xStart, selected_square->bottom.yStart },
+        { selected_square->left.xStart, selected_square->left.yStart }
     };
 
     int edge_1_length = sqrt(pow(source[0][0] - source[1][0], 2)
@@ -220,7 +220,7 @@ Image correct_perspective(Image *image, Square *selected_square,
     }
 
     saveVerbose(verbose_mode, &corrected_image, verbose_path,
-                "9.1-perspective-corrected.png", 1, 1);
+                "2.8-perspective-corrected.png", 1, 0);
 
     free_mat(transformation_matrix, 3);
     free_mat(transformation_matrix_inv, 3);
