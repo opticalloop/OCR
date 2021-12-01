@@ -376,6 +376,7 @@ Network</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <signal name="clicked" handler="reset_terminal" swapped="no"/>
                         <signal name="clicked" handler="show_page" object="neuralNetwork" swapped="no"/>
                       </object>
                       <packing>
@@ -836,11 +837,13 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
+            <property name="spacing">12</property>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
+                <property name="spacing">9</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
@@ -1025,6 +1028,20 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkCheckButton" id="train_image">
+                    <property name="label" translatable="yes">Train actual image</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkButton">
                     <property name="label" translatable="yes">Run training</property>
                     <property name="visible">True</property>
@@ -1051,37 +1068,17 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkTextView" id="terminal_text">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <child>
-                  <object class="GtkTextView">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="hexpand">True</property>
-                    <property name="editable">False</property>
-                    <property name="wrap_mode">word</property>
-                    <property name="buffer">textbuffer1</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkScrollbar">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="orientation">vertical</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
+                <property name="can_focus">True</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="editable">False</property>
+                <property name="wrap_mode">word</property>
+                <property name="buffer">textbuffer1</property>
+                <style>
+                  <class name="terminal"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

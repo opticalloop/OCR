@@ -5,6 +5,8 @@
 #include "Imagery/Utils/image.h"
 #include "NeuralNetwork/training.h"
 
+#define TEST_DATA_PATH "Test_data"
+
 int main(int argc, char **argv)
 {
     // generateDataFile();
@@ -16,12 +18,6 @@ int main(int argc, char **argv)
 
     launchWeights(&network, argv[1], 1);
 
-    // Network n;
-    // n.sizeInput = NBINPUTS;
-    // n.sizeOutput = NBOUTPUTS;
-    // Network *network = &n;
-    // launchWeights(network, "w3.data", 1);
-
     // Directory where all images are
     DIR *directory;
     struct dirent *in_file;
@@ -31,7 +27,7 @@ int main(int argc, char **argv)
     char str[1000];
 
     // Open the directory
-    if ((directory = opendir("Test_data")) == NULL)
+    if ((directory = opendir(TEST_DATA_PATH)) == NULL)
     {
         errx(1, "Error : Failed to open input directory\n");
     }

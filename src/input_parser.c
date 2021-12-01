@@ -366,9 +366,9 @@ static void analyzeNN(int argc, char **argv)
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
 
-        printVerbose(verbose, "    🔨 Creating network\n");
+        printVerbose(verbose, 0, "    🔨 Creating network\n");
 
-        launchWeights(&network, WEIGHT_PATH, verbose);
+        // launchWeights(&network, WEIGHT_PATH, verbose);
 
         if (verbose)
         {
@@ -389,7 +389,9 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path);
+        pthread_t thread;
+        thread = train_thread(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path, 0);
+        pthread_join(thread, NULL);
     }
     else if (xor)
     {

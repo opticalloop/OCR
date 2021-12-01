@@ -10,15 +10,29 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/pixel_operations.h"
 #include "NeuralNetwork/neural_network.h"
 #include "NeuralNetwork/save_load.h"
+#include "verbose.h"
 
-#define NBIMAGES 61054
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 16
+#define NBIMAGES 68000
+
+typedef struct Training_data
+{
+    unsigned int epoch;
+    unsigned int nbHiddenLayers;
+    unsigned int nbNodesPerHidden;
+    int verbose;
+    char *launch_path;
+    char *save_path;
+    int gui;
+}Training_data;
+
 
 /*
  *  Summary:
@@ -88,9 +102,11 @@ void generateDataFile(void);
  *   Void
  */
 
-void train(const unsigned int epoch, const unsigned int nbHiddenLayers,
+pthread_t train_thread(const unsigned int epoch, const unsigned int nbHiddenLayers,
            const unsigned int nbNodesPerHidden, const int verbose,
-           char *launch_path, char *save_path);
+           char *launch_path, char *save_path, int gui);
+
+void *train(void * args);
 
 /*
  *  Summary:

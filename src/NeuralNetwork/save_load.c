@@ -43,24 +43,7 @@ static void writeToFile(FILE *path, double number, char *extra)
 void saveWeights(Network *network, char *path)
 {
     // Check if file already exist
-    if (access(path, F_OK) == 0)
-    {
-        printf("Specified file path to save the neural network already exist\n"
-               "Do you want to overwrite it ? [Y/n] : ");
 
-        // Get input result, should be y or n (caps doens't import)
-        char answer = toupper(getchar());
-        while (answer != 'Y' && answer != 'N')
-        {
-            printf("\n Answer by entering Y or N : ");
-            answer = toupper(getchar());
-        }
-        if (answer == 'N')
-        {
-            printf("Returned");
-            return;
-        }
-    }
 
     // Open file
     FILE *file;
@@ -87,7 +70,12 @@ void saveWeights(Network *network, char *path)
         for (unsigned int j = 0; j < network->layers[i].nbNeurons; j++)
         {
             // writeToFile(file, (double)j, "# ");
-            fputs("\n#\n", file);
+            fputs("\n#", file);
+            
+            // Write biais
+            writeToFile(file, network->layers[i].neurons[j].bias, "");
+            fputs("\n", file);
+
             for (unsigned int k = 0;
                  k < network->layers[i].neurons[j].nbWeights; k++)
             {
@@ -102,17 +90,16 @@ void saveWeights(Network *network, char *path)
     fclose(file);
 }
 
-void launchWeights(Network *network, char *path, int verbose)
+void launchWeights(Network *network, char *path, int verbose, int gui)
 {
     if (access(path, F_OK) != 0)
     {
         errx(EXIT_FAILURE, "Weights file doesn't exist");
     }
 
-    if (verbose)
-    {
-        printf("--> 💾 Initing weights from %s\n", path);
-    }
+    char text[200];
+    snprintf(text, sizeof(text), "--> 💾 Initing weights from %s\n", path);
+    printVerbose(verbose, gui, text);
 
     // Open file
     FILE *file;
@@ -179,10 +166,28 @@ void launchWeights(Network *network, char *path, int verbose)
                 weightIndex = 0;
             }
             // New neuron
-            else if (chr == '\n')
+            else
             {
                 neuronIndex++;
                 weightIndex = 0;
+            
+                // Parse bias
+                chr = getc(file);
+                while (chr != EOF && chr != '\n')
+                {
+                    strncat(tempStr, &chr, 1);
+                    chr = getc(file);
+                }
+                if (chr != EOF)
+                {
+                    network->layers[layerIndex].neurons[neuronIndex].bias =
+                        atof(tempStr);
+                }
+                else
+                {
+                    errx(EXIT_FAILURE, "File too short");
+                }
+                memset(tempStr, 0, sizeof(tempStr));
             }
         }
         else if (chr == ' ' || chr == '\n')
