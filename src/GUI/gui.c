@@ -622,5 +622,7 @@ void quit()
         pthread_cancel(*thread);
         pthread_join(*thread, NULL);
     }
+    freeImage(&image, 0);
+    freeImage(&temp_image, 0);  
     gtk_main_quit();
 }
