@@ -143,4 +143,6 @@ Image cropImage(Image *image, SDL_Rect *rect);
 
 void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect);
 
+void cloneImage(Image *src, Image *dst);
+
 #endif
