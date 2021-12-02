@@ -229,8 +229,10 @@ void run_process(GtkButton *button)
 
         printf("Processing...\n");
         // Run processing
-        thread = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+        p_thread t;
+        t = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
+        thread = &t;
     }
     else
     {
