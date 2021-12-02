@@ -1,7 +1,7 @@
 CC = gcc -Iinclude/
 
 CPPFLAGS = `pkg-config --cflags sdl gtk+-3.0` -MMD -D__NO_INLINE__
-CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address -Wno-unknown-pragmas
 LDLFLAGS = -lm -lpthread
 LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
 

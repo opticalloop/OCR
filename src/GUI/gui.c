@@ -26,14 +26,7 @@ int resized_y = -1;
 int resized_w = -1;
 int resized_h = -1;
 
-char *get_filename_ext(const char *filename)
-{
-    // get the filename extension
-    char *dot = strrchr(filename, '.');
-    if (!dot || dot == filename)
-        return "";
-    return dot + 1;
-}
+#pragma region "Image_management"
 
 GdkPixbuf *image_to_pixbuf(Image *image)
 {
@@ -86,36 +79,17 @@ void change_image(Image *_image, char *GtkimageID)
     set_selected_image(pixbuf, GtkimageID);
 }
 
-void set_leftPannel_status(gboolean status)
+#pragma endregion "Image_management"
+
+#pragma region "File_management"
+
+char *get_filename_ext(const char *filename)
 {
-    // set the left pannel status
-    GtkWidget *leftPannel =
-        GTK_WIDGET(gtk_builder_get_object(builder, "left_panel"));
-    gtk_widget_set_sensitive(leftPannel, status);
-}
-
-void set_buttons_options_status(gboolean status)
-{
-    GtkButton *button_start =
-        GTK_BUTTON(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button_start),
-                             status); // disable button
-
-    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
-    gtk_widget_set_sensitive(GTK_WIDGET(box_1), status); // disable box
-}
-
-void edit_progress_bar(float progress, char *text)
-{
-    // get progress bar
-    GtkProgressBar *progress_bar =
-        GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
-
-    // set progress bar
-    gtk_progress_bar_set_fraction(progress_bar, progress);
-
-    // set progress bar text
-    gtk_progress_bar_set_text(progress_bar, text);
+    // get the filename extension
+    char *dot = strrchr(filename, '.');
+    if (!dot || dot == filename)
+        return "";
+    return dot + 1;
 }
 
 void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
@@ -164,6 +138,42 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
     }
 }
 
+#pragma endregion "File_management"
+
+#pragma region "GUI_interaction"
+
+void set_leftPannel_status(gboolean status)
+{
+    // set the left pannel status
+    GtkWidget *leftPannel =
+        GTK_WIDGET(gtk_builder_get_object(builder, "left_panel"));
+    gtk_widget_set_sensitive(leftPannel, status);
+}
+
+void set_buttons_options_status(gboolean status)
+{
+    GtkButton *button_start =
+        GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button_start),
+                             status); // disable button
+
+    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
+    gtk_widget_set_sensitive(GTK_WIDGET(box_1), status); // disable box
+}
+
+void edit_progress_bar(float progress, char *text)
+{
+    // get progress bar
+    GtkProgressBar *progress_bar =
+        GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+
+    // set progress bar
+    gtk_progress_bar_set_fraction(progress_bar, progress);
+
+    // set progress bar text
+    gtk_progress_bar_set_text(progress_bar, text);
+}
+
 void show_page(GtkWidget *widget, gpointer data)
 {
     GtkWidget *page = data;
@@ -176,15 +186,19 @@ void change_panel(GtkWidget *widget, gpointer data)
     gtk_stack_set_visible_child(stack_2, page);
 }
 
-void stop_processing()
+void cancel_edit_option(GtkWidget *widget, gpointer data)
 {
-    // get button
-    GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button),
-                             TRUE); // enable button to start processing
-    gtk_button_set_label(button, "Start Process");
-    gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
+    resizing = 0;
+
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
 }
+
+#pragma endregion "GUI_interaction"
+
+#pragma region "Process"
 
 void run_process(GtkButton *button)
 {
@@ -229,7 +243,7 @@ void run_process(GtkButton *button)
 
         printf("Processing...\n");
         // Run processing
-        p_thread t;
+        pthread_t t;
         t = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
                             strcmp(dim, "9x9"));
         thread = &t;
@@ -246,41 +260,19 @@ void run_process(GtkButton *button)
     }
 }
 
-void open_website()
+void stop_processing()
 {
-    // Check if the browser is installed
-    if (g_find_program_in_path("firefox") != NULL)
-    {
-        // Open the website
-        if (!system("firefox www.opticalloop.bugbear.com"))
-        {
-            printf("Error opening website\n");
-        }
-    }
+    // get button
+    GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button),
+                             TRUE); // enable button to start processing
+    gtk_button_set_label(button, "Start Process");
+    gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
 }
 
-void quit()
-{
-    if (thread != NULL)
-    {
-        // cancel thread
-        pthread_cancel(*thread);
-        pthread_join(*thread, NULL);
-    }
-    gtk_main_quit();
-}
+#pragma endregion "Process"
 
-void cancel_edit_option(GtkWidget *widget, gpointer data)
-{
-    resizing = 0;
-
-    GtkWidget *page = data;
-    change_panel(NULL, page);
-
-    set_leftPannel_status(TRUE); // enable buttons
-}
-
-// ------ ROTATION ------
+#pragma region "Rotate"
 
 void edit_rotation(GtkWidget *widget, gpointer data)
 {
@@ -338,9 +330,9 @@ void rotate_img(GtkWidget *widget, gpointer data)
     change_image(image, "selected_image2");
 }
 
-// ------ /ROTATION ------
+#pragma endregion "Rotate"
 
-// ------ RESIZE ------
+#pragma region "Resize"
 
 void edit_resize(GtkWidget *widget, gpointer data)
 {
@@ -377,6 +369,10 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     // change image
     change_image(image, "selected_image");
 }
+
+#pragma endregion "Resize"
+
+#pragma region "Neural Network"
 
 void start_nn(GtkWidget *widget, gpointer data)
 {
@@ -428,7 +424,15 @@ void start_nn(GtkWidget *widget, gpointer data)
 }
 
 void reset_nn()
-{}
+{
+    // Delete file
+    char cmd[200];
+    snprintf(cmd, sizeof(cmd), "rm -f %s", WEIGHTS_PATH);
+    if (!system(cmd))
+    {
+        printf("Error deleting file\n");
+    }
+}
 
 void cancel_nn(GtkWidget *widget, gpointer data)
 {
@@ -458,6 +462,47 @@ void cancel_nn(GtkWidget *widget, gpointer data)
 
     set_leftPannel_status(TRUE); // enable buttons
 }
+
+#pragma endregion "Neural Network"
+
+#pragma region "Terminal"
+
+void reset_terminal()
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // clear text buffer
+    gtk_text_buffer_set_text(text_buffer, "", -1);
+}
+
+void edit_terminal(char *string)
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // add string to text buffer
+    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
+    gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
+
+    if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
+    {
+        gtk_text_buffer_delete(text_buffer, &start, &end);
+    }
+}
+
+#pragma endregion "Terminal"
 
 void *init_gui()
 {
@@ -521,47 +566,27 @@ void *init_gui()
     quit();
     pthread_exit(NULL);
 }
-void reset_terminal()
+
+void open_website()
 {
-    // get text view
-    GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
-
-    // get text buffer
-    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
-
-    // clear text buffer
-    gtk_text_buffer_set_text(text_buffer, "", -1);
-}
-void edit_terminal(char *string)
-{
-    // get text view
-    GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
-
-    // get text buffer
-    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
-
-    // add string to text buffer
-    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
-
-    GtkTextIter start, end;
-    gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
-    gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
-
-    if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
+    // Check if the browser is installed
+    if (g_find_program_in_path("firefox") != NULL)
     {
-        gtk_text_buffer_delete(text_buffer, &start, &end);
+        // Open the website
+        if (!system("firefox www.opticalloop.bugbear.com"))
+        {
+            printf("Error opening website\n");
+        }
     }
 }
 
-void resetNeuralNetwork()
+void quit()
 {
-    // Delete file
-    char cmd[200];
-    snprintf(cmd, sizeof(cmd), "rm -f %s", WEIGHTS_PATH);
-    if (!system(cmd))
+    if (thread != NULL)
     {
-        printf("Error deleting file\n");
+        // cancel thread
+        pthread_cancel(*thread);
+        pthread_join(*thread, NULL);
     }
+    gtk_main_quit();
 }
