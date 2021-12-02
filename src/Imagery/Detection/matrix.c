@@ -145,8 +145,6 @@ void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
     Inverse(cinMatrix, sizeMatrix, determinte, coutMatrix, transposeMatrix);
 }
 
-
-
 void free_mat(double **mat, int n)
 {
     for (int i = 0; i < n; i++)

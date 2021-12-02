@@ -7,6 +7,12 @@
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/pixel_operations.h"
 
+/**
+ * @brief
+ *
+ * @param image
+ * @param selection
+ */
 void selectionFilter(Image *image, SDL_Rect *selection);
 
 #endif

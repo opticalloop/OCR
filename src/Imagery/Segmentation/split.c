@@ -24,7 +24,8 @@ void split(Image *image, Image seg[], int save, char *imagename, int hexa)
     unsigned int iall = 0;
     for (unsigned int y = 0; y < height && iall < nbblock; y += yincrem)
     {
-        for (unsigned int x = 0; x < width && iall < nbblock; x += xincrem, iall++)
+        for (unsigned int x = 0; x < width && iall < nbblock;
+             x += xincrem, iall++)
         {
             if (y + yincrem <= height && x + xincrem <= width)
             {

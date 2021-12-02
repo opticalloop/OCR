@@ -44,7 +44,6 @@ void saveWeights(Network *network, char *path)
 {
     // Check if file already exist
 
-
     // Open file
     FILE *file;
     file = fopen(path, "w");
@@ -71,7 +70,7 @@ void saveWeights(Network *network, char *path)
         {
             // writeToFile(file, (double)j, "# ");
             fputs("\n#", file);
-            
+
             // Write biais
             writeToFile(file, network->layers[i].neurons[j].bias, "");
             fputs("\n", file);
@@ -170,8 +169,8 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
             {
                 neuronIndex++;
                 weightIndex = 0;
-            
-                // Parse bias   
+
+                // Parse bias
                 while (chr != EOF && chr != '\n')
                 {
                     strncat(tempStr, &chr, 1);
@@ -181,7 +180,8 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
                 {
                     network->layers[layerIndex].neurons[neuronIndex].bias =
                         atof(tempStr);
-                    // printf("%f\n", network->layers[layerIndex].neurons[neuronIndex].bias);
+                    // printf("%f\n",
+                    // network->layers[layerIndex].neurons[neuronIndex].bias);
                 }
                 else
                 {
@@ -196,8 +196,8 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
         }
         else if (chr == '|')
         {
-                //  printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
-                //      neuronIndex, weightIndex, atof(tempStr));
+            //  printf("Layer %d Neuron %d Weight %d : %f\n", layerIndex,
+            //      neuronIndex, weightIndex, atof(tempStr));
 
             // Save weights
             network->layers[layerIndex]

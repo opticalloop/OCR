@@ -96,7 +96,7 @@ Image correct_perspective(Image *image, Square *selected_square,
 
     double **transformation_matrix = alloc_matrix(3);
 
-    double **transformation_matrix_inv =  alloc_matrix(3);
+    double **transformation_matrix_inv = alloc_matrix(3);
 
     compute_perspective_matrix(source, destination, transformation_matrix,
                                transformation_matrix_inv);
