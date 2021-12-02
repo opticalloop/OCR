@@ -163,26 +163,25 @@ void generateDataFile(void)
     fclose(file);
 }
 
-pthread_t train_thread(const unsigned int epoch, const unsigned int nbHiddenLayers,
-           const unsigned int nbNodesPerHidden, const int verbose,
-           char *launch_path, char *save_path, int gui)
+pthread_t train_thread(const unsigned int epoch,
+                       const unsigned int nbHiddenLayers,
+                       const unsigned int nbNodesPerHidden, const int verbose,
+                       char *launch_path, char *save_path, int gui)
 {
     pthread_t thread;
-    Training_data args = {
-        .epoch = epoch,
-        .nbHiddenLayers = nbHiddenLayers,
-        .nbNodesPerHidden = nbNodesPerHidden,
-        .verbose = verbose,
-        .launch_path = launch_path,
-        .save_path = save_path,
-        .gui = gui
-    };
+    Training_data args = { .epoch = epoch,
+                           .nbHiddenLayers = nbHiddenLayers,
+                           .nbNodesPerHidden = nbNodesPerHidden,
+                           .verbose = verbose,
+                           .launch_path = launch_path,
+                           .save_path = save_path,
+                           .gui = gui };
     pthread_create(&thread, NULL, train, (void *)&args);
 
     return thread;
 }
 
-void *train(void * args)
+void *train(void *args)
 {
     Training_data *data = (Training_data *)args;
     const unsigned int epoch = data->epoch;
@@ -194,15 +193,14 @@ void *train(void * args)
     char *save_path = data->save_path;
 
     char print_message[1000];
-    snprintf(print_message, sizeof(print_message), 
-    "    🔍 Launching Neural Network with %u hidden layers and %u "
-               "nodes per hidden\n",
-               nbHiddenLayers, nbNodesPerHidden);
+    snprintf(print_message, sizeof(print_message),
+             "    🔍 Launching Neural Network with %u hidden layers and %u "
+             "nodes per hidden\n",
+             nbHiddenLayers, nbNodesPerHidden);
 
     printVerbose(verbose, gui, print_message);
     memset(print_message, 0, sizeof(print_message));
     printVerbose(verbose, gui, "    🔨 Creating network\n");
-    
 
     Network n;
     n.sizeInput = NBINPUTS;
@@ -213,9 +211,9 @@ void *train(void * args)
     {
         *network =
             newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
-        
-        printVerbose(verbose, gui,"    🎰 Initing network\n");
-        
+
+        printVerbose(verbose, gui, "    🎰 Initing network\n");
+
         initNetwork(network);
     }
     else
@@ -245,7 +243,8 @@ void *train(void * args)
         train_count = 0;
         errorRate = 0.0;
 
-        snprintf(print_message, sizeof(print_message), "\n    📊 ###### EPOCH %u ######\n", i);
+        snprintf(print_message, sizeof(print_message),
+                 "\n    📊 ###### EPOCH %u ######\n", i);
         printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
 
@@ -281,8 +280,9 @@ void *train(void * args)
         }
         fclose(file);
         lastchr = ' ';
-        
-        snprintf(print_message, sizeof(print_message), "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+
+        snprintf(print_message, sizeof(print_message),
+                 "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
         printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
     }
@@ -291,7 +291,8 @@ void *train(void * args)
 
     if (strcmp(save_path, ""))
     {
-        snprintf(print_message, sizeof(print_message), "<-- 💾 Saving weights to %s\n", save_path);
+        snprintf(print_message, sizeof(print_message),
+                 "<-- 💾 Saving weights to %s\n", save_path);
         memset(print_message, 0, sizeof(print_message));
         saveWeights(network, save_path);
     }

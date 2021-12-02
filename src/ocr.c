@@ -38,6 +38,7 @@ pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
                             .output_folder = output_folder,
                             .gui = gui,
                             .hexa = hexa };
+    SDL_FreeSurface(surface);
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
     if (gui == 0)
@@ -135,8 +136,8 @@ void *OCR(void *Thread_args)
     unsigned int angle_index;
     for (angle_index = 1; angle_index < 4; angle_index++)
     {
-        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
-                    0);
+        saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
+                    save, 0);
         changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
         printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
 
@@ -146,7 +147,6 @@ void *OCR(void *Thread_args)
         if (verbose && save)
         {
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-
         }
         // Segmentation
         split(&cropped, all_cases, save, output_folder, hexa);
@@ -181,7 +181,8 @@ void *OCR(void *Thread_args)
             if (angle_index == 1)
             {
                 printf("No solution\n");
-                freeImage(&cropped, 0);   
+                freeGrid(grid, dimension); // Free grid
+                freeImage(&cropped, 0);
                 freeNetwork(&network);
                 pthread_exit(NULL);
             }

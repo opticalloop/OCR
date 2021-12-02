@@ -22,125 +22,114 @@ typedef struct Image
     char *path;
 } Image;
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param surface
+ * @param matrix
+ * @param width
+ * @param height
+ * @return Image
  */
 Image newImage(SDL_Surface *surface, int matrix, unsigned int width,
                unsigned int height);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param image
  */
 void displayImage(Image *image);
 
-/*
- *  Summary:
+/**
+ * @brief Create a Surface object
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param image
+ * @return SDL_Surface*
  */
 SDL_Surface *createSurface(Image *image);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *      *path:
- *
- *  Return:
- *
+ * @param image
+ * @param path
  */
 void saveImage(Image *image, char *path);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param image
+ * @param matrix
  */
 void freeImage(Image *image, int matrix);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *pixel:
- *      value:
- *
- *  Return:
- *
+ * @param pixel
+ * @param value
  */
 void updatePixelToSameValue(Pixel *pixel, unsigned int value);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *
- *
- *  Return:
- *
+ * @return Pixel
  */
 Pixel InstantiatePixelZero();
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param image
+ * @param matrix
+ * @return Pixel**
  */
 Pixel **copyPixelsArray(Image *image, int matrix);
 
+/**
+ * @brief
+ *
+ * @param image
+ * @param matrix
+ * @return Image
+ */
 Image copyImage(Image *image, int matrix);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      **mask:
- *      w:
- *      h:
- *
- *  Return:
- *
+ * @param mask
+ * @param w
+ * @param h
  */
 void freeMatrixArray(Pixel **mask, int w, int h);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *image:
- *
- *  Return:
- *
+ * @param image
  */
 void updateNeigbourgs(Image *image);
 
+/**
+ * @brief
+ *
+ * @param image
+ * @param rect
+ * @return Image
+ */
 Image cropImage(Image *image, SDL_Rect *rect);
 
+/**
+ * @brief
+ *
+ * @param src
+ * @param dest
+ * @param rect
+ */
 void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect);
 
 #endif

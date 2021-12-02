@@ -10,6 +10,10 @@
 
 #include "Imagery/Utils/image.h"
 
+/**
+ * @brief
+ *
+ */
 typedef struct Line
 {
     int xStart;
@@ -19,6 +23,10 @@ typedef struct Line
     double theta;
 } Line;
 
+/**
+ * @brief
+ *
+ */
 typedef struct LineList
 {
     Line *lines;
@@ -27,12 +35,20 @@ typedef struct LineList
 
 } LineList;
 
+/**
+ * @brief
+ *
+ */
 typedef struct Dot
 {
     int X;
     int Y;
 } Dot;
 
+/**
+ * @brief
+ *
+ */
 typedef struct Square
 {
     Line top;
@@ -41,14 +57,31 @@ typedef struct Square
     Line right;
 } Square;
 
+/**
+ * @brief
+ *
+ */
 typedef struct SquareList
 {
     Square *squares;
     int len;
 } SquareList;
 
+/**
+ * @brief
+ *
+ * @param x
+ * @param y
+ * @return unsigned int**
+ */
 unsigned int **initMatrice(unsigned int x, unsigned int y);
 
+/**
+ * @brief
+ *
+ * @param matrice
+ * @param height
+ */
 void freeMatrice(unsigned int **matrice, size_t height);
 
 #endif

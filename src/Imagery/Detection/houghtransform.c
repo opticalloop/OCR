@@ -136,7 +136,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     free(resultingList.lines);
 
     // Correc perspective and crop
-    Image img = correct_perspective(&tempImage, &lastSquare, verbose, output_folder);
+    Image img =
+        correct_perspective(&tempImage, &lastSquare, verbose, output_folder);
 
     // Save square to surface
     freeImage(&tempImage, 0);
@@ -197,7 +198,10 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
 
     // We intialize the accumulator with all the value
     // In the same time, we search for the max value in the accumulator
+
     unsigned int max = 0;
+    double rho;
+    int croppedRho;
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
@@ -206,8 +210,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
             {
                 for (int theta = 0; theta <= nbTheta; theta++)
                 {
-                    double rho = x * saveCos[theta] + y * saveSin[theta];
-                    int croppedRho = rho + diagonal;
+                    rho = x * saveCos[theta] + y * saveSin[theta];
+                    croppedRho = rho + diagonal;
                     accumulator[croppedRho][theta]++;
                     if (accumulator[croppedRho][theta] > max)
                     {

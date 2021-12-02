@@ -96,7 +96,7 @@ Image correct_perspective(Image *image, Square *selected_square,
 
     double **transformation_matrix = alloc_matrix(3);
 
-    double **transformation_matrix_inv =  alloc_matrix(3);
+    double **transformation_matrix_inv = alloc_matrix(3);
 
     compute_perspective_matrix(source, destination, transformation_matrix,
                                transformation_matrix_inv);
@@ -132,7 +132,7 @@ Image correct_perspective(Image *image, Square *selected_square,
     }
 
     saveVerbose(verbose_mode, &corrected_image, verbose_path,
-                "2.8-perspective-corrected.png", 1, 0);
+                "2.8-Perspective-corrected.bmp", 1, 0);
 
     free_mat(transformation_matrix, 3);
     free_mat(transformation_matrix_inv, 3);

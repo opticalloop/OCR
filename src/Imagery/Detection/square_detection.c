@@ -125,15 +125,17 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     if ((line1->xEnd - line1->xStart) != 0
         && (line2->xEnd - line2->xStart) != 0)
     {
-        double directCoeff1 =
-            ((double)line1->yEnd - (double)line1->yStart) / ((double)line1->xEnd - (double)line1->xStart);
-        double directCoeff2 =
-            ((double)line2->yEnd - (double)line2->yStart) / ((double)line2->xEnd - (double)line2->xStart);
+        double directCoeff1 = ((double)line1->yEnd - (double)line1->yStart)
+            / ((double)line1->xEnd - (double)line1->xStart);
+        double directCoeff2 = ((double)line2->yEnd - (double)line2->yStart)
+            / ((double)line2->xEnd - (double)line2->xStart);
 
-        double ordOrigin1 = (double)line1->yStart - (double)directCoeff1 * (double)line1->xStart;
-        double ordOrigin2 = (double)line2->yStart - (double)directCoeff2 * (double)line2->xStart;
+        double ordOrigin1 = (double)line1->yStart
+            - (double)directCoeff1 * (double)line1->xStart;
+        double ordOrigin2 = (double)line2->yStart
+            - (double)directCoeff2 * (double)line2->xStart;
 
-        if (((int) directCoeff1 - (int) directCoeff2) != 0)
+        if (((int)directCoeff1 - (int)directCoeff2) != 0)
         {
             int x = (ordOrigin1 - ordOrigin2) / (directCoeff2 - directCoeff1);
             int y = directCoeff1 * (ordOrigin2 - ordOrigin1)
@@ -585,7 +587,8 @@ void compute_Square(Square *square)
     square->bottom.xEnd = bottomLeft.X;
     square->bottom.yEnd = bottomLeft.Y;
 
-    // printf("Bottom: (%d, %d)\n", square->bottom.xStart, square->bottom.yStart);
+    // printf("Bottom: (%d, %d)\n", square->bottom.xStart,
+    // square->bottom.yStart);
 
     square->left.xStart = bottomLeft.X;
     square->left.yStart = bottomLeft.Y;
@@ -593,5 +596,4 @@ void compute_Square(Square *square)
     square->left.yEnd = topLeft.Y;
 
     // printf("Left: (%d, %d)\n\n", square->left.xStart, square->left.yStart);
-
 }
