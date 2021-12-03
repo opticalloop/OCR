@@ -1,12 +1,5 @@
 #include "Imagery/Detection/distortion_correction.h"
 
-/**
- * @brief Cross product of two vectors array
- *
- * @param vect_A
- * @param vect_B
- * @param cross_P
- */
 void cross_product(double vect_A[], double vect_B[], double cross_P[])
 {
     cross_P[0] = vect_A[1] * vect_B[2] - vect_A[2] * vect_B[1];
@@ -14,7 +7,7 @@ void cross_product(double vect_A[], double vect_B[], double cross_P[])
     cross_P[2] = vect_A[0] * vect_B[1] - vect_A[1] * vect_B[0];
 }
 
-void compute_perspective_matrix(int source[][2], double dest[][2],
+void compute_perspective_matrix(int source[4][2], double dest[4][2],
                                 double **transformation_matrix,
                                 double **transformation_matrix_inv)
 {
@@ -96,16 +89,16 @@ Image correct_perspective(Image *image, Square *selected_square,
 
     double **transformation_matrix = alloc_matrix(3);
 
-    double **transformation_matrix_inv =  alloc_matrix(3);
+    double **transformation_matrix_inv = alloc_matrix(3);
 
     compute_perspective_matrix(source, destination, transformation_matrix,
                                transformation_matrix_inv);
 
     Image corrected_image = newImage(NULL, 0, max_edge_length, max_edge_length);
 
-    for (int i = 0; i < corrected_image.height; i++)
+    for (unsigned int i = 0; i < corrected_image.height; i++)
     {
-        for (int j = 0; j < corrected_image.width; j++)
+        for (unsigned int j = 0; j < corrected_image.width; j++)
         {
             double ut = i;
             double vt = j;
@@ -132,7 +125,7 @@ Image correct_perspective(Image *image, Square *selected_square,
     }
 
     saveVerbose(verbose_mode, &corrected_image, verbose_path,
-                "2.8-perspective-corrected.png", 1, 0);
+                "2.8-Perspective-corrected.bmp", 1, 0);
 
     free_mat(transformation_matrix, 3);
     free_mat(transformation_matrix_inv, 3);

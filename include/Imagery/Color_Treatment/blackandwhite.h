@@ -1,20 +1,13 @@
 #ifndef BLACK_AND_WHITE_H
 #define BLACK_AND_WHITE_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-
 #include "Imagery/Utils/image.h"
 
-/*
- * Summary:
- *       Transform a colored image to an black and white image
+/**
+ * @brief Treat the image in black and white.
  *
- * Params :
- *       *image: the image to be transformed
- *
- *  Return:
- *       Noting the black and white is applied to the image directly
+ * @param image The image to treat.
+ * @return The treated image.
  */
 
 void blackandwhite(Image *image);

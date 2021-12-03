@@ -5,57 +5,39 @@
 #include <SDL/SDL_image.h>
 #include <err.h>
 
-/*
- *  Summary:
+/**
+ * @brief The Op class
  *
- *  Params:
- *
- *  Return:
- *      void
+ * This class is used to create a SDL_Surface from a file.
  */
 void init_sdl();
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *path:
- *
- *  Return:
- *
+ * @param path
+ * @return SDL_Surface*
  */
 SDL_Surface *load_image(char *path);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *img:
- *
- *  Return:
- *
+ * @param img
+ * @return SDL_Surface*
  */
 SDL_Surface *display_image(SDL_Surface *img);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *img:
- *
- *  Return:
- *      void
  */
 void wait_for_keypressed();
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *img:
- *
- *  Return:
- *      void
+ * @param surface
  */
 void SDL_FreeSurface(SDL_Surface *surface);
 
