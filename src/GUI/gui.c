@@ -61,8 +61,10 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
 
     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
-    int width = clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)),0,1000); // TODO: fix this
-    int height = clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)),0,1000);
+    int width = clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0,
+                      1000); // TODO: fix this
+    int height =
+        clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0, 1000);
 
     // int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
 
@@ -81,7 +83,7 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     int new_width = image_width * scale_factor;
     int new_height = image_height * scale_factor;
 
-    printf("%f %d %d\n",scale_factor, width, height);
+    printf("%f %d %d\n", scale_factor, width, height);
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
         pixbuf, new_width, new_height, GDK_INTERP_BILINEAR); // resize image
@@ -386,8 +388,8 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     // get picture
 
-    GtkImage *imageWidget =
-        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image3")); // get image
+    GtkImage *imageWidget = GTK_IMAGE(
+        gtk_builder_get_object(builder, "selected_image3")); // get image
 
     // get image size
     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
@@ -399,15 +401,21 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     resized_square.top.xStart = 0;
     resized_square.top.yStart = 0;
-    resized_square.right.xStart = width -1;
+    resized_square.right.xStart = width - 1;
     resized_square.right.yStart = 0;
-    resized_square.bottom.xStart = width -1;
-    resized_square.bottom.yStart = height -1;
+    resized_square.bottom.xStart = width - 1;
+    resized_square.bottom.yStart = height - 1;
     resized_square.left.xStart = 0;
-    resized_square.left.yStart = height -1;
+    resized_square.left.yStart = height - 1;
 
     // Change image
     selectionFilter(&image, &resized_square);
+    // get drawing area
+    GtkDrawingArea *drawing_area =
+        GTK_DRAWING_AREA(gtk_builder_get_object(builder, "drawing_area"));
+    // draw image on drawing area
+    gtk_widget_queue_draw(GTK_WIDGET(drawing_area));
+    // set image
     change_image(&image, "selected_image3");
 
     // change page
@@ -576,6 +584,70 @@ void edit_terminal(char *string)
 }
 
 #pragma endregion "Terminal"
+
+#pragma region "Result"
+
+void show_result()
+{
+    gtk_stack_set_visible_child_name(stack_2, "confirmation");
+
+    // Load image
+    change_image(&image, "selected_image1");
+
+    // get grid
+    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+
+    GtkStack *stack_result =
+        GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid));
+
+    // copy child of grid 0 0
+    GtkWidget *child = gtk_grid_get_child_at(grid, 0, 0);
+
+    for (size_t i = 0; i < 9; i++)
+    {
+        for (size_t j = 0; j < 9; j++)
+        {
+            // get input at i,j and set value
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
+            gtk_entry_set_text(entry, "9"); // TODO: set value
+        }
+    }
+}
+
+void confirm_result()
+{
+    GtkComboBox *combo_box =
+        GTK_COMBO_BOX(gtk_builder_get_object(builder, "dim_input"));
+    char *dim =
+        gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
+
+    int size = strcmp(dim, "9x9") ? 9 : 16;
+
+    unsigned int **result = malloc(sizeof(unsigned int *) * size);
+
+    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+
+    for (int i = 0; i < size; i++)
+    {
+        result[i] = malloc(sizeof(unsigned int) * size);
+        for (int j = 0; j < size; j++)
+        {
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
+            result[i * size + j] = atoi(gtk_entry_get_text(entry));
+        }
+    }
+
+    solveSuduko(result, 0, 0, size);
+
+    gtk_stack_set_visible_child_name(stack_2, "page_result");
+
+    for (size_t i = 0; i < size; i++)
+        free(result[i]);
+    free(result);
+}
+
+#pragma endregion
 
 void *init_gui()
 {
