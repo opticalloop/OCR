@@ -134,80 +134,59 @@ void *OCR(void *Thread_args)
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
-    for (angle_index = 1; angle_index < 4; angle_index++)
+    
+    saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
+                save, 0);
+    changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
+    printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
+
+    // Segmentation
+    // Initialize all case at NULL
+    Image all_cases[dimension * dimension];
+    if (verbose && save)
     {
-        saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
-                    save, 0);
-        changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
-        printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
+        printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
+    }
+    // Segmentation
+    split(&cropped, all_cases, save, output_folder, hexa);
 
-        // Segmentation
-        // Initialize all case at NULL
-        Image all_cases[dimension * dimension];
-        if (verbose && save)
+    printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
+    int val;
+    for (unsigned int i = 0; i < dimension; i++)
+    {
+        for (unsigned int j = 0; j < dimension; j++)
         {
-            printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-        }
-        // Segmentation
-        split(&cropped, all_cases, save, output_folder, hexa);
+            // Get the value of the case
+            val = getNetworkOutput(&network,
+                                    &(all_cases[i * dimension + j]), 0);
 
-        printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
-        int val;
-        for (unsigned int i = 0; i < dimension; i++)
-        {
-            for (unsigned int j = 0; j < dimension; j++)
+            if (!hexa && val > 9)
             {
-                // Get the value of the case
-                val = getNetworkOutput(&network,
-                                       &(all_cases[i * dimension + j]), 0);
-
-                if (!hexa && val > 9)
-                {
-                    val = 0;
-                }
-                grid[i][j] = val;
-
-                // Free the case
-                freeImage(&(all_cases[i * dimension + j]), 0);
+                val = 0;
             }
+            grid[i][j] = val;
+
+            // Free the case
+            freeImage(&(all_cases[i * dimension + j]), 0);
         }
-
-        basicPrint(grid, dimension);
-
-        // Solver
-        if (!isSolvable(grid, dimension))
-        {
-            rotate(&cropped, four_angles[angle_index]);
-            if (angle_index == 1)
-            {
-                printf("No solution\n");
-                freeGrid(grid, dimension); // Free grid
-                freeImage(&cropped, 0);
-                freeNetwork(&network);
-                pthread_exit(NULL);
-            }
-            if (verbose)
-            {
-                printf("    ❌ 3.5 Grid is not solvable\n");
-                printf("\n\n    ❓ Re-attemping with %f degree angle\n",
-                       four_angles[angle_index]);
-            }
-            continue;
-            // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
-        }
-
-        freeImage(&cropped, 0);
-        freeNetwork(&network);
-        break;
     }
 
-    if (angle_index == 4)
+    basicPrint(grid, dimension);
+    
+    if (gui)
     {
-        printf("No solution\n");
+        show_result(grid);
         freeGrid(grid, dimension);
-        freeImage(&cropped, 0);
-        freeNetwork(&network);
-        pthread_exit(NULL);
+        pthread_exit(NULL); // Exit thread
+    }
+
+    if (!isSolvable(grid, dimension))
+    {
+        printf("\n    ⚠️ The grid is not solvable\n");
+    }
+    else
+    {
+        printf("\n    🎉 The grid is solvable\n");
     }
 
     unsigned int **copy = allocGrid(dimension);

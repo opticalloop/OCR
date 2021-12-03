@@ -587,7 +587,7 @@ void edit_terminal(char *string)
 
 #pragma region "Result"
 
-void show_result()
+void show_result(unsigned int **grid)
 {
     gtk_stack_set_visible_child_name(stack_2, "confirmation");
 
@@ -595,56 +595,95 @@ void show_result()
     change_image(&image, "selected_image1");
 
     // get grid
-    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+    GtkGrid *grid_widget = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
     GtkStack *stack_result =
         GTK_STACK(gtk_builder_get_object(builder, "stack1"));
-    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid));
+    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid_widget));
 
     // copy child of grid 0 0
-    GtkWidget *child = gtk_grid_get_child_at(grid, 0, 0);
+    GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
+
+    // grid = allocGrid(9);
 
     for (size_t i = 0; i < 9; i++)
     {
         for (size_t j = 0; j < 9; j++)
         {
             // get input at i,j and set value
-            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
-            gtk_entry_set_text(entry, "9"); // TODO: set value
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
+            char ch[40] = " ";
+            if (grid[i][j] > 9)
+            {
+                // Convert 10 to A
+                ch[0] = 'A' + (grid[i][j] - 10);
+            }
+            else
+            {
+                ch[0] = '0' + grid[i][j];
+            }
+            gtk_entry_set_text(entry, ch);
         }
     }
+    // freeGrid(grid, 9);
 }
 
 void confirm_result()
 {
     GtkComboBox *combo_box =
         GTK_COMBO_BOX(gtk_builder_get_object(builder, "dim_input"));
-    char *dim =
+    char *dim_text =
         gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
-    int size = strcmp(dim, "9x9") ? 9 : 16;
+    int dim = !strcmp(dim_text, "9x9") ? 9 : 16;
 
-    unsigned int **result = malloc(sizeof(unsigned int *) * size);
+    unsigned int **result = allocGrid(dim);
 
     GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
-    for (int i = 0; i < size; i++)
+    char *str;
+    for (int i = 0; i < dim; i++)
     {
-        result[i] = malloc(sizeof(unsigned int) * size);
-        for (int j = 0; j < size; j++)
+        for (int j = 0; j < dim; j++)
         {
             GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
-            result[i * size + j] = atoi(gtk_entry_get_text(entry));
+            
+            str = gtk_entry_get_text(entry);
+            // Str length is 1 or 2
+            if (strlen(str) == 1)
+            {
+                // Is it a digit 
+                if (str[0] >= '0' && str[0] <= '9')
+                {
+                    result[i][j] = (unsigned int) str[0] - '0';
+                }
+                else if (str[0] >= 'A' && str[0] <= 'G')
+                {
+                   result[i][j] = (unsigned int) str[0] - 'A' + 10;
+                }
+                else
+                {
+                    printf("Error: Invalid input\n");
+                    return;
+                }
+            }
+            else if (strlen(str) == 2)
+            {
+                result[i][j] = (unsigned int) (str[0] - '0') * 10 + (str[1] - '0');
+            }
+            else
+            {
+                printf("Error : should write 1 or 2 digit long (1, 2, 3, 4, 5, 6, 7, 8, 9, to 16 with heca or digit notation)\n");
+                return;
+            }
         }
     }
 
-    solveSuduko(result, 0, 0, size);
+    solveSuduko(result, 0, 0, dim);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
-    for (size_t i = 0; i < size; i++)
-        free(result[i]);
-    free(result);
+    freeGrid(result, dim);
 }
 
 #pragma endregion

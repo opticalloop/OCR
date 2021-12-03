@@ -12,6 +12,7 @@
 #include "Imagery/Utils/op.h"
 #include "NeuralNetwork/training.h"
 #include "Imagery/Detection/distortion_correction.h"
+#include "Sudoku_Solver/sudoku_solver.h"
 #include "ocr.h"
 
 #pragma region "Image_management"

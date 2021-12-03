@@ -20,6 +20,7 @@
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
 #include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
 #include "Sudoku_Solver/sudoku_solver.h"
+#include "GUI/gui.h"
 #include "verbose.h"
 
 typedef struct Thread_argument
