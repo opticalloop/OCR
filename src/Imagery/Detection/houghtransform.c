@@ -69,7 +69,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     {
         printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n");
         four_angles[0] = angleRounded;
-        // rotateAll(&tempImage, &resultingList, angleRounded);
+        rotateAll(&tempImage, &resultingList, angleRounded);
     }
 
     // Draw auto rotated image

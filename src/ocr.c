@@ -106,7 +106,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
@@ -190,7 +189,7 @@ void *OCR(void *Thread_args)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
                 printf("\n\n    ❓ Re-attemping with %f degree angle\n",
-                       four_angles[angle_index]);
+                       four_angles[angle_index] + four_angles[0]);
             }
             continue;
             // errx(EXIT_FAILURE, "    ⛔ The grid is not solvable");
@@ -231,13 +230,26 @@ void *OCR(void *Thread_args)
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    SDL_Surface *sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
 
-    saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 0);
-    changeImageGUI(&sudoku_image, gui, 1, "Result", 1);
+    // Save image
+    if (verbose)
+    {
+        printf("<-- 💾 Saving sudoku image to %s/grid.bmp\n", output_folder);
+ 
+    }
+    char out[200];
+    snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
+    SDL_SaveBMP(sudoku_image, out);
 
+    if (gui)
+    {
+        change_image(sudoku_image, "selected_image");
+        edit_progress_bar(1, "Result");
+    }
+    SDL_FreeSurface(sudoku_image);
     pthread_exit(NULL); // Exit thread
 }

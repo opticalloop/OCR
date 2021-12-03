@@ -139,7 +139,7 @@ void saveGrid(unsigned int **grid, char outputPath[], int verbose,
     fclose(f);
 }
 
-Image createSudokuImage(unsigned int **grid, unsigned int **copy,
+SDL_Surface *createSudokuImage(unsigned int **grid, unsigned int **copy,
                         char *folder_path, unsigned int dimension)
 {
     Image image = newImage(NULL, 0, 266, 266);
@@ -155,9 +155,7 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                     && y != 59 && y != 88 && y != 89 && y != 118 && y != 147
                     && y != 176 && y != 177 && y != 206 && y != 235))
             {
-                image.pixels[x][y].r = 255;
-                image.pixels[x][y].g = 255;
-                image.pixels[x][y].b = 255;
+                put_pixel(image, x, y, 0);
             }
         }
     }
@@ -178,8 +176,8 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
             val = grid[i][j];
             if (val != 0)
             {
-                rect.x = Array[j];
-                rect.y = Array[i];
+                rect.x = Array[i];
+                rect.y = Array[j];
 
                 // Get the image number and copy it
                 if (!strcmp(folder_path, ""))
