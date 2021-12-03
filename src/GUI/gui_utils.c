@@ -23,6 +23,16 @@ void selectionFilter(Image *image, Square *square)
     int x = (square->top.xStart + square->right.xStart + square->bottom.xStart + square->left.xStart) / 4;
     int y = (square->top.yStart + square->right.yStart + square->bottom.yStart + square->left.yStart) / 4;
 
+    // Compute square
+    square->top.xEnd = square->right.xStart;
+    square->top.yEnd = square->right.yStart;
+    square->right.xEnd = square->bottom.xStart;
+    square->right.yEnd = square->bottom.yStart;
+    square->bottom.xEnd = square->left.xStart;
+    square->bottom.yEnd = square->left.yStart;
+    square->left.xEnd = square->top.xStart;
+    square->left.yEnd = square->top.yStart;
+
     // Draw the square
     drawSquare(square, image, width, height, 2);
 
@@ -30,28 +40,29 @@ void selectionFilter(Image *image, Square *square)
     {
         for (unsigned int j = 0; j < height; j++)
         {
-            if (is_in_trianle(x, y, square->top.xStart, square->top.yStart, square->right.xStart, square->right.yStart, i, j))
+            if (is_in_triangle(x, y, square->top.xStart, square->top.yStart, square->right.xStart, square->right.yStart, i, j))
             {
                 continue;
             }
 
-            if (is_in_trianle(x, y, square->right.xStart, square->right.yStart, square->bottom.xStart, square->bottom.yStart, i, j))
+            if (is_in_triangle(x, y, square->right.xStart, square->right.yStart, square->bottom.xStart, square->bottom.yStart, i, j))
             {
                 continue;
             }
 
-            if (is_in_trianle(x, y, square->bottom.xStart, square->bottom.yStart, square->left.xStart, square->left.yStart, i, j))
+            if (is_in_triangle(x, y, square->bottom.xStart, square->bottom.yStart, square->left.xStart, square->left.yStart, i, j))
             {
                 continue;
             }
 
-            if (is_in_trianle(x, y, square->left.xStart, square->left.yStart, square->top.xStart, square->top.yStart, i, j))
+            if (is_in_triangle(x, y, square->left.xStart, square->left.yStart, square->top.xStart, square->top.yStart, i, j))
             {
                 continue;
             }
-            image->pixel[i][j].r = image->pixel[i][j].r / 2;
-            image->pixel[i][j].g = image->pixel[i][j].g / 2;
-            image->pixel[i][j].b = image->pixel[i][j].b / 2;
+            printf("Not in square\n");
+            image->pixels[i][j].r = image->pixels[i][j].r / 2;
+            image->pixels[i][j].g = image->pixels[i][j].g / 2;
+            image->pixels[i][j].b = image->pixels[i][j].b / 2;
         }
     }
 }

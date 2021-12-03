@@ -11,6 +11,7 @@
 #include "GUI/gui_utils.h"
 #include "Imagery/Utils/op.h"
 #include "NeuralNetwork/training.h"
+#include "Imagery/Detection/distortion_correction.h"
 #include "ocr.h"
 
 #pragma region "Image_management"

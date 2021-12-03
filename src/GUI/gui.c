@@ -23,10 +23,7 @@ double tmp_rotation_value = 0;
 
 // Resize global variables
 int resizing = 0;
-int resized_x = -1;
-int resized_y = -1;
-int resized_w = -1;
-int resized_h = -1;
+Square resized_square;
 
 #pragma region "Image_management"
 
@@ -364,8 +361,18 @@ void edit_resize(GtkWidget *widget, gpointer data)
     resizing = 1;
     printf("    🛠️ Starting resize...\n");
 
-    // change image
-    // change_image(image, "selected_image3");
+    resized_square.top.xStart = 100;
+    resized_square.top.yStart = 100;
+    resized_square.right.xStart = 400;
+    resized_square.right.yStart = 100;
+    resized_square.bottom.xStart = 400;
+    resized_square.bottom.yStart = 450;
+    resized_square.left.xStart = 100;
+    resized_square.left.yStart = 500;
+
+    // Change image
+    selectionFilter(&image, &resized_square);
+    change_image(&image, "selected_image3");
 
     // change page
     GtkWidget *page = data;
@@ -381,12 +388,7 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     resizing = 0;
     printf("    👍 Finished resize\n");
 
-    SDL_Rect rect;
-    rect.x = resized_x;
-    rect.y = resized_y;
-    rect.w = resized_w;
-    rect.h = resized_h;
-    Image img = cropImage(&image, &rect);
+    Image img = correct_perspective(&image, &resized_square, 1, "temp/");
     image = img;
 
     GtkWidget *page = data;
