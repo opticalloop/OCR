@@ -384,14 +384,27 @@ void edit_resize(GtkWidget *widget, gpointer data)
     printf("    🛠️ Starting resize...\n");
     set_leftPannel_status(FALSE); // disable buttons
 
-    resized_square.top.xStart = 100;
-    resized_square.top.yStart = 100;
-    resized_square.right.xStart = 400;
-    resized_square.right.yStart = 10;
-    resized_square.bottom.xStart = 600;
-    resized_square.bottom.yStart = 350;
-    resized_square.left.xStart = 20;
-    resized_square.left.yStart = 500;
+    // get picture
+
+    GtkImage *imageWidget =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image3")); // get image
+
+    // get image size
+    GdkPixbuf *pixbuf = image_to_pixbuf(&image);
+
+    int width = gdk_pixbuf_get_width(pixbuf);
+    int height = gdk_pixbuf_get_height(pixbuf);
+
+    printf("    📷 Image size: %dx%d\n", width, height);
+
+    resized_square.top.xStart = 0;
+    resized_square.top.yStart = 0;
+    resized_square.right.xStart = width -1;
+    resized_square.right.yStart = 0;
+    resized_square.bottom.xStart = width -1;
+    resized_square.bottom.yStart = height -1;
+    resized_square.left.xStart = 0;
+    resized_square.left.yStart = height -1;
 
     // Change image
     selectionFilter(&image, &resized_square);
