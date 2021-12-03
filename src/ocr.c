@@ -230,7 +230,7 @@ void *OCR(void *Thread_args)
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    SDL_Surface *sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
@@ -243,13 +243,11 @@ void *OCR(void *Thread_args)
     }
     char out[200];
     snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
-    SDL_SaveBMP(sudoku_image, out);
-
     if (gui)
     {
-        change_image(sudoku_image, "selected_image");
+        change_image(&sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
-    SDL_FreeSurface(sudoku_image);
+    freeImage(&sudoku_image, 0);
     pthread_exit(NULL); // Exit thread
 }
