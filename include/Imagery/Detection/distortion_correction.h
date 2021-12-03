@@ -29,7 +29,7 @@ void cross_product(double vect_A[], double vect_B[], double cross_P[]);
  * @param transformation_matrix_inv
  */
 
-void compute_perspective_matrix(int source[][2], double dest[][2],
+void compute_perspective_matrix(int source[4][2], double dest[4][2],
                                 double **transformation_matrix,
                                 double **transformation_matrix_inv);
 
