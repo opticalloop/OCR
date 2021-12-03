@@ -4,10 +4,10 @@
 
 #define SQUARE_FACTOR 300
 
-LineList simplifyLines(LineList *linelist)
+MyList simplifyLines(MyList *linelist)
 {
-    const unsigned int len = linelist->len;
-    Line *allLines = linelist->lines;
+    const unsigned int len = linelist->length;
+    MyList *allLines = linelist;
     if (len <= 0)
     {
         errx(EXIT_FAILURE, "Got no line\n");
@@ -29,9 +29,9 @@ LineList simplifyLines(LineList *linelist)
                     continue;
                 }
 
-                if (allLines[j].xStart != -1)
+                if (((Line *)get_value(allLines, j)).xStart != -1)
                 {
-                    currentLine = allLines[j];
+                    currentLine = (Line *)get_value(allLines, j);
                     // Line are approximately equals
                     if (abs(referenceLine.xStart - currentLine.xStart)
                             < MIN_EQUAL
@@ -42,28 +42,30 @@ LineList simplifyLines(LineList *linelist)
                         && abs(referenceLine.yEnd - currentLine.yEnd)
                             < MIN_EQUAL)
                     {
-                        allLines[i].xStart =
+                        ((Line *)get_value(allLines, i)).xStart =
                             (referenceLine.xStart + currentLine.xStart) / 2;
-                        allLines[i].xEnd =
+                        ((Line *)get_value(allLines, i)).xEnd =
                             (referenceLine.xEnd + currentLine.xEnd) / 2;
-                        allLines[i].yStart =
+                        ((Line *)get_value(allLines, i)).yStart =
                             (referenceLine.yStart + currentLine.yStart) / 2;
-                        allLines[i].yEnd =
+                        ((Line *)get_value(allLines, i)).yEnd =
                             (referenceLine.yEnd + currentLine.yEnd) / 2;
-                        allLines[j].xStart = -1;
+                        ((Line *)get_value(allLines, j)).xStart = -1;
                         lastLinesCount++;
                     }
                 }
             }
         }
     }
+
+    //JE vois pas comment le modifier
     Line *resultingLines = malloc(lastLinesCount * sizeof(Line) + 1);
     int index = 0;
     for (unsigned int j = 0; j < len; j++)
     {
-        if (allLines[j].xStart != -1)
+        if (((Line *)get_value(allLines, j)).xStart != -1)
         {
-            resultingLines[index] = allLines[j];
+            resultingLines[index] = (Line *)get_value(allLines, j);
             index++;
         }
     }
@@ -76,9 +78,9 @@ LineList simplifyLines(LineList *linelist)
     return lines;
 }
 
-Square getSquare(LineList *lineList, Line *line, int index)
+Square getSquare(MyList *lineList, Line *line, int index)
 {
-    const unsigned int len = lineList->len;
+    const unsigned int len = lineList->length;
     Square square;
     Line actual = *line;
     // Degree
@@ -86,7 +88,7 @@ Square getSquare(LineList *lineList, Line *line, int index)
     int i = 0;
     for (unsigned int j = index + 1; j < len; j++)
     {
-        Line temp = lineList->lines[j];
+        Line temp = *((Line *)get_value(linelist, j);
         // Degree
         double tempAngle = temp.theta * 180.0 / M_PI;
         double angleDiff = actualAngle - tempAngle;
@@ -159,12 +161,11 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     return dot;
 }
 
-SquareList findSquare(LineList *lineList, int width, int height, Image *image,
+MyList findSquare(MyList *lineList, int width, int height, Image *image,
                       int draw)
 {
-    SquareList squareList;
-    squareList.squares = malloc(sizeof(Square));
-    const unsigned int len = lineList->len;
+    MyList squareList = { NULL, NULL, 0 };
+    const unsigned int len = lineList->length;
     unsigned int nbSquares = 0;
 
     // FIRST COLUMN
@@ -175,8 +176,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
             if (i == h)
                 continue;
             // Get all line that actualLine have a intersection point with
-            Dot dot1 = getIntersection(&(lineList->lines[h]),
-                                       &(lineList->lines[i]), width, height);
+            Dot dot1 = getIntersection(&(((Line *)get_value(linelist, h)),
+                                       &(((Line *)get_value(linelist, i)), width, height);
 
             if (dot1.X != -1)
             {
@@ -186,8 +187,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                     if (i == j)
                         continue;
                     Dot dot2 =
-                        getIntersection(&(lineList->lines[i]),
-                                        &(lineList->lines[j]), width, height);
+                        getIntersection(&(((Line *)get_value(linelist, i)),
+                                        &(((Line *)get_value(linelist, j)), width, height);
 
                     if (dot2.X != -1)
                     {
@@ -196,8 +197,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                         {
                             if (k == j)
                                 continue;
-                            Dot dot3 = getIntersection(&(lineList->lines[j]),
-                                                       &(lineList->lines[k]),
+                            Dot dot3 = getIntersection(&(((Line *)get_value(linelist, j)),
+                                                       &(((Line *)get_value(linelist, k)),
                                                        width, height);
 
                             if (dot3.X != -1)
@@ -206,8 +207,8 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                     continue;
                                 // DOES K have intersection with h
                                 Dot dot4 = getIntersection(
-                                    &(lineList->lines[k]),
-                                    &(lineList->lines[h]), width, height);
+                                    &(((Line *)get_value(linelist, k)),
+                                    &(((Line *)get_value(linelist, h), width, height);
 
                                 if (dot4.X != -1)
                                 {
@@ -244,17 +245,13 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
 
                                     compute_Square(&square);
 
-                                    squareList.squares = realloc(
-                                        squareList.squares,
-                                        (nbSquares + 1) * sizeof(Square));
-                                    squareList.squares[nbSquares] = square;
+                                    append(squareList, &square);
 
                                     if (draw)
                                     {
                                         drawSquare(&square, image, width,
                                                    height, 2);
                                     }
-                                    nbSquares++;
                                 }
                             }
                         }
@@ -263,7 +260,6 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
             }
         }
     }
-    squareList.len = nbSquares;
     return squareList;
 }
 
@@ -310,14 +306,14 @@ double getLineLength(Line *line)
                 + ((line->yEnd - line->yStart) * (line->yEnd - line->yStart)));
 }
 
-Square sortSquares(SquareList *squareList, Image *image)
+Square sortSquares(MyList *squareList, Image *image)
 {
     const unsigned int len = squareList->len;
-    Square temp = squareList->squares[0];
+    Square temp = *((Square *)get_value(squareList, 0));
     int tempFactor = getPerimeter(&temp);
     for (unsigned int i = 1; i < len; i++)
     {
-        Square square = squareList->squares[i];
+        Square square = *((Square *)get_value(squareList, i));
         int factor = getPerimeter(&square);
         if (factor > tempFactor) // && canBeSudokuGrid(&square, image))
         {

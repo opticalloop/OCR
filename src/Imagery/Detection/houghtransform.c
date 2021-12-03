@@ -31,7 +31,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     MyList *resultingList = simplifyLines(&list);
 
     if (verbose)
-        printf("    📈 2.3.1 %d edges\n", resultingList.len);
+        printf("    📈 2.3.1 %d edges\n", resultingList->length);
 
     if (save || gui)
     {
@@ -146,7 +146,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 }
 
 MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder, )
+                        char *output_folder, double *maxTheta)
 {
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
@@ -338,7 +338,7 @@ MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
             angle = i;
     }
 
-    list.maxTheta = degrees_ToRadians(angle);
+    *maxTheta = degrees_ToRadians(angle);
     return list;
 }
 
@@ -461,14 +461,15 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
-unsigned int findTheta(LineList *lineList)
+unsigned int findTheta(MyList *lineList)
 {
     unsigned int histogram[181] = { 0 };
 
     int value;
-    for (int i = 0; i < lineList->len; i++)
+    for (int i = 0; i < lineList->length; i++)
     {
-        value = (int)radian_To_Degree(lineList->lines[i].theta);
+        Line *l = (Line *)get_value(lineList, (size_t)i);
+        value = (int)radian_To_Degree(.theta);
         value++;
         printf("Value : %u\n", value);
 
@@ -491,7 +492,7 @@ unsigned int findTheta(LineList *lineList)
     return angle;
 }
 
-void rotateAll(Image *image, LineList *lineList, double angleDegree)
+void rotateAll(Image *image, MyList *lineList, double angleDegree)
 {
     rotate(image, angleDegree);
 
@@ -503,39 +504,40 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
     double newX;
     double newY;
 
-    for (int i = 0; i < lineList->len; i++)
+    for (int i = 0; i < lineList->length; i++)
     {
+        Line *l = (Line *)get_value(lineList, (size_t)i);
         // Calculate new position start
         newX =
-            ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
+            ((double)(cos(angle) * ((double)l->xStart - middleX)
                       - sin(angle)
-                          * ((double)lineList->lines[i].yStart - middleY))
+                          * ((double)l->yStart - middleY))
              + middleX);
 
         newY =
-            ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
+            ((double)(cos(angle) * ((double)l->yStart - middleY)
                       + sin(angle)
-                          * ((double)lineList->lines[i].xStart - middleX))
+                          * ((double)l->xStart - middleX))
              + middleY);
 
-        lineList->lines[i].xStart = (int)newX;
-        lineList->lines[i].yStart = (int)newY;
+        l->xStart = (int)newX;
+        l->yStart = (int)newY;
 
         // Calculate new position end
         newX =
-            ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
+            ((double)(cos(angle) * ((double)l->xEnd - middleX)
                       - sin(angle)
-                          * ((double)lineList->lines[i].yEnd - middleY))
+                          * ((double)l->yEnd - middleY))
              + middleX);
 
         newY =
-            ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
+            ((double)(cos(angle) * ((double)l->yEnd - middleY)
                       + sin(angle)
-                          * ((double)lineList->lines[i].xEnd - middleX))
+                          * ((double)l->xEnd - middleX))
              + middleY);
 
-        lineList->lines[i].xEnd = (int)newX;
-        lineList->lines[i].yEnd = (int)newY;
+        l->xEnd = (int)newX;
+        l->yEnd = (int)newY;
     }
 }
 

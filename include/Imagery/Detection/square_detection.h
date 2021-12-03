@@ -13,7 +13,7 @@
  * @param linelist
  * @return LineList
  */
-LineList simplifyLines(LineList *linelist);
+MyList simplifyLines(MyList *linelist);
 
 /**
  * @brief Get the Square object
