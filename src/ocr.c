@@ -25,7 +25,7 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
+pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
@@ -46,7 +46,7 @@ pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
         pthread_join(thread, NULL);
     }
 
-    return &thread;
+    return thread;
 }
 
 void *OCR(void *Thread_args)

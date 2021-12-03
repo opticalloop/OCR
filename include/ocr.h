@@ -45,7 +45,7 @@ typedef struct Thread_argument
  * @param hexa
  * @return pthread_t*
  */
-pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
+pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa);
 
 /**
