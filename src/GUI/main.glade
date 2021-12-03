@@ -41,7 +41,6 @@
   <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <signal name="configure-event" handler="on_configure" swapped="no"/>
     <signal name="destroy" handler="quit" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
@@ -557,23 +556,8 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
+                        <property name="pack_type">end</property>
                         <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkScale" id="Rotation_scale">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="show_fill_level">True</property>
-                        <property name="restrict_to_fill_level">False</property>
-                        <property name="fill_level">0</property>
-                        <property name="round_digits">1</property>
-                        <signal name="value-changed" handler="rotate_img" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
@@ -759,8 +743,6 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                         <property name="can_focus">False</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
-                        <property name="hexpand">True</property>
-                        <property name="vexpand">True</property>
                         <property name="stock">gtk-connect</property>
                         <style>
                           <class name="sudoku_image"/>
@@ -1051,6 +1033,20 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                 </child>
                 <child>
                   <object class="GtkButton">
+                    <property name="label" translatable="yes">Reset</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="reset_nn" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
                     <property name="label" translatable="yes">Run training</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -1061,22 +1057,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="pack_type">end</property>
-                    <property name="position">5</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton">
-                    <property name="label" translatable="yes">Reset</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="reset_nn" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="pack_type">end</property>
-                    <property name="position">6</property>
+                    <property name="position">7</property>
                   </packing>
                 </child>
                 <style>

@@ -79,9 +79,6 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     int new_width = image_width * scale_factor;
     int new_height = image_height * scale_factor;
 
-    printf("%d %d %d %d\n", width, height, image_width, image_height);
-    printf("%f %d %d\n", scale_factor, new_width, new_height);
-
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
         pixbuf, new_width, new_height, GDK_INTERP_BILINEAR); // resize image
