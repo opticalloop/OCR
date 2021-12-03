@@ -2,19 +2,21 @@
 
 void grayscale(Image *image)
 {
-    int width = image->width;
-    int height = image->height;
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
 
+    Pixel pixel;
+    double average;
     // For each pixel of the image
-    for (int x = 0; x < width; x++)
+    for (unsigned int x = 0; x < width; x++)
     {
-        for (int y = 0; y < height; y++)
+        for (unsigned int y = 0; y < height; y++)
         {
             // get the pixel
-            Pixel pixel = image->pixels[x][y];
+            pixel = image->pixels[x][y];
 
             // Compute the average of the pixel
-            float average = 0.3 * pixel.r + 0.59 * pixel.g + 0.11 * pixel.b;
+            average = 0.3 * pixel.r + 0.59 * pixel.g + 0.11 * pixel.b;
             image->pixels[x][y].r = average;
             image->pixels[x][y].g = average;
             image->pixels[x][y].b = average;

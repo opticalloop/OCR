@@ -1,22 +1,14 @@
-//
-// Created by dov on 11/09/2021.
-//
-
 #ifndef OCR_ARRAY_SORT_H
 #define OCR_ARRAY_SORT_H
 
 #include "Imagery/Utils/image.h"
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *arr:
- *      n:
- *
- *  Return:
- *
+ * @param arr
+ * @param n
  */
 void array_sort(Pixel *arr, int n);
 
-#endif // OCR_ARRAY_SORT_H
+#endif

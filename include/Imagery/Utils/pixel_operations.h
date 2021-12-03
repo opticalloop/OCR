@@ -5,42 +5,31 @@
 #include <SDL/SDL_image.h>
 #include <stdlib.h>
 
-/*
- *  Summary:
+/**
+ * @brief Get the pixel object
  *
- *  Params:
- *      *surface:
- *      x:
- *      y:
- *
- *  Return:
- *
+ * @param surface
+ * @param x
+ * @param y
+ * @return Uint32
  */
 Uint32 get_pixel(SDL_Surface *surface, unsigned x, unsigned y);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *surface:
- *      x:
- *      y:
- *
- *  Return:
- *      void
- *
+ * @param surface
+ * @param x
+ * @param y
+ * @param pixel
  */
 void put_pixel(SDL_Surface *surface, unsigned x, unsigned y, Uint32 pixel);
 
-/*
- *  Summary:
+/**
+ * @brief
  *
- *  Params:
- *      *screen:
- *      *image:
- *
- *  Return:
- *      void
+ * @param screen
+ * @param image
  */
 void update_surface(SDL_Surface *screen, SDL_Surface *image);
 

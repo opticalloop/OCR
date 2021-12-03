@@ -10,8 +10,8 @@
 #include "GUI/draw.h"
 #include "GUI/gui_utils.h"
 #include "Imagery/Utils/op.h"
-#include "ocr.h"
 #include "NeuralNetwork/training.h"
+#include "ocr.h"
 
 #pragma region "Image_management"
 

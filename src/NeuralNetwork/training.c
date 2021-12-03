@@ -2,6 +2,7 @@
 
 #define DATA_PATH "Digits-Only/"
 #define DATA_FILE_PATH "src/NeuralNetwork/data.txt"
+#define TEST_DATA_PATH "src/NeuralNetwork/Test_data"
 
 void printResult(double expected[], Neuron neuron[])
 {
@@ -162,46 +163,44 @@ void generateDataFile(void)
     fclose(file);
 }
 
-pthread_t train_thread(const unsigned int epoch, const unsigned int nbHiddenLayers,
-           const unsigned int nbNodesPerHidden, const int verbose,
-           char *launch_path, char *save_path, int gui)
+pthread_t train_thread(const unsigned int epoch,
+                       const unsigned int nbHiddenLayers,
+                       const unsigned int nbNodesPerHidden, const int verbose,
+                       char *launch_path, char *save_path, int gui)
 {
     pthread_t thread;
-    Training_data args = {
-        .epoch = epoch,
-        .nbHiddenLayers = nbHiddenLayers,
-        .nbNodesPerHidden = nbNodesPerHidden,
-        .verbose = verbose,
-        .launch_path = launch_path,
-        .save_path = save_path,
-        .gui = gui
-    };
+    Training_data args = { .epoch = epoch,
+                           .nbHiddenLayers = nbHiddenLayers,
+                           .nbNodesPerHidden = nbNodesPerHidden,
+                           .verbose = verbose,
+                           .launch_path = launch_path,
+                           .save_path = save_path,
+                           .gui = gui };
     pthread_create(&thread, NULL, train, (void *)&args);
 
     return thread;
 }
 
-void *train(void * args)
+void *train(void *args)
 {
-    Training_data data = *(Training_data *)args;
-    const unsigned int epoch = data.epoch;
-    const unsigned int nbHiddenLayers = data.nbHiddenLayers;
-    const unsigned int nbNodesPerHidden = data.nbNodesPerHidden; 
-    const int verbose = data.verbose;
-    const int gui = data.gui;
-    char *launch_path = data.launch_path;
-    char *save_path = data.save_path;
+    Training_data *data = (Training_data *)args;
+    const unsigned int epoch = data->epoch;
+    const unsigned int nbHiddenLayers = data->nbHiddenLayers;
+    const unsigned int nbNodesPerHidden = 15; 
+    const int verbose = data->verbose;
+    const int gui = data->gui;
+    char *launch_path = data->launch_path;
+    char *save_path = data->save_path;
 
     char print_message[1000];
-    snprintf(print_message, sizeof(print_message), 
-    "    🔍 Launching Neural Network with %u hidden layers and %u "
-               "nodes per hidden\n",
-               nbHiddenLayers, nbNodesPerHidden);
+    snprintf(print_message, sizeof(print_message),
+             "    🔍 Launching Neural Network with %u hidden layers and %u "
+             "nodes per hidden\n",
+             nbHiddenLayers, nbNodesPerHidden);
 
     printVerbose(verbose, gui, print_message);
     memset(print_message, 0, sizeof(print_message));
     printVerbose(verbose, gui, "    🔨 Creating network\n");
-    
 
     Network n;
     n.sizeInput = NBINPUTS;
@@ -212,9 +211,9 @@ void *train(void * args)
     {
         *network =
             newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
-        
-        printVerbose(verbose, gui,"    🎰 Initing network\n");
-        
+
+        printVerbose(verbose, gui, "    🎰 Initing network\n");
+
         initNetwork(network);
     }
     else
@@ -244,7 +243,8 @@ void *train(void * args)
         train_count = 0;
         errorRate = 0.0;
 
-        snprintf(print_message, sizeof(print_message), "\n    📊 ###### EPOCH %u ######\n", i);
+        snprintf(print_message, sizeof(print_message),
+                 "\n    📊 ###### EPOCH %u ######\n", i);
         printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
 
@@ -255,7 +255,7 @@ void *train(void * args)
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network, 0.01);
+            gradientDescent(network, 0.001);
 
             if (i == epoch && verbose)
             {
@@ -269,7 +269,7 @@ void *train(void * args)
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
 
-                gradientDescent(network, 0.01);
+                gradientDescent(network, 0.001);
 
                 if (i == epoch && verbose)
                 {
@@ -280,15 +280,19 @@ void *train(void * args)
         }
         fclose(file);
         lastchr = ' ';
-        
-        snprintf(print_message, sizeof(print_message), "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
+
+        snprintf(print_message, sizeof(print_message),
+                 "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
         printVerbose(verbose, gui, print_message);
         memset(print_message, 0, sizeof(print_message));
     }
 
+    testTrain(network);
+
     if (strcmp(save_path, ""))
     {
-        snprintf(print_message, sizeof(print_message), "<-- 💾 Saving weights to %s\n", save_path);
+        snprintf(print_message, sizeof(print_message),
+                 "<-- 💾 Saving weights to %s\n", save_path);
         memset(print_message, 0, sizeof(print_message));
         saveWeights(network, save_path);
     }
@@ -342,4 +346,64 @@ int isFullWhite(Image *image)
         }
     }
     return 1;
+}
+
+void testTrain(Network *network)
+{
+    // Directory where all images are
+    DIR *directory;
+    struct dirent *in_file;
+
+    // To manage Image To Binary
+    int input[NBINPUTS];
+    char str[1000];
+
+    // Open the directory
+    if ((directory = opendir(TEST_DATA_PATH)) == NULL)
+    {
+        errx(1, "Error : Failed to open input directory\n");
+    }
+    while ((in_file = readdir(directory)) != NULL)
+    {
+        if (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
+        {
+            continue;
+        }
+
+        // Compute image path
+        strcpy(str,  TEST_DATA_PATH);
+        strcat(str, "/");
+        strcat(str, in_file->d_name);
+
+        // Get image binary arrays
+        printf("%s\n", str);
+        SDL_Surface *surface = load_image(str);
+        Image img = newImage(surface, 0, surface->w, surface->h);
+        SDL_FreeSurface(surface);
+        imageToBinary(&img, input);
+
+        char ch = in_file->d_name[strlen(in_file->d_name) - 5];
+        printf("Input : %c\n", ch);
+
+        int res = getNetworkOutput(network, &img, 0);
+        printf("Ouput : %d\n\n", res);
+        freeImage(&img, 0);
+    }
+    closedir(directory);
+
+    int zero_intput[NBINPUTS] = { 0.0 };
+    printf("Input : 0\n");
+    frontPropagation(network, zero_intput);
+    double temp = network->layers[(network->nbLayers - 2) + 1].neurons[0].value;
+    int result = 0;
+
+    for (unsigned int i = 1; i < NBOUTPUTS; i++)
+    {
+        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value > temp)
+        {
+            temp = network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
+            result = i;
+        }
+    }
+    printf("Ouput : %d\n\n", result);
 }
