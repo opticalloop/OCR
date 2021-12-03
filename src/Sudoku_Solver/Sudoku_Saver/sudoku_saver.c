@@ -155,6 +155,12 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
                     && y != 59 && y != 88 && y != 89 && y != 118 && y != 147
                     && y != 176 && y != 177 && y != 206 && y != 235))
             {
+                image.pixels[x][y].r = 255;
+                image.pixels[x][y].g = 255;
+                image.pixels[x][y].b = 255;
+            }
+            else
+            {
                 image.pixels[x][y].r = 0;
                 image.pixels[x][y].g = 0;
                 image.pixels[x][y].b = 0;
@@ -178,8 +184,8 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
             val = grid[i][j];
             if (val != 0)
             {
-                rect.x = Array[i];
-                rect.y = Array[j];
+                rect.x = Array[j];
+                rect.y = Array[i];
 
                 // Get the image number and copy it
                 if (!strcmp(folder_path, ""))
@@ -215,6 +221,12 @@ Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
                  && y != 293 && y != 322 && y != 351 && y != 352 && y != 381
                  && y != 410 && y != 439 && y != 468 && y != 469)
             {
+                image.pixels[x][y].r = 255;
+                image.pixels[x][y].g = 255;
+                image.pixels[x][y].b = 255;
+            }
+            else
+            {
                 image.pixels[x][y].r = 0;
                 image.pixels[x][y].g = 0;
                 image.pixels[x][y].b = 0;
@@ -238,8 +250,8 @@ Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
             val = grid[i][j];
             if (val != 0)
             {
-                rect.x = Array[i];
-                rect.y = Array[j];
+                rect.x = Array[j];
+                rect.y = Array[i];
 
                 // Get the image number and copy it
                 if (!strcmp(folder_path, ""))

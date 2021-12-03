@@ -243,19 +243,12 @@ void *OCR(void *Thread_args)
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
 
-    // Save image
-    if (verbose)
-    {
-        printf("<-- 💾 Saving sudoku image to %s/grid.bmp\n", output_folder);
- 
-    }
-    char out[200];
-    snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
     if (gui)
     {
         change_image(&sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
-    freeImage(&sudoku_image, 0);
+    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid",
+                save, 1);
     pthread_exit(NULL); // Exit thread
 }
