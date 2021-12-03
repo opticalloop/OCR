@@ -18,7 +18,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // Call major fonction
-    LineList list =
+    MyList *list =
         houghtransform(image, drawImage, verbose, save, output_folder);
 
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
@@ -28,7 +28,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     // LINES SIMPLIFICATION
 
-    LineList resultingList = simplifyLines(&list);
+    MyList *resultingList = simplifyLines(&list);
 
     if (verbose)
         printf("    📈 2.3.1 %d edges\n", resultingList.len);
@@ -97,7 +97,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n");
 
     // FIND ALL SQUARES
-    SquareList squares;
+    MyList squares;
     if (save || gui)
     {
         Image _squareImage = copyImage(&tempImage, 0);
@@ -145,8 +145,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     return img;
 }
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder)
+MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                        char *output_folder, )
 {
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
@@ -240,9 +240,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     }
 
     // Create line return line array
-    Line *allLines = malloc(sizeof(Line));
-
-    int nbEdges = 0;
+    Line *allLines = { NULL, NULL, 0 };
 
     double tempMaxTheta = 0.0;
     unsigned int histogram[181] = { 0 };
@@ -317,11 +315,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                     draw_line(drawImage, width, height, &line, &pixel, 1, draw);
 
                 // Add line on our return list
-                allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
-
-                allLines[nbEdges] = line;
-
-                nbEdges++;
+                append(allLines, line);
             }
         }
     }
@@ -334,9 +328,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     if (verbose)
         printf("    📜 2.2.6 %d edges\n", nbEdges);
 
-    LineList list;
-    list.lines = allLines;
-    list.len = nbEdges;
+    MyList *list = allLines;
 
     // Find best angle
     unsigned int angle = 0;

@@ -5,6 +5,7 @@
 #include "Imagery/Detection/sobel.h"
 #include "Imagery/Detection/square_detection.h"
 #include "Imagery/Detection/struct.h"
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
@@ -36,7 +37,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
  * @return LineList
  */
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                         char *output_folder);
 
 /**
@@ -85,7 +86,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
  * @param lineList
  * @return unsigned int
  */
-unsigned int findTheta(LineList *lineList);
+unsigned int findTheta(MyList *lineList);
 
 /**
  * @brief
@@ -94,7 +95,7 @@ unsigned int findTheta(LineList *lineList);
  * @param lineList
  * @param angleDegree
  */
-void rotateAll(Image *image, LineList *lineList, double angleDegree);
+void rotateAll(Image *image, MyList *lineList, double angleDegree);
 
 /**
  * @brief

@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/struct.h"
 
 /**
@@ -22,7 +23,7 @@ LineList simplifyLines(LineList *linelist);
  * @param index
  * @return Square
  */
-Square getSquare(LineList *lineList, Line *line, int index);
+Square getSquare(MyList *lineList, Line *line, int index);
 
 /**
  * @brief Get the Intersection object
@@ -45,7 +46,7 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height);
  * @param draw
  * @return SquareList
  */
-SquareList findSquare(LineList *lineList, int width, int height, Image *image,
+MyList findSquare(LineList *lineList, int width, int height, Image *image,
                       int draw);
 
 /**
@@ -57,7 +58,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
  * @param image
  * @return SquareList
  */
-SquareList getAllSquare(LineList *lineList, int width, int height,
+MyList getAllSquare(MyList *lineList, int width, int height,
                         Image *image);
 
 /**
@@ -85,7 +86,7 @@ double getLineLength(Line *line);
  * @param image
  * @return Square
  */
-Square sortSquares(SquareList *squareList, Image *image);
+Square sortSquares(MyList *squareList, Image *image);
 
 /**
  * @brief
