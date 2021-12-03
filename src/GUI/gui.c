@@ -61,8 +61,10 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
 
     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
 
-    int width = gtk_widget_get_allocated_width(GTK_WIDGET(panel));
-    int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
+    int width = clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)),0,1000); // TODO: fix this
+    int height = clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)),0,1000);
+
+    // int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
 
     // get image size
     int image_width = gdk_pixbuf_get_width(pixbuf);
@@ -79,6 +81,7 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     int new_width = image_width * scale_factor;
     int new_height = image_height * scale_factor;
 
+    printf("%f %d %d\n",scale_factor, width, height);
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
         pixbuf, new_width, new_height, GDK_INTERP_BILINEAR); // resize image
@@ -621,12 +624,6 @@ void *init_gui()
     quit();
     pthread_exit(NULL);
 }
-
-void on_configure()
-{
-    // rezize image
-}
-
 void open_website()
 {
     // Check if the browser is installed

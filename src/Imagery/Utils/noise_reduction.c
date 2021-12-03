@@ -327,7 +327,7 @@ float noiseLevel(Image *image)
     return count;
 }
 
-unsigned int clamp(unsigned int value, unsigned int min, unsigned int max)
+inline unsigned int clamp(unsigned int value, unsigned int min, unsigned int max)
 {
     return value < min ? min : value > max ? max : value;
 }
