@@ -1,6 +1,6 @@
 #include "NeuralNetwork/training.h"
 
-#define DATA_PATH "Digits-Only/"
+#define DATA_PATH "src/NeuralNetwork/Digits-Only/"
 #define DATA_FILE_PATH "src/NeuralNetwork/data.txt"
 #define TEST_DATA_PATH "src/NeuralNetwork/Test_data"
 
@@ -123,6 +123,8 @@ void generateDataFile(void)
     {
         errx(1, "Error : Failed to open input directory\n");
     }
+    int counter = 0;
+    char ch;
     while ((in_file = readdir(directory)) != NULL)
     {
         if (!strcmp(in_file->d_name, ".") || !strcmp(in_file->d_name, ".."))
@@ -142,11 +144,11 @@ void generateDataFile(void)
         freeImage(&img, 0);
 
         // Get expected value
-        int num = in_file->d_name[strlen(in_file->d_name) - 5] - '0';
+        ch = in_file->d_name[strlen(in_file->d_name) - 5];
 
         // Write expected value
         char strTemp[50];
-        sprintf(strTemp, "%d", num);
+        sprintf(strTemp, "%c", ch);
         fputs("#", file);
         fputs(strTemp, file);
 
@@ -157,7 +159,12 @@ void generateDataFile(void)
             sprintf(strTemp, "%d", input[i]);
             fputs(strTemp, file);
         }
+        counter++;
         fputs("\n", file);
+        if (counter % 100 == 0)
+        {
+            printf("%d images written\n", counter);
+        }
     }
     closedir(directory);
     fclose(file);
@@ -186,7 +193,7 @@ void *train(void *args)
     Training_data *data = (Training_data *)args;
     const unsigned int epoch = data->epoch;
     const unsigned int nbHiddenLayers = data->nbHiddenLayers;
-    const unsigned int nbNodesPerHidden = 15; 
+    const unsigned int nbNodesPerHidden = 30; 
     const int verbose = data->verbose;
     const int gui = data->gui;
     char *launch_path = data->launch_path;
@@ -230,7 +237,7 @@ void *train(void *args)
     int zero_intput[NBINPUTS] = { 0.0 };
     double zero_expected[NBOUTPUTS] = {
         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
 
     // Open file where data is
