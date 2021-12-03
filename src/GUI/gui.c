@@ -59,9 +59,32 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
 
+    GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+
+    int width = gtk_widget_get_allocated_width(GTK_WIDGET(panel));
+    int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
+
+    // get image size
+    int image_width = gdk_pixbuf_get_width(pixbuf);
+    int image_height = gdk_pixbuf_get_height(pixbuf);
+
+    // get scale factor
+    double scale_factor = 1;
+    if (image_width > width || image_height > height)
+    {
+        scale_factor = (double)width / image_width;
+        if (scale_factor * image_height > height)
+            scale_factor = (double)height / image_height;
+    }
+    int new_width = image_width * scale_factor;
+    int new_height = image_height * scale_factor;
+
+    printf("%d %d %d %d\n", width, height, image_width, image_height);
+    printf("%f %d %d\n", scale_factor, new_width, new_height);
+
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
-        pixbuf, 500, 500, GDK_INTERP_BILINEAR); // resize image
+        pixbuf, new_width, new_height, GDK_INTERP_BILINEAR); // resize image
 
     // set the image
     gtk_image_set_from_pixbuf(imageWidget, resized_image);
