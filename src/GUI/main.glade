@@ -9,8 +9,38 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="lower">1</property>
+    <property name="upper">1000000</property>
+    <property name="value">1000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment3">
+    <property name="lower">1</property>
+    <property name="upper">1000000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment4">
+    <property name="lower">1</property>
+    <property name="upper">1000000</property>
+    <property name="value">30</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>jpg</mime-type>
+      <mime-type>bmp</mime-type>
+      <mime-type>jpeg</mime-type>
+      <mime-type>png</mime-type>
+    </mime-types>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
+    <signal name="configure-event" handler="on_configure" swapped="no"/>
     <signal name="destroy" handler="quit" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
@@ -174,7 +204,7 @@
                             <property name="can_focus">False</property>
                             <property name="margin_bottom">1</property>
                             <property name="title" translatable="yes"/>
-                            <signal name="file-set" handler="on_file_set" object="start" swapped="no"/>
+                            <signal name="file-set" handler="on_file_set" object="right_panel" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -728,6 +758,8 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                         <property name="can_focus">False</property>
                         <property name="halign">center</property>
                         <property name="valign">center</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
                         <property name="stock">gtk-connect</property>
                         <style>
                           <class name="sudoku_image"/>
@@ -1018,20 +1050,6 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                 </child>
                 <child>
                   <object class="GtkButton">
-                    <property name="label" translatable="yes">Reset</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="reset_nn" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">5</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton">
                     <property name="label" translatable="yes">Run training</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -1042,7 +1060,22 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="pack_type">end</property>
-                    <property name="position">7</property>
+                    <property name="position">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Reset</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="reset_nn" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">6</property>
                   </packing>
                 </child>
                 <style>
@@ -1151,31 +1184,4 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="adjustment2">
-    <property name="lower">1</property>
-    <property name="upper">1000000</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment3">
-    <property name="lower">1</property>
-    <property name="upper">1000000</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="adjustment4">
-    <property name="lower">1</property>
-    <property name="upper">1000000</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkFileFilter" id="filefilter1">
-    <mime-types>
-      <mime-type>jpg</mime-type>
-      <mime-type>bmp</mime-type>
-      <mime-type>jpeg</mime-type>
-      <mime-type>png</mime-type>
-    </mime-types>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1"/>
 </interface>

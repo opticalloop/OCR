@@ -59,7 +59,32 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
 
-    // resize the image
+    // get stack
+    GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+
+    // open image
+    gtk_image_set_from_pixbuf(imageWidget, pixbuf);
+
+    int width = gtk_widget_get_allocated_width(GTK_WIDGET(panel));
+    int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
+
+    // get image size
+    int image_width = gdk_pixbuf_get_width(pixbuf);
+    int image_height = gdk_pixbuf_get_height(pixbuf);
+
+    // get scale factor
+    double scale_factor = 1;
+    if (image_width > width || image_height > height)
+    {
+        scale_factor = (double)width / image_width;
+        if (scale_factor * image_height > height)
+            scale_factor = (double)height / image_height;
+    }
+    int new_width = image_width * scale_factor;
+    int new_height = image_height * scale_factor;
+
+    printf("%d %d %d %d\n", width, height, image_width, image_height);
+    printf("%f %d %d\n", scale_factor, new_width, new_height);
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
         pixbuf, 500, 500, GDK_INTERP_BILINEAR); // resize image
 
@@ -109,7 +134,6 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
         SDL_FreeSurface(surface);
         temp_image = copyImage(&image, 0);
 
-        
         printf("    🎨 Loaded %s\n", filename);
 
         // Display image
@@ -256,7 +280,7 @@ void run_process(GtkButton *button)
         // Run processing
         pthread_t t;
         t = OCR_thread(IMAGE_SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
-                            strcmp(dim, "9x9"));
+                       strcmp(dim, "9x9"));
         thread = &t;
     }
     else
@@ -324,7 +348,7 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
 
     // get scale value
     GtkScale *scale =
-    GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
+        GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
     rotation_value = gtk_range_get_value(GTK_RANGE(scale));
 
     change_image(&image, "selected_image"); // change image of main page
@@ -360,6 +384,7 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     resizing = 1;
     printf("    🛠️ Starting resize...\n");
+    set_leftPannel_status(FALSE); // disable buttons
 
     resized_square.top.xStart = 100;
     resized_square.top.yStart = 100;
@@ -377,8 +402,6 @@ void edit_resize(GtkWidget *widget, gpointer data)
     // change page
     GtkWidget *page = data;
     change_panel(NULL, page);
-
-    set_leftPannel_status(FALSE); // disable buttons
 }
 
 void on_resize_finished(GtkWidget *widget, gpointer data)
@@ -426,7 +449,8 @@ void start_nn(GtkWidget *widget, gpointer data)
     // get check button value
     GtkCheckButton *check_button =
         GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "train_image"));
-    int check_button_value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button));
+    int check_button_value =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button));
 
     // Check if file exists
     FILE *file;
@@ -601,6 +625,11 @@ void *init_gui()
     // End program
     quit();
     pthread_exit(NULL);
+}
+
+void on_configure()
+{
+    // rezize image
 }
 
 void open_website()
