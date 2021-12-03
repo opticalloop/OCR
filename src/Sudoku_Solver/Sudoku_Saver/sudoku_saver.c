@@ -195,6 +195,66 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
     return image;
 }
 
+Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
+                        char *folder_path)
+{
+    Image image = newImage(NULL, 0, 470, 470);
+
+    for (unsigned int x = 0; x < 470; x++)
+    {
+        for (unsigned int y = 0; y < 470; y++)
+        {
+            if (x != 0 && x != 1 && x != 355 && x != 356 && x != 30 
+                 && x != 59 && x != 88 && x != 117 && x != 118 && x != 147 
+                 && x != 176 && x != 205 && x != 234 && x != 235 && x != 264 
+                 && x != 293 && x != 322 && x != 351 && x != 352 && x != 381 
+                 && x != 410 && x != 439 && x != 468 && x != 469
+                 && y != 0 && y != 1 && y != 355 && y != 356 && y != 30 
+                 && y != 59 && y != 88 && y != 117 && y != 118 && y != 147
+                 && y != 176 && y != 205 && y != 234 && y != 235 && y != 264
+                 && y != 293 && y != 322 && y != 351 && y != 352 && y != 381
+                 && y != 410 && y != 439 && y != 468 && y != 469)
+            {
+                image.pixels[x][y].r = 0;
+                image.pixels[x][y].g = 0;
+                image.pixels[x][y].b = 0;
+            }
+        }
+    }
+
+    // Coordonates
+    unsigned int Array[16] = { 2, 31, 60, 89, 119, 148, 177, 206, 236, 265, 294, 323, 353, 382, 411, 440};
+    unsigned int val;
+
+    // SDL_Rect to copy to the actual image
+    SDL_Rect rect;
+    rect.w = IMAGE_SIZE;
+    rect.h = IMAGE_SIZE;
+    Image temp;
+    for (unsigned int i = 0; i < 16; i++)
+    {
+        for (unsigned int j = 0; j < 16; j++)
+        {
+            val = grid[i][j];
+            if (val != 0)
+            {
+                rect.x = Array[i];
+                rect.y = Array[j];
+
+                // Get the image number and copy it
+                if (!strcmp(folder_path, ""))
+                    temp = getImage(val, IMAGE_DIRECTORY, copy[i][j]);
+                else
+                    temp = getImage(val, folder_path, copy[i][j]);
+                pasteOnImage(&temp, &image, &rect);
+                freeImage(&temp, 0);
+            }
+        }
+    }
+
+    return image;
+}
+
 Image getImage(unsigned int val, char *directory, unsigned int green)
 {
     char str[1000];

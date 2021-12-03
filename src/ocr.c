@@ -230,7 +230,15 @@ void *OCR(void *Thread_args)
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    Image sudoku_image;
+    if (hexa)
+    {
+        sudoku_image = createHexaSudokuImage(grid, copy, IMAGE_PATH);
+    }   
+    else
+    {
+        sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    }
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
