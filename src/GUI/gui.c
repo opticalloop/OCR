@@ -364,10 +364,10 @@ void edit_resize(GtkWidget *widget, gpointer data)
     resized_square.top.xStart = 100;
     resized_square.top.yStart = 100;
     resized_square.right.xStart = 400;
-    resized_square.right.yStart = 100;
-    resized_square.bottom.xStart = 400;
-    resized_square.bottom.yStart = 450;
-    resized_square.left.xStart = 100;
+    resized_square.right.yStart = 10;
+    resized_square.bottom.xStart = 600;
+    resized_square.bottom.yStart = 350;
+    resized_square.left.xStart = 20;
     resized_square.left.yStart = 500;
 
     // Change image
