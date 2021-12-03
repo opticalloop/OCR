@@ -11,10 +11,10 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     const unsigned int w = image->width;
     const unsigned int h = image->height;
 
-    printVerbose(verbose, "    🎨 1 Preprocessing image\n");
+    printVerbose(verbose, 0, "    🎨 1 Preprocessing image\n");
 
     // CONTRAST
-    printVerbose(verbose, "    📸 1.1 Applying constrast Filter\n");
+    printVerbose(verbose, 0, "    📸 1.1 Applying constrast Filter\n");
     image_levels(image, 10);
     invert(image);
     image_normalize_brightness(image);
@@ -23,8 +23,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.1, "Contrast filter", 0);
 
     // MEDIAN
-    printVerbose(verbose, "    🎥 1.2 Applying Median Filter\n");
-    Pixel **mask = copyPixelsArray(image);
+    printVerbose(verbose, 0, "    🎥 1.2 Applying Median Filter\n");
+    Pixel **mask = copyPixelsArray(image, 1);
     updateNeigbourgs(image);
     applyFilter(mask, image, MedianFilter, Median, w, h);
     ApplyMaskToImage(image, mask, w, h);
@@ -33,13 +33,14 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.15, "Median filter", 0);
 
     // AVERAGE
-    printVerbose(verbose, "    🎬 1.3 Applying Average Filter\n");
+    printVerbose(verbose, 0, "    🎬 1.3 Applying Average Filter\n");
     applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     changeImageGUI(image, gui, 0.2, "Average filter", 0);
 
     // ADAPTATIVE THRESHOLD
-    printVerbose(verbose, "    💻 1.4 Applying Adaptative Threshold Filter\n");
+    printVerbose(verbose, 0,
+                 "    💻 1.4 Applying Adaptative Threshold Filter\n");
     float noise = noiseLevel(image);
     if (verbose)
         printf("    👍 1.4.1 Noise level : %f\n", noise);
@@ -49,13 +50,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.25, "Adaptative threshold", 0);
 
     // DILATE
-    printVerbose(verbose, "    🧱 1.5 Smoothing image\n");
+    printVerbose(verbose, 0, "    🧱 1.5 Smoothing image\n");
     dilate(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Smooth_filter", save, 0);
     changeImageGUI(image, gui, 0.3, "Smoothed image", 0);
 
     // INTERTING
-    printVerbose(verbose, "    ❓ 1.6 Inverting image\n");
+    printVerbose(verbose, 0, "    ❓ 1.6 Inverting image\n");
     NegativePictureIfNormal(image);
     saveVerbose(verbose, image, pathToSave, "1.6_Inverted_filter", save, 0);
     changeImageGUI(image, gui, 0.35, "Inverted image", 0);
@@ -222,32 +223,7 @@ void dilate(Image *image)
     const unsigned int height = image->height;
 
     // Create two dimensional array of pixels
-    Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
-    if (_pixels == NULL)
-    {
-        errx(EXIT_FAILURE, "Error while allocating memory");
-    }
-
-    unsigned int x = 0;
-    for (; x < width; x++)
-    {
-        _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
-        if (_pixels[x] == NULL)
-        {
-            errx(EXIT_FAILURE, "Error while allocating memory");
-        }
-    }
-
-    // Copy of all pixel
-    for (unsigned int x = 0; x < width; x++)
-    {
-        for (unsigned int y = 0; y < height; y++)
-        {
-            // Consider that the image is in grayscale
-            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
-            updatePixelToSameValue(&(image->pixels[x][y]), 0);
-        }
-    }
+    Pixel **_pixels = copyPixelsArray(image, 0);
 
     for (unsigned int i = 1; i < width - 1; i++)
     {
@@ -267,68 +243,6 @@ void dilate(Image *image)
                 }
             }
             updatePixelToSameValue(&(image->pixels[i][j]), 0);
-        }
-    }
-
-    // Free
-    for (unsigned int i = 0; i < width; i++)
-    {
-        free(_pixels[i]);
-    }
-    free(_pixels);
-}
-
-void erode(Image *image)
-{
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
-
-    // Create two dimensional array of pixels
-    Pixel **_pixels = malloc(sizeof(Pixel *) * (width + 1));
-    if (_pixels == NULL)
-    {
-        errx(EXIT_FAILURE, "Error while allocating memory");
-    }
-
-    unsigned int x = 0;
-    for (; x < width; x++)
-    {
-        _pixels[x] = malloc(sizeof(Pixel) * (height + 1));
-        if (_pixels[x] == NULL)
-        {
-            errx(EXIT_FAILURE, "Error while allocating memory");
-        }
-    }
-    // '\0'
-    _pixels[x] = NULL;
-
-    // Copy of all pixel
-    for (unsigned int x = 0; x < width; x++)
-    {
-        for (unsigned int y = 0; y < height; y++)
-        {
-            // Consider that the image is in grayscale
-            updatePixelToSameValue(&(_pixels[x][y]), image->pixels[x][y].r);
-            updatePixelToSameValue(&(image->pixels[x][y]), 0);
-        }
-    }
-
-    for (unsigned int i = 1; i < width - 1; i++)
-    {
-        for (unsigned int j = 1; j < height - 1; j++)
-        {
-            // Black pixel
-            if (_pixels[i][j].r == 0)
-            {
-                // Check if white pixel around
-                if (_pixels[i + 1][j].r != 255 && _pixels[i][j - 1].r != 255
-                    && _pixels[i][j + 1].r != 255 && _pixels[i - 1][j].r != 255)
-                {
-                    updatePixelToSameValue(&(image->pixels[i][j]), 0);
-                    continue;
-                }
-            }
-            updatePixelToSameValue(&(image->pixels[i][j]), 255);
         }
     }
 

@@ -25,12 +25,20 @@ static void checkFolderOutput(char *output_folder)
     }
 }
 
-pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
+pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    Thread_argument arg = { surface,       output_path, verbose, save,
-                            output_folder, gui,         hexa };
+    SDL_Surface *surface = IMG_Load(intput_path);
+    Image img = newImage(surface, 1, surface->w, surface->h);
+    Thread_argument arg = { .image = img,
+                            .output_path = output_path,
+                            .verbose = verbose,
+                            .save = save,
+                            .output_folder = output_folder,
+                            .gui = gui,
+                            .hexa = hexa };
+    SDL_FreeSurface(surface);
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
     if (gui == 0)
@@ -44,7 +52,8 @@ pthread_t *OCR_thread(SDL_Surface *surface, char *output_path, int verbose,
 void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
-    SDL_Surface *startSurface = arg.surface;
+    Image image = arg.image;
+    char *image_path = image.path;
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;
@@ -59,18 +68,14 @@ void *OCR(void *Thread_args)
     }
 
     // Create image
-    printVerbose(verbose, "--> 💾 Creating image\n");
-    Image image;
-    image.path = "";
-    image.surface = startSurface;
+    printVerbose(verbose, 0, "--> 💾 Creating image\n");
 
-    newImage(&image, 1);
-
-    if (image.width > 3000 || image.height > 3000)
-    {
-        printVerbose(verbose, "      📏 1.0 Simplifying image\n");
-        image = resize(&image, image.width * 0.5, image.height * 0.5, 1);
-    }
+    // if (image.width > 3000 || image.height > 3000)
+    // {
+    //     printVerbose(verbose, "      📏 1.0 Simplifying image\n");
+    //     Image img = copyImage(&image, 1);
+    //     image = resize(&img, image.width * 0.5, image.height * 0.5, 1);
+    // }
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
 
@@ -80,82 +85,80 @@ void *OCR(void *Thread_args)
     // Preprocessing
     grayscale(&image);
     saveVerbose(verbose, &image, output_folder, "1.0_Grayscale", save, 0);
-    changeImageGUI(&image, gui, 0.05, "Grayscale image", 0);
+    changeImageGUI(&image, 0, 0.05, "Grayscale image", 0);
 
     // Binarization
     Preprocessing(&image, output_folder, verbose, save, gui);
 
     // DETECTION
 
-    printVerbose(verbose, "\n    🔍 2 Grid detection (Hough Transform)\n");
-    printVerbose(verbose, "    🎥 2.1 Applying sobel edge detection filter\n");
+    printVerbose(verbose, 0, "\n    🔍 2 Grid detection (Hough Transform)\n");
+    printVerbose(verbose, 0,
+                 "    🎥 2.1 Applying sobel edge detection filter\n");
+
+    Image drawImage = copyImage(&image, 0);
 
     // Apply sobel edge detection filter
     SobelEdgeDetection(&image);
 
-    Image drawImage = copyImage(&image, 0);
-
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
-    printVerbose(verbose, "    🔨 2.2 Launching Hough Transform\n");
+    printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
-    SDL_Surface *cropped_image = detection(&image, &drawImage, verbose, save,
-                                           output_folder, four_angles, gui);
+    Image cropped = detection(&image, &drawImage, verbose, save, output_folder,
+                              four_angles, gui);
 
     // Free image
     freeImage(&image, 1);
 
-    // Create cropped image
-    Image cropped;
-    cropped.surface = cropped_image;
-    newImage(&cropped, 0);
-
     // Reverse the image before segmenting
     reverse_color(&cropped);
-    updateSurface(&cropped);
 
     unsigned int dimension = hexa ? 16 : 9;
     unsigned int **grid = allocGrid(dimension);
 
     // Recognisation + Construction
-    printVerbose(verbose, "\n    ❓ 3 Initing digit recognition\n");
-    printVerbose(verbose, "    📊 3.1 Creating neural network\n");
+    printVerbose(verbose, 0, "\n    ❓ 3 Initing digit recognition\n");
+    printVerbose(verbose, 0, "    📊 3.1 Creating neural network\n");
 
     Network network;
     network.sizeInput = NBINPUTS;
     network.sizeOutput = NBOUTPUTS;
 
-    printVerbose(verbose, "    📑 3.2 Initing weights\n");
-    launchWeights(&network, WEIGHT_PATH, verbose);
+    printVerbose(verbose, 0, "    📑 3.2 Initing weights\n");
+    launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
     for (angle_index = 1; angle_index < 4; angle_index++)
     {
-        saveVerbose(verbose, &cropped, output_folder, "2.8_Cropped_image", save,
-                    0);
-        changeImageGUI(&cropped, gui, 0.8, "Cropped image", 0);
-        printVerbose(verbose, "    🪓 3.3 Segmenting cropped image\n");
+        saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
+                    save, 0);
+        changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
+        printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
 
         // Segmentation
         // Initialize all case at NULL
-        SDL_Surface *all_cases[hexa ? 256 : 81];
+        Image all_cases[dimension * dimension];
         if (verbose && save)
+        {
             printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
-        split9(&cropped, all_cases, save, output_folder);
+        }
+        // Segmentation
+        split(&cropped, all_cases, save, output_folder, hexa);
 
-        printVerbose(verbose, "    🔨 3.4 Creating sudoku grid\n");
+        printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
         int val;
         for (unsigned int i = 0; i < dimension; i++)
         {
             for (unsigned int j = 0; j < dimension; j++)
             {
                 // Get the value of the case
-                val =
-                    getNetworkOutput(&network, all_cases[i * dimension + j], 0);
+                val = getNetworkOutput(&network,
+                                       &(all_cases[i * dimension + j]), 0);
 
                 if (!hexa && val > 9)
                 {
@@ -164,7 +167,7 @@ void *OCR(void *Thread_args)
                 grid[i][j] = val;
 
                 // Free the case
-                SDL_FreeSurface(all_cases[i * dimension + j]);
+                freeImage(&(all_cases[i * dimension + j]), 0);
             }
         }
 
@@ -174,6 +177,14 @@ void *OCR(void *Thread_args)
         if (!isSolvable(grid, dimension))
         {
             rotate(&cropped, four_angles[angle_index]);
+            if (angle_index == 1)
+            {
+                printf("No solution\n");
+                freeGrid(grid, dimension); // Free grid
+                freeImage(&cropped, 0);
+                freeNetwork(&network);
+                pthread_exit(NULL);
+            }
             if (verbose)
             {
                 printf("    ❌ 3.5 Grid is not solvable\n");
@@ -202,9 +213,9 @@ void *OCR(void *Thread_args)
     // Copy array to have different color when saving the image
     copyArray(grid, copy, dimension);
 
-    printVerbose(verbose, "    ✅ 3.5 Grid is solvable\n");
-    printVerbose(verbose, "\n    🎲 4 Solving sudoku grid\n");
-    printVerbose(verbose, "    🔍 4.2 Solving grid\n");
+    printVerbose(verbose, 0, "    ✅ 3.5 Grid is solvable\n");
+    printVerbose(verbose, 0, "\n    🎲 4 Solving sudoku grid\n");
+    printVerbose(verbose, 0, "    🔍 4.2 Solving grid\n");
 
     solveSuduko(grid, 0, 0, dimension);
     basicPrint(grid, dimension);
@@ -213,13 +224,13 @@ void *OCR(void *Thread_args)
     {
         errx(EXIT_FAILURE, "    ⛔ Error while solving grid");
     }
-    printVerbose(verbose, "    ✅ 4.3 Grid is solved\n");
+    printVerbose(verbose, 0, "    ✅ 4.3 Grid is solved\n");
 
     // SaveResult
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    SDL_Surface *sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
@@ -232,13 +243,11 @@ void *OCR(void *Thread_args)
     }
     char out[200];
     snprintf(out, sizeof(out), "%s/grid.bmp", output_folder);
-    SDL_SaveBMP(sudoku_image, out);
-
     if (gui)
     {
-        change_image(sudoku_image, "selected_image");
+        change_image(&sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
-    SDL_FreeSurface(sudoku_image);
+    freeImage(&sudoku_image, 0);
     pthread_exit(NULL); // Exit thread
 }

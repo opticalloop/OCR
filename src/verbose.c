@@ -26,7 +26,7 @@ void changeImageGUI(Image *image, int gui, double value, char *message,
 {
     if (gui)
     {
-        change_image(image->surface, "selected_image");
+        change_image(image, "selected_image");
         edit_progress_bar(value, message);
     }
     if (free)
@@ -35,10 +35,14 @@ void changeImageGUI(Image *image, int gui, double value, char *message,
     }
 }
 
-void printVerbose(int verbose, char *message)
+void printVerbose(int verbose, int gui, char *message)
 {
     if (verbose)
     {
         printf("%s", message);
+    }
+    if (gui)
+    {
+        edit_terminal(message);
     }
 }

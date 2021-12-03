@@ -5,22 +5,11 @@
 #include "Imagery/Utils/image.h"
 #include "NeuralNetwork/training.h"
 
-int main(void)
+
+int training_test(int argc, char **argv)
 {
     // generateDataFile();
-    train(100, 2, 32, 1, "", "w.data");
-
-    // Network n;
-    // n.sizeInput = NBINPUTS;
-    // n.sizeOutput = NBOUTPUTS;
-    // Network *network = &n;
-    // launchWeights(network, "w3.data", 1);
-
-    // SDL_Surface *surface = load_image("9.jpg");
-
-    // int res = getNetworkOutput(network, surface, 1);
-    // printf("Input : 9\n");
-    // printf("Ouput : %d\n", res);
-    // freeNetwork(network);
-    // SDL_FreeSurface(surface);
+    train(10, 1, 15, 1, "", argv[1]);
+    
+    return 0;
 }

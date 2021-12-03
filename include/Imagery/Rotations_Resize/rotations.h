@@ -9,11 +9,12 @@
 
 #include "Imagery/Rotations_Resize/bilinear_interpolation.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Utils/noise_reduction.h"
 
-/*
+/**
  * @brief Rotate an image
- * @param surface The image to rotate
- * @param angle The angle of rotation
+ * @param Image The image to rotate
+ * @param angleDegree The angle of rotation in degree
  * @return The rotated image
  */
 

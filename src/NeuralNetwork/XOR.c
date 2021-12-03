@@ -44,7 +44,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
     }
     else
     {
-        launchWeights(network, launch_path, verbose);
+        launchWeights(network, launch_path, verbose, 0);
     }
 
     double errorRate = 0.0;
@@ -62,7 +62,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
 
             frontPropagation(network, input);
             errorRate = backPropagation(network, expected);
-            gradientDescent(network);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
