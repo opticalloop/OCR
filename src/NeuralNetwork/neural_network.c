@@ -168,25 +168,26 @@ void frontPropagation(Network *network, int input[])
     }
 
     // Output layer
-    Layer prevLayer = network->layers[network->nbLayers - 2];
+    // Layer prevLayer = network->layers[network->nbLayers - 2];
     layer = &(network->layers[network->nbLayers - 1]);
-    nbNeurons = layer->nbNeurons;
+    softmaxLayer(layer);
+    // nbNeurons = layer->nbNeurons;
 
-    // For each neuron of the actual layer
-    for (unsigned int j = 0; j < nbNeurons; j++)
-    {
-        Neuron *neuron = &(layer->neurons[j]);
-        double sum = 0.0;
+    // // For each neuron of the actual layer
+    // for (unsigned int j = 0; j < nbNeurons; j++)
+    // {
+    //     Neuron *neuron = &(layer->neurons[j]);
+    //     double sum = 0.0;
 
-        // Calcul new neuron value based on his weights and the value of
-        // previous layer
-        for (unsigned int k = 0; k <= prevLayer.nbNeurons; k++)
-        {
-            sum += neuron->weights[k] * prevLayer.neurons[k].value;
-        }
-        sum += neuron->bias;
-        layer->neurons[j].value = softmax(sum);
-    }
+    //     // Calcul new neuron value based on his weights and the value of
+    //     // previous layer
+    //     for (unsigned int k = 0; k <= prevLayer.nbNeurons; k++)
+    //     {
+    //         sum += neuron->weights[k] * prevLayer.neurons[k].value;
+    //     }
+    //     sum += neuron->bias;
+    //     layer->neurons[j].value = softmax(sum);
+    // }
 }
 
 void freeNetwork(Network *network)
@@ -278,7 +279,7 @@ double sigmoid(double x)
     }
     else
     {
-        return 0.01 * x;
+        return 0;
     }
 }
 
@@ -291,13 +292,27 @@ double sigmoidPrime(double x)
     }
     else
     {
-        return 0.01;
+        return 0;
     }
 }
 
 double softmax(double x)
 {
     return exp(x) / (1 + exp(x));
+}
+
+void softmaxLayer(Layer *layer)
+{
+    double sum = 0.0;
+    for (unsigned int i = 0; i < layer->nbNeurons; i++)
+    {
+        layer->neurons[i].value = exp(layer->neurons[i].value);
+        sum += layer->neurons[i].value;
+    }
+    for (unsigned int i = 0; i < layer->nbNeurons; i++)
+    {
+        layer->neurons[i].value = layer->neurons[i].value / sum;
+    }
 }
 
 // Apply softmax with cross entropy

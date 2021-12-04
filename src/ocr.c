@@ -106,7 +106,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n");
 
     // Four possible angle
-
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
     // Detect the grid
@@ -210,13 +209,25 @@ void *OCR(void *Thread_args)
     saveGrid(grid, "grid.result", verbose, dimension);
 
     // Create, save and free the image
-    Image sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    Image sudoku_image;
+    if (hexa)
+    {
+        sudoku_image = createHexaSudokuImage(grid, copy, IMAGE_PATH);
+    }   
+    else
+    {
+        sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
+    }
 
     freeGrid(grid, dimension); // Free grid
     freeGrid(copy, dimension); // Free copy
 
-    saveVerbose(verbose, &sudoku_image, output_folder, "Result", save, 0);
-    changeImageGUI(&sudoku_image, gui, 1, "Result", 1);
-
+    if (gui)
+    {
+        change_image(&sudoku_image, "selected_image");
+        edit_progress_bar(1, "Result");
+    }
+    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid",
+                save, 1);
     pthread_exit(NULL); // Exit thread
 }

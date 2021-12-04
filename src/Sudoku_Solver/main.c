@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     char output_path[1000];
     snprintf(output_path, sizeof(output_path), "%s.result", argv[1]);
 
-    saveGrid(grid, output_path, verbose);
+    saveGrid(grid, output_path, verbose, dim);
 
     // Create, save and free the image
     Image image = createSudokuImage(grid, copy, "", dim);
