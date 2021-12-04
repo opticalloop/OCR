@@ -95,3 +95,69 @@ void clearsquare(Image *image)
         }
     }
 }
+
+unsigned int __dfs(M,x,y){
+    M[x][y] =  1;
+    unsigned int lengraph = 0;
+    
+    if(x-1>=0 && y-1>=0 && M[x-1][y-1]==0)
+        lengraph = 1 + __dfs(M,x-1,y-1);
+    if(x>=0 && y-1>=0 && M[x][y-1]==0)
+        lengraph = 1 + __dfs(M,x,y-1);
+    if(x+1>28 && y-1>=0 && M[x+1][y-1]==0)
+        lengraph = 1 + __dfs(M,x+1,y-1);
+    if(x-1>=0 && y>=0 && M[x-1][y]==0)
+        lengraph = 1 + __dfs(M,x-1,y);
+    if(x+1>28 && y>=0 && M[x+1][y]==0)
+        lengraph = 1 + __dfs(M,x+1,y);
+    if(x-1>=0 && y+1>=0 && M[x-1][y+1]==0)
+        lengraph = 1 + __dfs(M,x-1,y+1);
+    if(x>=0 && y+1>=0 && M[x][y+1]==0)
+        lengraph = 1 + __dfs(M,x,y+1);
+    if(x+1>28 && y+1>=0 && M[x+1][y+1]==0)
+        lengraph = 1 + __dfs(M,x+1,y+1);
+
+    return lengraph
+}
+unsigned int max(unsigned int a, unsigned int b){
+    return a>b?a:b;
+}
+
+void to_clear(int[][] M, Image *image){
+    for (int i = 0; i < 28; i++)
+    {
+        for (int j = 0; j < 28; j++)
+        {
+            if(M[i][j]==1){
+                image[x][y].r = 255;
+                image[x][y].g = 255;
+                image[x][y].b = 255;
+            }
+
+void clear_imperfections(Image *image)
+{
+    int M[28][28];
+    unsigned int maxlen = 0;
+    for(unsigned int x = 0; x < 28; x++)
+    {
+        for(unsigned int y = 0; y < 28; y++)
+        {
+            M[x][y] = 0;
+        }
+    }
+
+    for(unsigned int x = 0; x < 28; x++)
+    {
+        for(unsigned int y = 0; y < 28; y++)
+        {
+            int[][] res = int[
+            if(M[x][y] == 0)
+            {
+                lengraph =  max(__dfs(M,x,y),maxlen);
+            }
+        }
+    }
+
+
+}
+
