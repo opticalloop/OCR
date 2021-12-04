@@ -149,6 +149,7 @@ void *OCR(void *Thread_args)
     // Segmentation
     split(&cropped, all_cases, save, output_folder, hexa);
 
+
     printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n");
     int val;
     for (unsigned int i = 0; i < dimension; i++)

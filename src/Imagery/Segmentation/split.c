@@ -7,8 +7,7 @@ void savesquare(Image *image, unsigned int iall, char *imagename, int hexa)
     int unit = iall % (hexa ? 16 : 9);
 
     snprintf(str, sizeof(str), "%s/3.%d_%d.bmp", imagename, dozen, unit);
-    saveImage(image, str);
-}
+
 
 void split(Image *image, Image seg[], int save, char *imagename, int hexa)
 {
@@ -19,6 +18,7 @@ void split(Image *image, Image seg[], int save, char *imagename, int hexa)
     const unsigned int yincrem = hexa ? height / 16 : height / 9;
 
     const unsigned int nbblock = hexa ? 256 : 81;
+
 
     SDL_Rect block;
     unsigned int iall = 0;
@@ -33,6 +33,7 @@ void split(Image *image, Image seg[], int save, char *imagename, int hexa)
                 block.y = y;
                 block.w = xincrem;
                 block.h = yincrem;
+
 
                 Image imagebis = cropImage(image, &block);
 
