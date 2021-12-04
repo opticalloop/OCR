@@ -144,7 +144,7 @@ void *OCR(void *Thread_args)
     Image all_cases[dimension * dimension];
     if (verbose && save)
     {
-        printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
+        printf("<-- 💾 Saving all %d digit to %s\n", hexa ? 256 : 81, output_folder);
     }
     // Segmentation
     split(&cropped, all_cases, save, output_folder, hexa);
@@ -163,6 +163,7 @@ void *OCR(void *Thread_args)
             {
                 val = 0;
             }
+            val = 0;
             grid[i][j] = val;
 
             // Free the case

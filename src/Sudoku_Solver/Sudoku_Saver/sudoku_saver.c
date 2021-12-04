@@ -30,11 +30,11 @@ void basicPrint(unsigned int **grid, unsigned int dimension)
             }
             if (grid[i][j] > 9)
             {
-                printf("%d", grid[i][j]);
+                printf("%c", grid[i][j] + 'A' - 10);
             }
             else
             {
-                printf(" %d", grid[i][j]);
+                printf("%d", grid[i][j]);
             }
         }
 
@@ -57,7 +57,7 @@ void readGrid(unsigned int **grid, char inputPath[], int verbose,
 
     if (verbose)
     {
-        printf("--> 📂 Reading %s\n", inputPath);
+        printf("--> 💾 Reading %s\n", inputPath);
     }
 
     char ch = 0;
@@ -73,6 +73,14 @@ void readGrid(unsigned int **grid, char inputPath[], int verbose,
         else if (ch > '0' && ch <= '9')
         {
             tempGrid[index] = ch - '0';
+        }
+        else if (ch >= 'A' && ch <= 'Z')
+        {
+            tempGrid[index] = ch - 'A' + 10;
+        }
+        else if (ch >= 'a' && ch <= 'z')
+        {
+            tempGrid[index] = ch - 'a' + 10;
         }
         else if (ch != '\n' && ch != '\0' && ch != ' ')
         {
@@ -120,18 +128,33 @@ void saveGrid(unsigned int **grid, char outputPath[], int verbose,
             }
             else
             {
-                fprintf(f, "%d", grid[i][j]);
+                if (grid[i][j] > 9)
+                {
+                    fprintf(f, "%c", grid[i][j] + 'A' - 10);
+                }
+                else
+                {
+                    fprintf(f, "%d", grid[i][j]);
+                }
             }
-            if (j == 2 || j == 5)
+            if ((dimension == 16) && (j == 3 || j == 7 || j == 11))
+            {
+                fprintf(f, " ");
+            }
+            else if ((dimension == 9) && (j == 2 || j == 5))
             {
                 fprintf(f, " ");
             }
         }
-        if (i != 8)
+        if (i != (dimension - 1))
         {
             fprintf(f, "\n");
         }
-        if (i == 2 || i == 5)
+        if ((dimension == 16) && (i == 3 || i == 7 || i == 11))
+        {
+            fprintf(f, "\n");
+        }
+        else if ((dimension == 9) && (i == 2 || i == 5))
         {
             fprintf(f, "\n");
         }
