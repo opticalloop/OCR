@@ -9,12 +9,12 @@
 
 #include "GUI/draw.h"
 #include "GUI/gui_utils.h"
-#include "Imagery/Utils/op.h"
-#include "Imagery/Utils/image.h"
-#include "NeuralNetwork/training.h"
 #include "Imagery/Detection/distortion_correction.h"
-#include "Sudoku_Solver/sudoku_solver.h"
+#include "Imagery/Utils/image.h"
+#include "Imagery/Utils/op.h"
+#include "NeuralNetwork/training.h"
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
+#include "Sudoku_Solver/sudoku_solver.h"
 #include "ocr.h"
 
 #pragma region "Image_management"
@@ -87,9 +87,9 @@ void cancel_nn(GtkWidget *widget, gpointer data);
 
 #pragma region "Terminal"
 
-void reset_terminal();
+void reset_terminal(char *terminal_id);
 
-void edit_terminal(char *string);
+void edit_terminal(char *terminal_id, char *string);
 
 #pragma endregion "Terminal"
 

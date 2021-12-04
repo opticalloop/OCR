@@ -43,6 +43,7 @@ void printVerbose(int verbose, int gui, char *message)
     }
     if (gui)
     {
-        edit_terminal(message);
+        edit_terminal("terminal_text",
+                      message); // TODO: change default name for terminal_id
     }
 }

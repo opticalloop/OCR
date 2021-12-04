@@ -492,9 +492,7 @@ void start_nn(GtkWidget *widget, gpointer data)
             return;
         }
     }
-
-    // start training
-    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+    reset_terminal("terminal_text");
     pthread_t t =
         train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
                      check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
@@ -549,11 +547,11 @@ void cancel_nn(GtkWidget *widget, gpointer data)
 
 #pragma region "Terminal"
 
-void reset_terminal()
+void reset_terminal(char *terminal_id)
 {
     // get text view
     GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, terminal_id));
 
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
@@ -562,11 +560,11 @@ void reset_terminal()
     gtk_text_buffer_set_text(text_buffer, "", -1);
 }
 
-void edit_terminal(char *string)
+void edit_terminal(char *terminal_id, char *string)
 {
     // get text view
     GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, terminal_id));
 
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
@@ -793,7 +791,8 @@ void *init_gui()
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
 
     // on resize window
-    g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
+    // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
+    // TODO: fix this
 
     // load UI
     gtk_widget_show_all(window); // show window
