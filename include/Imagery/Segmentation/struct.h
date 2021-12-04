@@ -47,7 +47,7 @@ typedef struct SquareList
     int len;
 } SquareList;
 
-int **initMatriceInt( int x, int y);
+int **initMatriceInt(int x, int y);
 
 void freeMatrice(int **matrice, size_t height);
 

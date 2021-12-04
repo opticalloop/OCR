@@ -193,7 +193,7 @@ void *train(void *args)
     Training_data *data = (Training_data *)args;
     const unsigned int epoch = data->epoch;
     const unsigned int nbHiddenLayers = data->nbHiddenLayers;
-    const unsigned int nbNodesPerHidden = 15; 
+    const unsigned int nbNodesPerHidden = 15;
     const int verbose = data->verbose;
     const int gui = data->gui;
     char *launch_path = data->launch_path;
@@ -235,10 +235,9 @@ void *train(void *args)
     // Init 0 expectation
 
     int zero_intput[NBINPUTS] = { 0.0 };
-    double zero_expected[NBOUTPUTS] = {
-        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-    };
+    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -378,7 +377,7 @@ void testTrain(Network *network)
         }
 
         // Compute image path
-        strcpy(str,  TEST_DATA_PATH);
+        strcpy(str, TEST_DATA_PATH);
         strcat(str, "/");
         strcat(str, in_file->d_name);
 
@@ -406,9 +405,11 @@ void testTrain(Network *network)
 
     for (unsigned int i = 1; i < NBOUTPUTS; i++)
     {
-        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value > temp)
+        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value
+            > temp)
         {
-            temp = network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
+            temp =
+                network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
             result = i;
         }
     }

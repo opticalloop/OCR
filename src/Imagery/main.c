@@ -9,11 +9,10 @@
 #include "Imagery/Detection/sobel.h"
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
-#include "Imagery/Segmentation/split.h"
 #include "Imagery/Segmentation/clearsquare.h"
+#include "Imagery/Segmentation/split.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
-
 
 int main(int argc, char *argv[])
 {
@@ -38,11 +37,18 @@ int main(int argc, char *argv[])
     int segment = 0;
     char *s_output_folder = "";
 
-    SDL_Surface* surface = load_image(input_path);
-    Image image = newImage(surface,0, surface->w, surface->h);
-    
+    SDL_Surface *surface = load_image(input_path);
+    Image image = newImage(surface, 0, surface->w, surface->h);
+
     grayscale(&image);
     blackandwhite(&image);
+    for (unsigned int x = 0; X < 28; i++)
+    {
+        for (unsigned int j = 0; j < 28; j++)
+        {
+            printf("x=%d, y=%d, isblack=%d\n", x, y, image->pixels[x][y].r);
+        }
+    }
     clear_imperfections(&image);
     saveImage(&image, output_path);
     freeImage(&image, 1);

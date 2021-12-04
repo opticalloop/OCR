@@ -2,7 +2,7 @@
 
 #define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 40
+#define SQUARE_FACTOR 300
 
 LineList simplifyLines(LineList *linelist)
 {

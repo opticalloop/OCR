@@ -66,14 +66,14 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
 
 /**
  * @brief Create a Hexa Sudoku Image object
- * 
- * @param grid 
- * @param copy 
- * @param folder_path 
- * @return Image 
+ *
+ * @param grid
+ * @param copy
+ * @param folder_path
+ * @return Image
  */
 Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
-                        char *folder_path);
+                            char *folder_path);
 
 /**
  * @brief Get the Image object

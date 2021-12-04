@@ -225,7 +225,7 @@ Image createSudokuImage(unsigned int **grid, unsigned int **copy,
 }
 
 Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
-                        char *folder_path)
+                            char *folder_path)
 {
     Image image = newImage(NULL, 0, 470, 470);
 
@@ -233,16 +233,16 @@ Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
     {
         for (unsigned int y = 0; y < 470; y++)
         {
-            if (x != 0 && x != 1 && x != 355 && x != 356 && x != 30 
-                 && x != 59 && x != 88 && x != 117 && x != 118 && x != 147 
-                 && x != 176 && x != 205 && x != 234 && x != 235 && x != 264 
-                 && x != 293 && x != 322 && x != 351 && x != 352 && x != 381 
-                 && x != 410 && x != 439 && x != 468 && x != 469
-                 && y != 0 && y != 1 && y != 355 && y != 356 && y != 30 
-                 && y != 59 && y != 88 && y != 117 && y != 118 && y != 147
-                 && y != 176 && y != 205 && y != 234 && y != 235 && y != 264
-                 && y != 293 && y != 322 && y != 351 && y != 352 && y != 381
-                 && y != 410 && y != 439 && y != 468 && y != 469)
+            if (x != 0 && x != 1 && x != 355 && x != 356 && x != 30 && x != 59
+                && x != 88 && x != 117 && x != 118 && x != 147 && x != 176
+                && x != 205 && x != 234 && x != 235 && x != 264 && x != 293
+                && x != 322 && x != 351 && x != 352 && x != 381 && x != 410
+                && x != 439 && x != 468 && x != 469 && y != 0 && y != 1
+                && y != 355 && y != 356 && y != 30 && y != 59 && y != 88
+                && y != 117 && y != 118 && y != 147 && y != 176 && y != 205
+                && y != 234 && y != 235 && y != 264 && y != 293 && y != 322
+                && y != 351 && y != 352 && y != 381 && y != 410 && y != 439
+                && y != 468 && y != 469)
             {
                 image.pixels[x][y].r = 255;
                 image.pixels[x][y].g = 255;
@@ -258,7 +258,8 @@ Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
     }
 
     // Coordonates
-    unsigned int Array[16] = { 2, 31, 60, 89, 119, 148, 177, 206, 236, 265, 294, 323, 353, 382, 411, 440};
+    unsigned int Array[16] = { 2,   31,  60,  89,  119, 148, 177, 206,
+                               236, 265, 294, 323, 353, 382, 411, 440 };
     unsigned int val;
 
     // SDL_Rect to copy to the actual image

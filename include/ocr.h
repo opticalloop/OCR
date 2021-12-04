@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "GUI/gui.h"
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/distortion_correction.h"
 #include "Imagery/Detection/houghtransform.h"
@@ -20,7 +21,6 @@
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
 #include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
 #include "Sudoku_Solver/sudoku_solver.h"
-#include "GUI/gui.h"
 #include "verbose.h"
 
 typedef struct Thread_argument
@@ -47,7 +47,7 @@ typedef struct Thread_argument
  * @return pthread_t*
  */
 pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
-                      int save, char *output_folder, int gui, int hexa);
+                     int save, char *output_folder, int gui, int hexa);
 
 /**
  * @brief
