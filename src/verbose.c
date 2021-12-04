@@ -35,7 +35,7 @@ void changeImageGUI(Image *image, int gui, double value, char *message,
     }
 }
 
-void printVerbose(int verbose, int gui, char *message)
+void printVerbose(int verbose, int gui, char *message, char *terminal)
 {
     if (verbose)
     {
@@ -43,7 +43,7 @@ void printVerbose(int verbose, int gui, char *message)
     }
     if (gui)
     {
-        edit_terminal("terminal_text",
-                      message); // TODO: change default name for terminal_id
+        edit_terminal(terminal,
+                      message);
     }
 }
