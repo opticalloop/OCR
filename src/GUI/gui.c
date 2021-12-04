@@ -733,11 +733,14 @@ void confirm_result()
 
     change_image(&sudoku_image, "result_image");
 
-    freeImage(&sudoku_image);
+    freeImage(&sudoku_image, 9);
 }
 
 #pragma endregion
-
+void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
+{
+    change_image(&image, "selected_image");
+}
 void *init_gui()
 {
     builder = NULL;
@@ -788,6 +791,9 @@ void *init_gui()
 
     GtkProgressBar *progress_bar =
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
+
+    // on resize window
+    g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
 
     // load UI
     gtk_widget_show_all(window); // show window
