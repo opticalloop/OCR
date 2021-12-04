@@ -15,18 +15,16 @@ static void checkFolderOutput(char *output_folder)
         char delete[200];
         snprintf(delete, sizeof(delete), "rm -rf %s", output_folder);
         if (system(delete))
-        {
-        }
+        {}
     }
     char directory[200];
     snprintf(directory, sizeof(directory), "mkdir %s", output_folder);
     if (system(directory))
-    {
-    }
+    {}
 }
 
 pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
-                      int save, char *output_folder, int gui, int hexa)
+                     int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
     SDL_Surface *surface = IMG_Load(intput_path);
@@ -133,9 +131,9 @@ void *OCR(void *Thread_args)
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
-    
-    saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
-                save, 0);
+
+    saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
+                0);
     changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
     printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n");
 
@@ -144,7 +142,8 @@ void *OCR(void *Thread_args)
     Image all_cases[dimension * dimension];
     if (verbose && save)
     {
-        printf("<-- 💾 Saving all %d digit to %s\n", hexa ? 256 : 81, output_folder);
+        printf("<-- 💾 Saving all %d digit to %s\n", hexa ? 256 : 81,
+               output_folder);
     }
     // Segmentation
     split(&cropped, all_cases, save, output_folder, hexa);
@@ -156,8 +155,8 @@ void *OCR(void *Thread_args)
         for (unsigned int j = 0; j < dimension; j++)
         {
             // Get the value of the case
-            val = getNetworkOutput(&network,
-                                    &(all_cases[i * dimension + j]), 0);
+            val =
+                getNetworkOutput(&network, &(all_cases[i * dimension + j]), 0);
 
             if (!hexa && val > 9)
             {
@@ -175,7 +174,7 @@ void *OCR(void *Thread_args)
 
     freeNetwork(&network);
     freeImage(&cropped, 0);
-    
+
     if (gui)
     {
         show_result(grid);
@@ -186,7 +185,8 @@ void *OCR(void *Thread_args)
     if (!isSolvable(grid, dimension))
     {
         printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n");
-        printf("\n    ❌ Please use the graphical interface to solve the grid easily\n");
+        printf("\n    ❌ Please use the graphical interface to solve the grid "
+               "easily\n");
         freeGrid(grid, dimension);
         return;
     }
@@ -219,7 +219,7 @@ void *OCR(void *Thread_args)
     if (hexa)
     {
         sudoku_image = createHexaSudokuImage(grid, copy, IMAGE_PATH);
-    }   
+    }
     else
     {
         sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
@@ -233,7 +233,6 @@ void *OCR(void *Thread_args)
         change_image(&sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
-    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid",
-                save, 1);
+    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid", save, 1);
     pthread_exit(NULL); // Exit thread
 }

@@ -596,7 +596,8 @@ void show_result(unsigned int **grid)
     change_image(&image, "selected_image1");
 
     // get grid
-    GtkGrid *grid_widget = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+    GtkGrid *grid_widget =
+        GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
     GtkStack *stack_result =
         GTK_STACK(gtk_builder_get_object(builder, "stack1"));
@@ -612,7 +613,8 @@ void show_result(unsigned int **grid)
         for (size_t j = 0; j < 9; j++)
         {
             // get input at i,j and set value
-            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
+            GtkEntry *entry =
+                GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
             char ch[40] = " ";
             if (grid[i][j] > 9)
             {
@@ -648,19 +650,19 @@ void confirm_result()
         for (int j = 0; j < dim; j++)
         {
             GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
-            
+
             str = gtk_entry_get_text(entry);
             // Str length is 1 or 2
             if (strlen(str) == 1)
             {
-                // Is it a digit 
+                // Is it a digit
                 if (str[0] >= '0' && str[0] <= '9')
                 {
-                    result[i][j] = (unsigned int) str[0] - '0';
+                    result[i][j] = (unsigned int)str[0] - '0';
                 }
                 else if (str[0] >= 'A' && str[0] <= 'G')
                 {
-                   result[i][j] = (unsigned int) str[0] - 'A' + 10;
+                    result[i][j] = (unsigned int)str[0] - 'A' + 10;
                 }
                 else
                 {
@@ -670,11 +672,13 @@ void confirm_result()
             }
             else if (strlen(str) == 2)
             {
-                result[i][j] = (unsigned int) (str[0] - '0') * 10 + (str[1] - '0');
+                result[i][j] =
+                    (unsigned int)(str[0] - '0') * 10 + (str[1] - '0');
             }
             else
             {
-                printf("Error : should write 1 or 2 digit long (1, 2, 3, 4, 5, 6, 7, 8, 9, to 16 with heca or digit notation)\n");
+                printf("Error : should write 1 or 2 digit long (1, 2, 3, 4, 5, "
+                       "6, 7, 8, 9, to 16 with heca or digit notation)\n");
                 return;
             }
         }
@@ -682,7 +686,7 @@ void confirm_result()
 
     if (!isSolvable(result, dim))
     {
-       // display error message
+        // display error message
         GtkWidget *dialog = gtk_message_dialog_new(
             GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
             GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
@@ -706,7 +710,7 @@ void confirm_result()
     if (dim == 16)
     {
         sudoku_image = createHexaSudokuImage(result, copy, IMAGE_PATH);
-    }   
+    }
     else
     {
         sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
