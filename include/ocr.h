@@ -20,6 +20,7 @@
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
 #include "Sudoku_Solver/Sudoku_Solved/sudoku_solved.h"
 #include "Sudoku_Solver/sudoku_solver.h"
+#include "GUI/gui.h"
 #include "verbose.h"
 
 typedef struct Thread_argument
@@ -45,7 +46,7 @@ typedef struct Thread_argument
  * @param hexa
  * @return pthread_t*
  */
-pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
+pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
                       int save, char *output_folder, int gui, int hexa);
 
 /**

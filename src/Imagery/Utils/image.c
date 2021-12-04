@@ -355,3 +355,19 @@ void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect)
         }
     }
 }
+
+void cloneImage(Image *src, Image *dst)
+{
+    const unsigned int width = src->width;
+    const unsigned int height = src->height;
+
+    for (unsigned int i = 0; i < width; i++)
+    {
+        for (unsigned int j = 0; j < height; j++)
+        {
+            dst->pixels[i][j].r = src->pixels[i][j].r;
+            dst->pixels[i][j].g = src->pixels[i][j].g;
+            dst->pixels[i][j].b = src->pixels[i][j].b;
+        }
+    }
+}
