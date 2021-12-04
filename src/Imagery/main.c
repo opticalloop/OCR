@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
     SDL_Surface* surface = load_image(input_path);
     Image image = newImage(surface,0, surface->w, surface->h);
     
-    newImage(&image);
     grayscale(&image);
     blackandwhite(&image);
     clear_imperfections(image);
