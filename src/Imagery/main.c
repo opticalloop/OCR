@@ -10,18 +10,13 @@
 #include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Segmentation/split.h"
+#include "Imagery/Segmentation/clearsquare.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/noise_reduction.h"
 
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
-    {
-        printHelp();
-        return EXIT_SUCCESS;
-    }
-
     char *input_path = argv[1];
     char *output_path = argv[2];
 
@@ -44,24 +39,14 @@ int main(int argc, char *argv[])
     char *s_output_folder = "";
 
     SDL_Surface* surface = load_image(input_path);
-    Image _image = newImage(surface,0, surface->w, surface->h);
+    Image image = newImage(surface,0, surface->w, surface->h);
     
-    newImage(image);
-    grayscale(image);
-    if(hexa){
-        Image seg[81];
-        split(&img, seg[81], 1, s_output_folder,hexa);
-        updateSurface(&img);
-        freeList(seg, 81);
-    }else{
-        Image seg[256];
-        split(&img, seg[256], 1, s_output_folder,hexa);
-        updateSurface(&img);
-        freeList(seg, 256);
-    }
-
-    saveImage(&img, output_path);
-    freeImage(&img, 1);
+    newImage(&image);
+    grayscale(&image);
+    blackandwhite(&image);
+    clear_imperfections(image);
+    saveImage(&image, output_path);
+    freeImage(&image, 1);
 
     return EXIT_SUCCESS;
 }

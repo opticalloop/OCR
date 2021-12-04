@@ -96,64 +96,58 @@ void clearsquare(Image *image)
     }
 }
 
-unsigned int __dfs(M,x,y,cur){
+int __dfs(int **M, int x, int y, int **cur){
     M[x][y] =  1;
     cur[x][y] = 1;
     unsigned int lengraph = 0;
     
     if(x-1>=0 && y-1>=0 && M[x-1][y-1]==0)
-        lengraph = 1 + __dfs(M,x-1,y-1);
+        lengraph = 1 + __dfs(M,x-1,y-1, cur);
     if(x>=0 && y-1>=0 && M[x][y-1]==0)
-        lengraph = 1 + __dfs(M,x,y-1);
+        lengraph = 1 + __dfs(M,x,y-1, cur);
     if(x+1>28 && y-1>=0 && M[x+1][y-1]==0)
-        lengraph = 1 + __dfs(M,x+1,y-1);
+        lengraph = 1 + __dfs(M,x+1,y-1, cur);
     if(x-1>=0 && y>=0 && M[x-1][y]==0)
-        lengraph = 1 + __dfs(M,x-1,y);
+        lengraph = 1 + __dfs(M,x-1,y, cur);
     if(x+1>28 && y>=0 && M[x+1][y]==0)
-        lengraph = 1 + __dfs(M,x+1,y);
+        lengraph = 1 + __dfs(M,x+1,y, cur);
     if(x-1>=0 && y+1>=0 && M[x-1][y+1]==0)
-        lengraph = 1 + __dfs(M,x-1,y+1);
+        lengraph = 1 + __dfs(M,x-1,y+1, cur);
     if(x>=0 && y+1>=0 && M[x][y+1]==0)
-        lengraph = 1 + __dfs(M,x,y+1);
+        lengraph = 1 + __dfs(M,x,y+1, cur);
     if(x+1>28 && y+1>=0 && M[x+1][y+1]==0)
-        lengraph = 1 + __dfs(M,x+1,y+1);
+        lengraph = 1 + __dfs(M,x+1,y+1, cur);
 
-    return lengraph
+    return lengraph;
 }
 
-void clear_matrice(int[][] M, Image *image){
-    for (int i = 0; i < 28; i++)
+void clear_matrice(int **M, Image *image){
+    for (int x = 0; x < 28; x++)
     {
-        for (int j = 0; j < 28; j++)
+        for (int y = 0; y < 28; y++)
         {
-            if(M[i][j]==1){
-                image[x][y].r = 255;
-                image[x][y].g = 255;
-                image[x][y].b = 255;
+            if(M[x][y]!=1){
+                updatePixelToSameValue(&(image->pixels[x][y]), 255);
             }
+        }
+    }
+}
 
 void clear_imperfections(Image *image)
 {
-    int M[28][28];
+    int **M = initMatriceInt(28, 28);
     unsigned int maxlen = 0;
-    for(unsigned int x = 0; x < 28; x++)
-    {
-        for(unsigned int y = 0; y < 28; y++)
-        {
-            M[x][y] = 0;
-        }
-    }
-
+    
     // the matrix who will keep the current graph connexe 
-    int cur[28][28];
+    int **cur = initMatriceInt(28, 28);
     //result matrix
-    int res[28][28];
+    int **res = initMatriceInt(28, 28);
 
     for(unsigned int x = 0; x < 28; x++)
     {
         for(unsigned int y = 0; y < 28; y++)
         {
-            //initialise the matrix
+            //reset the current matrix
             for(unsigned int i = 0; i < 28; i++)
             {
                 for(unsigned int j = 0; j < 28; j++)
@@ -179,6 +173,9 @@ void clear_imperfections(Image *image)
             }
         }
     }
-    clear_matrice(res,image);
+    clear_matrice( res, image);
+    freeMatriceInt(M, 28);
+    freeMatriceInt(cur, 28);
+    freeMatriceInt(res, 28);
 }
 
