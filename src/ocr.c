@@ -171,6 +171,9 @@ void *OCR(void *Thread_args)
     }
 
     basicPrint(grid, dimension);
+
+    freeNetwork(&network);
+    freeImage(&cropped, 0);
     
     if (gui)
     {
@@ -181,18 +184,20 @@ void *OCR(void *Thread_args)
 
     if (!isSolvable(grid, dimension))
     {
-        printf("\n    ⚠️ The grid is not solvable\n");
+        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n");
+        printf("\n    ❌ Please use the graphical interface to solve the grid easily\n");
+        freeGrid(grid, dimension);
+        return;
     }
     else
     {
-        printf("\n    🎉 The grid is solvable\n");
+        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n");
     }
 
     unsigned int **copy = allocGrid(dimension);
     // Copy array to have different color when saving the image
     copyArray(grid, copy, dimension);
 
-    printVerbose(verbose, 0, "    ✅ 3.5 Grid is solvable\n");
     printVerbose(verbose, 0, "\n    🎲 4 Solving sudoku grid\n");
     printVerbose(verbose, 0, "    🔍 4.2 Solving grid\n");
 
