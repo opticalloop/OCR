@@ -20,7 +20,7 @@
 
 #define NBINPUTS 28 * 28
 #define NBOUTPUTS 17
-#define NBIMAGES 68000
+#define NBIMAGES 70000
 
 typedef struct Training_data
 {
