@@ -193,7 +193,7 @@ void *train(void *args)
     Training_data *data = (Training_data *)args;
     const unsigned int epoch = data->epoch;
     const unsigned int nbHiddenLayers = data->nbHiddenLayers;
-    const unsigned int nbNodesPerHidden = 30; 
+    const unsigned int nbNodesPerHidden = 15; 
     const int verbose = data->verbose;
     const int gui = data->gui;
     char *launch_path = data->launch_path;
