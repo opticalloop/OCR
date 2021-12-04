@@ -96,8 +96,9 @@ void clearsquare(Image *image)
     }
 }
 
-unsigned int __dfs(M,x,y){
+unsigned int __dfs(M,x,y,cur){
     M[x][y] =  1;
+    cur[x][y] = 1;
     unsigned int lengraph = 0;
     
     if(x-1>=0 && y-1>=0 && M[x-1][y-1]==0)
@@ -119,11 +120,8 @@ unsigned int __dfs(M,x,y){
 
     return lengraph
 }
-unsigned int max(unsigned int a, unsigned int b){
-    return a>b?a:b;
-}
 
-void to_clear(int[][] M, Image *image){
+void clear_matrice(int[][] M, Image *image){
     for (int i = 0; i < 28; i++)
     {
         for (int j = 0; j < 28; j++)
@@ -146,18 +144,41 @@ void clear_imperfections(Image *image)
         }
     }
 
+    // the matrix who will keep the current graph connexe 
+    int cur[28][28];
+    //result matrix
+    int res[28][28];
+
     for(unsigned int x = 0; x < 28; x++)
     {
         for(unsigned int y = 0; y < 28; y++)
         {
-            int[][] res = int[
+            //initialise the matrix
+            for(unsigned int i = 0; i < 28; i++)
+            {
+                for(unsigned int j = 0; j < 28; j++)
+                {
+                    cur[i][j] = 0;
+                }
+            }
+
             if(M[x][y] == 0)
             {
-                lengraph =  max(__dfs(M,x,y),maxlen);
+                unsigned int len = __dfs(M,x,y,res);
+                if ( len > maxlen){
+                    maxlen = len;
+                    //copy the current graph in the result matrix
+                    for(unsigned int i = 0; i < 28; i++)
+                    {
+                        for(unsigned int j = 0; j < 28; j++)
+                        {
+                            res[i][j] = cur[i][j];
+                        }
+                    }
+                }
             }
         }
     }
-
-
+    clear_matrice(res,image);
 }
 
