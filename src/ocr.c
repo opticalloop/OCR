@@ -204,8 +204,6 @@ void *OCR(void *Thread_args)
     {
         printf("No solution\n");
         freeGrid(grid, dimension);
-        freeImage(&cropped, 0);
-        freeNetwork(&network);
         pthread_exit(NULL);
     }
 

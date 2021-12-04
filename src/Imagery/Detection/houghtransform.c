@@ -11,12 +11,6 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     // Surface without sobel filter
     Image tempImage = copyImage(drawImage, 0);
 
-    // Directly free
-    if (!save)
-    {
-        freeImage(drawImage, 0);
-    }
-
     // Call major fonction
     LineList list =
         houghtransform(image, drawImage, verbose, save, output_folder);
