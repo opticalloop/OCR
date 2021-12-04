@@ -2,6 +2,7 @@
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
 #define DATA_PATH "src/NeuralNetwork/data.txt"
+#define IMAGE_PATH "src/Sudoku_Solver/Sudoku_Saver/Images"
 
 #define IMAGE_SAVE_PATH "temp.bmp"
 #define IMAGE_TEMP_PATH "temp2.bmp"
@@ -604,7 +605,7 @@ void show_result(unsigned int **grid)
     // copy child of grid 0 0
     GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
 
-    // grid = allocGrid(9);
+    grid = allocGrid(9);
 
     for (size_t i = 0; i < 9; i++)
     {
@@ -625,7 +626,7 @@ void show_result(unsigned int **grid)
             gtk_entry_set_text(entry, ch);
         }
     }
-    // freeGrid(grid, 9);
+    freeGrid(grid, 9);
 }
 
 void confirm_result()
@@ -679,11 +680,48 @@ void confirm_result()
         }
     }
 
+    if (!isSolvable(result, dim))
+    {
+       // display error message
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+            "The grid is not solvable, please correct the grid");
+        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+        gtk_widget_destroy(dialog); // destroy dialog
+    }
+
+    unsigned int **copy = allocGrid(dim);
+    // Copy array to have different color when saving the image
+    copyArray(result, copy, dim);
+
+    printf("\n    📊 Solving sudoku\n");
+
     solveSuduko(result, 0, 0, dim);
 
-    gtk_stack_set_visible_child_name(stack_2, "page_result");
+    saveGrid(result, "grid.result", 1, dim);
 
-    freeGrid(result, dim);
+    // Create, save and free the image
+    Image sudoku_image;
+    if (dim == 16)
+    {
+        sudoku_image = createHexaSudokuImage(result, copy, IMAGE_PATH);
+    }   
+    else
+    {
+        sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
+    }
+
+    freeGrid(result, dim); // Free grid
+    freeGrid(copy, dim); // Free copy
+
+    change_image(&sudoku_image, "selected_image");
+    edit_progress_bar(1, "Result");
+
+    // TODO : change the way we save image
+    saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
+
+    gtk_stack_set_visible_child_name(stack_2, "page_result");
 }
 
 #pragma endregion
