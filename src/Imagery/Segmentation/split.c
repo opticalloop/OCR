@@ -7,7 +7,7 @@ void savesquare(Image *image, unsigned int iall, char *imagename, int hexa)
     int unit = iall % (hexa ? 16 : 9);
 
     snprintf(str, sizeof(str), "%s/3.%d_%d.bmp", imagename, dozen, unit);
-
+}
 
 void split(Image *image, Image seg[], int save, char *imagename, int hexa)
 {

@@ -413,32 +413,38 @@ static void analyzeNN(int argc, char **argv)
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-    if (argc == 1)
-    {
-        printHelp();
-        return EXIT_SUCCESS;
-    }
+    char *input_path = argv[1];
+    char *output_path = argv[2];
 
-    if (!strcmp(argv[1], "ocr"))
-    {
-        analyzeOCR(argc, argv);
-    }
-    else if (!strcmp(argv[1], "nn"))
-    {
-        analyzeNN(argc, argv);
-    }
-    else if (!strcmp(argv[1], "--help"))
-    {
-        printHelp();
-    }
-    else
-    {
-        checkError(1,
-                   "⛔ The first argument should be ocr or nn (Neural "
-                   "network)\n See --help for more");
-    }
+    int verbose = 0;
+
+    int preprocessing = 0;
+    char *p_output_folder = "";
+    int hexa = 1;
+
+    int _rotate = 0;
+    double degree = 0;
+
+    int detect = 0;
+
+    int _resize = 0;
+    int resize_width = 0;
+    int resize_height = 0;
+
+    int segment = 0;
+    char *s_output_folder = "";
+
+    SDL_Surface* surface = load_image(input_path);
+    Image image = newImage(surface,0, surface->w, surface->h);
+    SDL_FreeSurface(surface);
+
+    grayscale(&image);
+    blackandwhite(&image);
+    clear_imperfections(&image);
+    saveImage(&image, output_path);
+    freeImage(&image, 1);
 
     return EXIT_SUCCESS;
 }

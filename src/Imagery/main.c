@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     
     grayscale(&image);
     blackandwhite(&image);
-    clear_imperfections(image);
+    clear_imperfections(&image);
     saveImage(&image, output_path);
     freeImage(&image, 1);
 

@@ -96,27 +96,34 @@ void clearsquare(Image *image)
     }
 }
 
-int __dfs(int **M, int x, int y, int **cur){
+int __dfs(int **M, int x, int y, int **cur, Image *image){
     M[x][y] =  1;
     cur[x][y] = 1;
     unsigned int lengraph = 0;
     
-    if(x-1>=0 && y-1>=0 && M[x-1][y-1]==0)
-        lengraph = 1 + __dfs(M,x-1,y-1, cur);
-    if(x>=0 && y-1>=0 && M[x][y-1]==0)
-        lengraph = 1 + __dfs(M,x,y-1, cur);
-    if(x+1>28 && y-1>=0 && M[x+1][y-1]==0)
-        lengraph = 1 + __dfs(M,x+1,y-1, cur);
-    if(x-1>=0 && y>=0 && M[x-1][y]==0)
-        lengraph = 1 + __dfs(M,x-1,y, cur);
-    if(x+1>28 && y>=0 && M[x+1][y]==0)
-        lengraph = 1 + __dfs(M,x+1,y, cur);
-    if(x-1>=0 && y+1>=0 && M[x-1][y+1]==0)
-        lengraph = 1 + __dfs(M,x-1,y+1, cur);
-    if(x>=0 && y+1>=0 && M[x][y+1]==0)
-        lengraph = 1 + __dfs(M,x,y+1, cur);
-    if(x+1>28 && y+1>=0 && M[x+1][y+1]==0)
-        lengraph = 1 + __dfs(M,x+1,y+1, cur);
+    if(x-1>=0 && x-1 < 28 && y-1>=0 && y-1 < 28 && M[x-1][y-1]==0 && image->pixels[x-1][y-1].r == 0)
+        lengraph = 1 + __dfs(M,x-1,y-1, cur, image);
+
+    if(x>=0 && x < 28 && y-1>=0 && y < 28 && M[x][y-1]==0 && image->pixels[x][y-1].r == 0)
+        lengraph = 1 + __dfs(M,x,y-1, cur, image);
+
+    if(x+1>=0 && x+1<28&& y-1>=0 &&  y-1 < 28 && M[x+1][y-1]==0 && image->pixels[x+1][y-1].r == 0)
+        lengraph = 1 + __dfs(M,x+1,y-1, cur, image);
+
+    if(x-1>=0 && x-1 < 28 && y>=0 && y < 28 && M[x-1][y]==0 && image->pixels[x-1][y].r == 0)
+        lengraph = 1 + __dfs(M,x-1,y, cur, image);
+
+    if(x+1 > 0 && x+1<28 && y>=0 && y < 28 && M[x+1][y]==0 && image->pixels[x+1][y].r == 0)
+        lengraph = 1 + __dfs(M,x+1,y, cur, image);
+
+    if(x-1>=0 && x-1 < 28 && y+1>=0 && y+1 < 28 && M[x-1][y+1]==0 && image->pixels[x-1][y+1].r == 0)
+        lengraph = 1 + __dfs(M,x-1,y+1, cur, image);
+
+    if(x>=0 && x<28 && y+1 > 0 && y+1<28 && M[x][y+1]==0 && image->pixels[x][y+1].r == 0)
+        lengraph = 1 + __dfs(M,x,y+1, cur, image);
+
+    if(x+1 > 0 && x+1<28 && y+1>=0 && y+1<28 && M[x+1][y+1]==0 && image->pixels[x+1][y+1].r == 0)
+        lengraph = 1 + __dfs(M,x+1,y+1, cur, image);
 
     return lengraph;
 }
@@ -139,7 +146,7 @@ void clear_imperfections(Image *image)
     unsigned int maxlen = 0;
     
     // the matrix who will keep the current graph connexe 
-    int **cur = initMatriceInt(28, 28);
+    int **cur = initMatriceInt(28, 28); 
     //result matrix
     int **res = initMatriceInt(28, 28);
 
@@ -156,9 +163,9 @@ void clear_imperfections(Image *image)
                 }
             }
 
-            if(M[x][y] == 0)
+            if(M[x][y] == 0 && image->pixels[x][y].r == 0)
             {
-                unsigned int len = __dfs(M,x,y,res);
+                unsigned int len = __dfs(M,x,y,cur,image);
                 if ( len > maxlen){
                     maxlen = len;
                     //copy the current graph in the result matrix
@@ -173,7 +180,7 @@ void clear_imperfections(Image *image)
             }
         }
     }
-    clear_matrice( res, image);
+    clear_matrice(res, image);
     freeMatriceInt(M, 28);
     freeMatriceInt(cur, 28);
     freeMatriceInt(res, 28);
