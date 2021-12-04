@@ -1,6 +1,6 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.3
+#define THRESHOLD 0.4
 
 Image detection(Image *image, Image *drawImage, int verbose, int save,
                 char *output_folder, double four_angles[4], int gui)
@@ -9,13 +9,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     const unsigned int h = image->height;
 
     // Surface without sobel filter
-    Image tempImage = copyImage(image, 0);
-
-    // Directly free
-    if (!save)
-    {
-        freeImage(drawImage, 0);
-    }
+    Image tempImage = copyImage(drawImage, 0);
 
     // Call major fonction
     LineList list =
@@ -24,7 +18,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
                 0);
     changeImageGUI(drawImage, gui, 0.45, "Hough all lines", 1);
-    printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
+    printVerbose(verbose, 0, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
 
@@ -58,16 +52,16 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     if (verbose)
         printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
                resultingList.maxTheta);
-    if ((angleRounded >= 88 && angleRounded <= 92)
-        || (angleRounded >= 0 && angleRounded <= 3))
+    if ((angleRounded >= 85 && angleRounded <= 95)
+        || (angleRounded >= 0 && angleRounded <= 5))
 
     {
-        printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
+        printVerbose(verbose, 0, "    📐 2.4.1 Do not need to rotate image\n");
         four_angles[0] = 0;
     }
     else
     {
-        printVerbose(verbose, "    📐 2.4.1 Rotating image\n");
+        printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n");
         four_angles[0] = angleRounded;
         rotateAll(&tempImage, &resultingList, angleRounded);
     }
@@ -94,7 +88,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     // FINDING SQUARES
 
-    printVerbose(verbose, "    📦 2.5 Finding all squares\n");
+    printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n");
 
     // FIND ALL SQUARES
     SquareList squares;
@@ -118,7 +112,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // SORTING SQUARES
-    printVerbose(verbose, "    📉 2.6 Finding the predominating square\n");
+    printVerbose(verbose, 0, "    📉 2.6 Finding the predominating square\n");
 
     Square lastSquare = sortSquares(&squares, image);
 
@@ -131,32 +125,18 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
                     "2.7_Hough_last_square", save, 0);
         changeImageGUI(&_lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
-
-    // GETTING MAX SQUARE
-
-    printVerbose(verbose, "    📋 2.7 Computing cropped image\n");
-
-    // Get square dimension
-    int l1 = getLineLength(&(lastSquare.top));
-    int l3 = getLineLength(&(lastSquare.right));
-
-    SDL_Rect rect;
-    Dot dot = getBetterCorner(&lastSquare);
-    rect.x = dot.X;
-    rect.y = dot.Y;
-    rect.w = l1;
-    rect.h = l3;
-
     // Free square
     free(squares.squares);
-
     free(resultingList.lines);
 
+    // Correc perspective and crop
+    Image img =
+        correct_perspective(&tempImage, &lastSquare, verbose, output_folder);
+
     // Save square to surface
-    Image res = cropImage(image, &rect);
     freeImage(&tempImage, 0);
 
-    return res;
+    return img;
 }
 
 LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
@@ -192,7 +172,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         arrThetas[index] = val;
     }
 
-    printVerbose(verbose, "    🎲 2.2.1 Computing cos and sin array\n");
+    printVerbose(verbose, 0, "    🎲 2.2.1 Computing cos and sin array\n");
     // Create a save of cos and sin value for each theta, to optimize
     // performance.
     double *saveCos = calloc(nbTheta + 1, sizeof(double));
@@ -207,12 +187,15 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         saveSin[theta] = sin(arrThetas[theta]);
     }
 
-    printVerbose(verbose, "    📥 2.2.2 Filling accumulator\n");
+    printVerbose(verbose, 0, "    📥 2.2.2 Filling accumulator\n");
     unsigned int **accumulator = initMatrice(nbTheta + 1, nbRho + 1);
 
     // We intialize the accumulator with all the value
     // In the same time, we search for the max value in the accumulator
+
     unsigned int max = 0;
+    double rho;
+    int croppedRho;
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
@@ -221,8 +204,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
             {
                 for (int theta = 0; theta <= nbTheta; theta++)
                 {
-                    double rho = x * saveCos[theta] + y * saveSin[theta];
-                    int croppedRho = rho + diagonal;
+                    rho = x * saveCos[theta] + y * saveSin[theta];
+                    croppedRho = rho + diagonal;
                     accumulator[croppedRho][theta]++;
                     if (accumulator[croppedRho][theta] > max)
                     {
@@ -263,7 +246,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     int prev_theta = 0, prev_rho = 0;
     int boolIsIncreasing = 1;
 
-    printVerbose(verbose, "    📜 2.2.5 Drawing on image\n");
+    printVerbose(verbose, 0, "    📜 2.2.5 Drawing on image\n");
     Pixel pixel = { .r = 40, .g = 40, .b = 200 };
 
     for (int theta = 0; theta <= nbTheta; theta++)

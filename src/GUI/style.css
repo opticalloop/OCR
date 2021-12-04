@@ -18,6 +18,7 @@ window button {
     border: 1px solid #794000;
     background:rgb(189, 120, 10);
 }
+
 .left_panel button:disabled {
     /* background-color: rgb(255, 136, 0); */
     border: 1px solid #794000;
@@ -38,10 +39,39 @@ window button {
     /* animation-iteration-count: infinite; */
     
 }
+
+
 .right_panel {
     background-color: rgb(16, 16, 42);
     /* border-radius: 10px; */
     padding: 30px;
+}
+.right_panel button:hover {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #794000;
+    background:rgb(189, 120, 10);
+}
+.right_panel spinbutton {
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    border: 1px solid #ff8800;
+    color: white;
+}
+.right_panel spinbutton button {
+    background-color: #ff8800;
+    border-radius: 0px;
+    /* border: 1px solid red; */
+    color: white;
+}
+.right_panel .terminal{
+    background-color: rgb(38, 38, 47);
+    border-radius: 10px;
+    /* color: white; */
+}
+.right_panel .terminal text{
+    background-color: rgb(38, 38, 47);
+    border-radius: 10px;
+    /* color: white; */
 }
 .sudoku_image {
 

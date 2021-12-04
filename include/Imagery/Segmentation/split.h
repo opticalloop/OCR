@@ -12,31 +12,25 @@
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/op.h"
 
-/*
- *  Summary:
- *      save the block taken from the big image
+
+/**
+ * @brief
  *
- *  Params:
- *      *image: the square taken from the big image
- *      iall: the position of the square in the grid to know how to name the
- * file *imagename: name of the big image
- *
- *  Return:
- *      Nothing it save directly in a folder
- *
+ * @param image
+ * @param iall
+ * @param imagename
+ * @param hexa
  */
 void savesquare(Image *image, unsigned int iall, char *imagename, int hexa);
 
-/*
- *  Summary:
- *      Split the image in 81 blocks
+/**
+ * @brief
  *
- *  Params:
- *      *image: The image split
- *
- *  Return:
- *      Nothing save is done directly and array is modify directly in the
- * function
+ * @param image
+ * @param seg
+ * @param save
+ * @param imagename
+ * @param hexa
  */
 void split(Image *image, Image seg[], int save, char *imagename, int hexa);
 

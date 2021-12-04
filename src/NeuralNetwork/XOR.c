@@ -44,7 +44,7 @@ void launchXOR(unsigned int epoch, unsigned int nbHiddenLayers,
     }
     else
     {
-        launchWeights(network, launch_path, verbose);
+        launchWeights(network, launch_path, verbose, 0);
     }
 
     double errorRate = 0.0;

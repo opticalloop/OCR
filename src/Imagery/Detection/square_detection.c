@@ -2,7 +2,7 @@
 
 #define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 50
+#define SQUARE_FACTOR 40
 
 LineList simplifyLines(LineList *linelist)
 {
@@ -125,15 +125,17 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     if ((line1->xEnd - line1->xStart) != 0
         && (line2->xEnd - line2->xStart) != 0)
     {
-        int directCoeff1 =
-            (line1->yEnd - line1->yStart) / (line1->xEnd - line1->xStart);
-        int directCoeff2 =
-            (line2->yEnd - line2->yStart) / (line2->xEnd - line2->xStart);
+        double directCoeff1 = ((double)line1->yEnd - (double)line1->yStart)
+            / ((double)line1->xEnd - (double)line1->xStart);
+        double directCoeff2 = ((double)line2->yEnd - (double)line2->yStart)
+            / ((double)line2->xEnd - (double)line2->xStart);
 
-        int ordOrigin1 = line1->yStart - directCoeff1 * line1->xStart;
-        int ordOrigin2 = line2->yStart - directCoeff2 * line2->xStart;
+        double ordOrigin1 = (double)line1->yStart
+            - (double)directCoeff1 * (double)line1->xStart;
+        double ordOrigin2 = (double)line2->yStart
+            - (double)directCoeff2 * (double)line2->xStart;
 
-        if ((directCoeff1 - directCoeff2) != 0)
+        if (((int)directCoeff1 - (int)directCoeff2) != 0)
         {
             int x = (ordOrigin1 - ordOrigin2) / (directCoeff2 - directCoeff1);
             int y = directCoeff1 * (ordOrigin2 - ordOrigin1)
@@ -141,11 +143,10 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
                 + ordOrigin1;
 
             // In degree
-            int angleDiff = abs(radian_To_Degree(line1->theta)
-                                - radian_To_Degree(line2->theta));
+            double angleDiff = abs(radian_To_Degree(line1->theta)
+                                   - radian_To_Degree(line2->theta));
 
-            if (x >= 0 && x < width && y >= 0 && y < height && angleDiff > 85
-                && angleDiff < 95)
+            if (x >= 0 && x < width && y >= 0 && y < height)
             {
                 dot.X = x;
                 dot.Y = y;
@@ -240,6 +241,9 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                     {
                                         continue;
                                     }
+
+                                    compute_Square(&square);
+
                                     squareList.squares = realloc(
                                         squareList.squares,
                                         (nbSquares + 1) * sizeof(Square));
@@ -310,13 +314,11 @@ Square sortSquares(SquareList *squareList, Image *image)
 {
     const unsigned int len = squareList->len;
     Square temp = squareList->squares[0];
-    int tempFactor =
-        getLineLength(&(temp.bottom)) * getLineLength(&(temp.right));
+    int tempFactor = getPerimeter(&temp);
     for (unsigned int i = 1; i < len; i++)
     {
         Square square = squareList->squares[i];
-        int factor =
-            getLineLength(&(square.bottom)) * getLineLength(&(square.right));
+        int factor = getPerimeter(&square);
         if (factor > tempFactor) // && canBeSudokuGrid(&square, image))
         {
             tempFactor = factor;
@@ -379,7 +381,7 @@ int canBeSudokuGrid(Square *square, Image *image)
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness)
 {
-    Pixel color = { .r = 0, .g = 255, .b = 0 };
+    Pixel color = { .r = 255, .g = 0, .b = 255 };
     draw_line(image, width, height, &(square->left), &color, thickness, 1);
     draw_line(image, width, height, &(square->bottom), &color, thickness, 1);
     draw_line(image, width, height, &(square->top), &color, thickness, 1);
@@ -406,4 +408,192 @@ Dot getBetterCorner(Square *square)
         dot.Y = square->left.yStart;
     }
     return dot;
+}
+
+double getPerimeter(Square *square)
+{
+    // Get perimeter of the square
+    return getLineLength(&(square->left)) + getLineLength(&(square->right))
+        + getLineLength(&(square->top)) + getLineLength(&(square->bottom));
+}
+
+// Reorder the 4 points of the square
+void compute_Square(Square *square)
+{
+    Dot dot1 = { .X = square->top.xStart, .Y = square->top.yStart };
+    Dot dot2 = { .X = square->right.xStart, .Y = square->right.yStart };
+    Dot dot3 = { .X = square->bottom.xStart, .Y = square->bottom.yStart };
+    Dot dot4 = { .X = square->left.xStart, .Y = square->left.yStart };
+
+    // Compute addition
+    int cord1 = dot1.X + dot1.Y;
+    int cord2 = dot2.X + dot2.Y;
+    int cord3 = dot3.X + dot3.Y;
+    int cord4 = dot4.X + dot4.Y;
+
+    int mark[4] = { 0, 0, 0, 0 };
+    int index = 0;
+
+    // Compare them and get all dot
+    int min = cord1;
+    Dot topLeft = dot1;
+    if (cord2 < min)
+    {
+        min = cord2;
+        topLeft = dot2;
+        index = 1;
+    }
+    if (cord3 < min)
+    {
+        min = cord3;
+        topLeft = dot3;
+        index = 2;
+    }
+    if (cord4 < min)
+    {
+        min = cord4;
+        topLeft = dot4;
+        index = 3;
+    }
+    mark[index] = 1;
+
+    // Compute max
+    int max = cord1;
+    Dot bottomRight = dot1;
+    index = 0;
+    if (cord2 > max)
+    {
+        max = cord2;
+        bottomRight = dot2;
+        index = 1;
+    }
+    if (cord3 > max)
+    {
+        max = cord3;
+        bottomRight = dot3;
+        index = 2;
+    }
+    if (cord4 > max)
+    {
+        max = cord4;
+        bottomRight = dot4;
+        index = 3;
+    }
+    mark[index] = 1;
+
+    Dot topRight = dot1;
+    Dot bottomLeft = dot1;
+    if (mark[0] == 0 && mark[1] == 0)
+    {
+        if (dot1.X < dot2.X)
+        {
+            bottomLeft = dot1;
+            topRight = dot2;
+        }
+        else
+        {
+            bottomLeft = dot2;
+            topRight = dot1;
+        }
+    }
+
+    if (mark[0] == 0 && mark[2] == 0)
+    {
+        if (dot1.X < dot3.X)
+        {
+            bottomLeft = dot1;
+            topRight = dot3;
+        }
+        else
+        {
+            bottomLeft = dot3;
+            topRight = dot1;
+        }
+    }
+
+    if (mark[0] == 0 && mark[3] == 0)
+    {
+        if (dot1.X < dot4.X)
+        {
+            bottomLeft = dot1;
+            topRight = dot4;
+        }
+        else
+        {
+            bottomLeft = dot4;
+            topRight = dot1;
+        }
+    }
+
+    if (mark[1] == 0 && mark[2] == 0)
+    {
+        if (dot2.X < dot3.X)
+        {
+            bottomLeft = dot2;
+            topRight = dot3;
+        }
+        else
+        {
+            bottomLeft = dot3;
+            topRight = dot2;
+        }
+    }
+
+    if (mark[1] == 0 && mark[3] == 0)
+    {
+        if (dot2.X < dot4.X)
+        {
+            bottomLeft = dot2;
+            topRight = dot4;
+        }
+        else
+        {
+            bottomLeft = dot4;
+            topRight = dot2;
+        }
+    }
+
+    if (mark[2] == 0 && mark[3] == 0)
+    {
+        if (dot3.X < dot4.X)
+        {
+            bottomLeft = dot3;
+            topRight = dot4;
+        }
+        else
+        {
+            bottomLeft = dot4;
+            topRight = dot3;
+        }
+    }
+
+    // Set each start and end point of the line in the square
+    square->top.xStart = topLeft.X;
+    square->top.yStart = topLeft.Y;
+    square->top.xEnd = topRight.X;
+    square->top.yEnd = topRight.Y;
+
+    // printf("Top: (%d, %d)\n", square->top.xStart, square->top.yStart);
+
+    square->right.xStart = topRight.X;
+    square->right.yStart = topRight.Y;
+    square->right.xEnd = bottomRight.X;
+    square->right.yEnd = bottomRight.Y;
+
+    // printf("Right: (%d, %d)\n", square->right.xStart, square->right.yStart);
+
+    square->bottom.xStart = bottomRight.X;
+    square->bottom.yStart = bottomRight.Y;
+    square->bottom.xEnd = bottomLeft.X;
+    square->bottom.yEnd = bottomLeft.Y;
+
+    // printf("Bottom: (%d, %d)\n", square->bottom.xStart,
+    // square->bottom.yStart);
+
+    square->left.xStart = bottomLeft.X;
+    square->left.yStart = bottomLeft.Y;
+    square->left.xEnd = topLeft.X;
+    square->left.yEnd = topLeft.Y;
+
+    // printf("Left: (%d, %d)\n\n", square->left.xStart, square->left.yStart);
 }

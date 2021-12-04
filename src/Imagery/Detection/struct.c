@@ -27,3 +27,9 @@ void freeMatrice(unsigned int **matrice, size_t height)
     }
     free(matrice);
 }
+
+void setSquarePoint(Line *point, unsigned int x, unsigned int y)
+{
+    point->xStart = x;
+    point->yStart = y;
+}

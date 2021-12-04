@@ -1,7 +1,7 @@
 CC = gcc -Iinclude/
 
 CPPFLAGS = `pkg-config --cflags sdl gtk+-3.0` -MMD -D__NO_INLINE__
-CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address -Wno-unknown-pragmas
 LDLFLAGS = -lm -lpthread
 LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
 
@@ -45,11 +45,11 @@ format:
 
 test:
 	./main ocr src/Imagery/image_01.jpeg -v -S output_1 \
-	|| ./main ocr src/Imagery/image_02.jpeg -v -S output_2 \
-	|| ./main ocr src/Imagery/image_03.jpeg -v -S output_3 \
-	|| ./main ocr src/Imagery/image_04.jpeg -v -S output_4 \
-	|| ./main ocr src/Imagery/image_05.jpeg -v -S output_5 \
-	|| ./main ocr src/Imagery/image_06.jpeg -v -S output_6
+	&& ./main ocr src/Imagery/image_02.jpeg -v -S output_2 \
+	&& ./main ocr src/Imagery/image_03.jpeg -v -S output_3 \
+	&& ./main ocr src/Imagery/image_04.jpeg -v -S output_4 \
+	&& ./main ocr src/Imagery/image_05.jpeg -v -S output_5 \
+	&& ./main ocr src/Imagery/image_06.jpeg -v -S output_6
 
 # Clean all trash files
 clean:

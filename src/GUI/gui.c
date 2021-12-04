@@ -1,7 +1,14 @@
 #include "GUI/gui.h"
 
 #define WEIGHTS_PATH "src/NeuralNetwork/Weights/w.data"
-#define SAVE_PATH "temp.bmp"
+#define DATA_PATH "src/NeuralNetwork/data.txt"
+#define IMAGE_PATH "src/Sudoku_Solver/Sudoku_Saver/Images"
+
+#define IMAGE_SAVE_PATH "temp.bmp"
+#define IMAGE_TEMP_PATH "temp2.bmp"
+
+Image image;
+Image temp_image;
 
 GtkBuilder *builder;
 gchar *filename;
@@ -9,30 +16,17 @@ GtkWidget *window = NULL;
 GtkStack *stack;
 GtkStack *stack_2;
 pthread_t *thread;
-pthread_t *thread_2;
+pthread_t *thread_neural_network;
 int processing = 0;
 int is_weights_available = 0;
-float rotation_value = 0;
-float tmp_rotation_value = 0;
-
-Image *image;
-Image *temp_image;
+double rotation_value = 0;
+double tmp_rotation_value = 0;
 
 // Resize global variables
 int resizing = 0;
-int resized_x = -1;
-int resized_y = -1;
-int resized_w = -1;
-int resized_h = -1;
+Square resized_square;
 
-char *get_filename_ext(const char *filename)
-{
-    // get the filename extension
-    char *dot = strrchr(filename, '.');
-    if (!dot || dot == filename)
-        return "";
-    return dot + 1;
-}
+#pragma region "Image_management"
 
 GdkPixbuf *image_to_pixbuf(Image *image)
 {
@@ -66,9 +60,34 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     GtkImage *imageWidget =
         GTK_IMAGE(gtk_builder_get_object(builder, GtkimageID)); // get image
 
+    GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+
+    int width = clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0,
+                      1000); // TODO: fix this
+    int height =
+        clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0, 1000);
+
+    // int height = gtk_widget_get_allocated_height(GTK_WIDGET(panel));
+
+    // get image size
+    int image_width = gdk_pixbuf_get_width(pixbuf);
+    int image_height = gdk_pixbuf_get_height(pixbuf);
+
+    // get scale factor
+    double scale_factor = 1;
+    if (image_width > width || image_height > height)
+    {
+        scale_factor = (double)width / image_width;
+        if (scale_factor * image_height > height)
+            scale_factor = (double)height / image_height;
+    }
+    int new_width = image_width * scale_factor;
+    int new_height = image_height * scale_factor;
+
+    printf("%f %d %d\n", scale_factor, width, height);
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
-        pixbuf, 500, 500, GDK_INTERP_BILINEAR); // resize image
+        pixbuf, new_width, new_height, GDK_INTERP_BILINEAR); // resize image
 
     // set the image
     gtk_image_set_from_pixbuf(imageWidget, resized_image);
@@ -84,6 +103,71 @@ void change_image(Image *_image, char *GtkimageID)
 
     set_selected_image(pixbuf, GtkimageID);
 }
+
+#pragma endregion "Image_management"
+
+#pragma region "File_management"
+
+char *get_filename_ext(const char *filename)
+{
+    // get the filename extension
+    char *dot = strrchr(filename, '.');
+    if (!dot || dot == filename)
+        return "";
+    return dot + 1;
+}
+
+void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
+{
+    // select filename and update image
+    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
+    char *ext = get_filename_ext(filename);
+    // GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
+    // GtkButton *button = data;
+
+    // check if file is an image
+    if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
+        || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
+    {
+        // Create both image
+        SDL_Surface *surface = IMG_Load(filename);
+        image = newImage(surface, 0, surface->w, surface->h);
+        SDL_FreeSurface(surface);
+        temp_image = copyImage(&image, 0);
+
+        printf("    🎨 Loaded %s\n", filename);
+
+        // Display image
+        change_image(&image, "selected_image");
+
+        // update label
+        GtkLabel *label =
+            GTK_LABEL(gtk_builder_get_object(builder, "picture_path"));
+        gtk_label_set_text(label, filename);
+
+        gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
+        set_buttons_options_status(TRUE); // enable buttons
+
+        saveImage(&image, IMAGE_SAVE_PATH);
+    }
+    else
+    {
+        set_buttons_options_status(FALSE); // disable buttons
+        // gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
+        //                               NULL); // reset filename
+
+        // display error message
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "File is not an image");
+        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+        gtk_widget_destroy(dialog); // destroy dialog
+    }
+}
+
+#pragma endregion "File_management"
+
+#pragma region "GUI_interaction"
 
 void set_leftPannel_status(gboolean status)
 {
@@ -117,73 +201,40 @@ void edit_progress_bar(float progress, char *text)
     gtk_progress_bar_set_text(progress_bar, text);
 }
 
-void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
-{
-    // select filename and update image
-    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
-    GtkBox *box_1 = GTK_BOX(gtk_builder_get_object(builder, "options"));
-    char *ext = get_filename_ext(filename);
-    GtkButton *button = data;
-
-    // check if file is an image
-    if (strcmp(ext, "png") == 0 || strcmp(ext, "jpg") == 0
-        || strcmp(ext, "jpeg") == 0 || strcmp(ext, "bmp") == 0)
-    {
-        SDL_Surface *surface = IMG_Load(filename);
-        Image img_temp = newImage(surface, 0, surface->w, surface->h);
-        temp_image = &img_temp;
-
-        Image tmp = copyImage(&img_temp, 0);
-        image = &tmp;
-
-        change_image(image, "selected_image");
-
-        // update label
-        GtkLabel *label =
-            GTK_LABEL(gtk_builder_get_object(builder, "picture_path"));
-        gtk_label_set_text(label, filename);
-
-        gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
-        set_buttons_options_status(TRUE); // enable buttons
-
-        saveImage(image, SAVE_PATH);
-    }
-    else
-    {
-        set_buttons_options_status(FALSE); // disable buttons
-        // gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_chooser),
-        //                               NULL); // reset filename
-
-        // display error message
-        GtkWidget *dialog = gtk_message_dialog_new(
-            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "File is not an image");
-        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
-        gtk_widget_destroy(dialog); // destroy dialog
-    }
-}
-
 void show_page(GtkWidget *widget, gpointer data)
 {
+    // Avoid warning
+    (void)widget;
+
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack, page);
 }
 
 void change_panel(GtkWidget *widget, gpointer data)
 {
+    // Avoid warning
+    (void)widget;
+
     GtkWidget *page = data;
     gtk_stack_set_visible_child(stack_2, page);
 }
 
-void stop_processing()
+void cancel_edit_option(GtkWidget *widget, gpointer data)
 {
-    // get button
-    GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
-    gtk_widget_set_sensitive(GTK_WIDGET(button),
-                             TRUE); // enable button to start processing
-    gtk_button_set_label(button, "Start Process");
-    gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
+    // Avoid warning
+    (void)widget;
+
+    resizing = 0;
+
+    GtkWidget *page = data;
+    change_panel(NULL, page);
+
+    set_leftPannel_status(TRUE); // enable buttons
 }
+
+#pragma endregion "GUI_interaction"
+
+#pragma region "Process"
 
 void run_process(GtkButton *button)
 {
@@ -228,8 +279,10 @@ void run_process(GtkButton *button)
 
         printf("Processing...\n");
         // Run processing
-        thread = OCR_thread(SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
-                            strcmp(dim, "9x9"));
+        pthread_t t;
+        t = OCR_thread(IMAGE_SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+                       strcmp(dim, "9x9"));
+        thread = &t;
     }
     else
     {
@@ -243,50 +296,28 @@ void run_process(GtkButton *button)
     }
 }
 
-void open_website()
+void stop_processing()
 {
-    // Check if the browser is installed
-    if (g_find_program_in_path("firefox") != NULL)
-    {
-        // Open the website
-        if (!system("firefox www.opticalloop.bugbear.com"))
-        {
-            printf("Error opening website\n");
-        }
-    }
+    // get button
+    GtkButton *button = GTK_BUTTON(gtk_builder_get_object(builder, "start"));
+    gtk_widget_set_sensitive(GTK_WIDGET(button),
+                             TRUE); // enable button to start processing
+    gtk_button_set_label(button, "Start Process");
+    gtk_stack_set_visible_child_name(stack_2, "page2"); // show page 2
 }
 
-void quit()
-{
-    if (thread != NULL)
-    {
-        // cancel thread
-        pthread_cancel(*thread);
-        pthread_join(*thread, NULL);
-    }
-    gtk_main_quit();
-}
+#pragma endregion "Process"
 
-void cancel_edit_option(GtkWidget *widget, gpointer data)
-{
-    resizing = 0;
-
-    GtkWidget *page = data;
-    change_panel(NULL, page);
-
-    set_leftPannel_status(TRUE); // enable buttons
-}
-
-// ------ ROTATION ------
+#pragma region "Rotate"
 
 void edit_rotation(GtkWidget *widget, gpointer data)
 {
-    // Load image
-    GtkImage *image =
-        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image2"));
-    GdkPixbuf *pixbuf = gtk_image_get_pixbuf(image);
+    // Don't get warning
+    (void)widget;
+    printf("    ❓ Starting rotation...\n");
 
-    set_selected_image(pixbuf, "selected_image2");
+    // Load image
+    change_image(&image, "selected_image2");
 
     // reset scale to value 0
     GtkScale *scale =
@@ -296,8 +327,7 @@ void edit_rotation(GtkWidget *widget, gpointer data)
     gtk_range_set_value(GTK_RANGE(scale),
                         rotation_value != 0 ? rotation_value : 0);
 
-    // change page
-
+    // Change page
     GtkWidget *page = data;
     change_panel(NULL, page);
 
@@ -306,6 +336,12 @@ void edit_rotation(GtkWidget *widget, gpointer data)
 
 void on_rotation_finished(GtkWidget *widget, gpointer data)
 {
+    // Don't get warning
+    (void)widget;
+
+    printf("    👍 Finished rotation\n");
+
+    // Change page
     GtkWidget *page = data;
     change_panel(NULL, page);
 
@@ -316,55 +352,87 @@ void on_rotation_finished(GtkWidget *widget, gpointer data)
         GTK_SCALE(gtk_builder_get_object(builder, "scale_rotation"));
     rotation_value = gtk_range_get_value(GTK_RANGE(scale));
 
-    change_image(image, "selected_image"); // change image of main page
-    saveImage(SAVE_PATH, image); // save image
+    change_image(&image, "selected_image"); // change image of main page
+
+    // Save
+    saveImage(&image, IMAGE_SAVE_PATH);
+    saveImage(&image, IMAGE_TEMP_PATH);
 }
 
 void rotate_img(GtkWidget *widget, gpointer data)
 {
-    // Copy temp to img
-    // Free image pixels
-    freeImage(image, 0);
-
-    image->pixels = copyPixelsArray(temp_image, 0);
+    // Don't get warning
+    (void)data;
 
     // Get range value
-    float value = gtk_range_get_value(widget);
+    double value = gtk_range_get_value(GTK_RANGE(widget));
 
-    rotate(image, value);
-    change_image(image, "selected_image2");
+    cloneImage(&temp_image, &image);
+    rotate(&image, value);
+
+    // Visualize temp image
+    change_image(&image, "selected_image2");
 }
 
-// ------ /ROTATION ------
+#pragma endregion "Rotate"
 
-// ------ RESIZE ------
+#pragma region "Resize"
 
 void edit_resize(GtkWidget *widget, gpointer data)
 {
-    resizing = 1;
-    printf("Resizing\n");
+    // Avoid warning
+    (void)widget;
 
-    // change image
-    change_image(image, "selected_image3");
+    resizing = 1;
+    printf("    🛠️ Starting resize...\n");
+    set_leftPannel_status(FALSE); // disable buttons
+
+    // get picture
+
+    GtkImage *imageWidget = GTK_IMAGE(
+        gtk_builder_get_object(builder, "selected_image3")); // get image
+
+    // get image size
+    GdkPixbuf *pixbuf = image_to_pixbuf(&image);
+
+    int width = gdk_pixbuf_get_width(pixbuf);
+    int height = gdk_pixbuf_get_height(pixbuf);
+
+    printf("    📷 Image size: %dx%d\n", width, height);
+
+    resized_square.top.xStart = 0;
+    resized_square.top.yStart = 0;
+    resized_square.right.xStart = width - 1;
+    resized_square.right.yStart = 0;
+    resized_square.bottom.xStart = width - 1;
+    resized_square.bottom.yStart = height - 1;
+    resized_square.left.xStart = 0;
+    resized_square.left.yStart = height - 1;
+
+    // Change image
+    selectionFilter(&image, &resized_square);
+    // get drawing area
+    GtkDrawingArea *drawing_area =
+        GTK_DRAWING_AREA(gtk_builder_get_object(builder, "drawing_area"));
+    // draw image on drawing area
+    gtk_widget_queue_draw(GTK_WIDGET(drawing_area));
+    // set image
+    change_image(&image, "selected_image3");
 
     // change page
     GtkWidget *page = data;
     change_panel(NULL, page);
-
-    set_leftPannel_status(FALSE); // disable buttons
 }
 
 void on_resize_finished(GtkWidget *widget, gpointer data)
 {
+    // Avoid warning
+    (void)widget;
     resizing = 0;
+    printf("    👍 Finished resize\n");
 
-    SDL_Rect rect;
-    rect.x = resized_x;
-    rect.y = resized_y;
-    rect.w = resized_w;
-    rect.h = resized_h;
-    Image img = cropImage(image, &rect);
-    image = &img;
+    Image img = correct_perspective(&image, &resized_square, 1, "temp/");
+    image = img;
 
     GtkWidget *page = data;
     change_panel(NULL, page);
@@ -372,11 +440,19 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     set_leftPannel_status(TRUE); // enable buttons
 
     // change image
-    change_image(image, "selected_image");
+    change_image(&image, "selected_image");
 }
+
+#pragma endregion "Resize"
+
+#pragma region "Neural Network"
 
 void start_nn(GtkWidget *widget, gpointer data)
 {
+    // Avoid warning
+    (void)widget;
+    (void)data;
+
     // get spin button value
     GtkSpinButton *epoch_input =
         GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "epoch_input"));
@@ -390,14 +466,59 @@ void start_nn(GtkWidget *widget, gpointer data)
         GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "node_input"));
     int node_input_value = gtk_spin_button_get_value_as_int(node_input);
 
+    // get check button value
+    GtkCheckButton *check_button =
+        GTK_CHECK_BUTTON(gtk_builder_get_object(builder, "train_image"));
+    int check_button_value =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button));
+
+    // Check if file exists
+    FILE *file;
+    file = fopen(WEIGHTS_PATH, "r");
+    if (file != NULL && !check_button_value)
+    {
+        fclose(file);
+        // ask user if he wants to cancel
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+            "At the end of the process the current neural network will be "
+            "overriden. \nDo you want to continue?");
+        gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (response != GTK_RESPONSE_YES)
+        {
+            return;
+        }
+    }
+
     // start training
-    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value);
-    // TODO : add training function in thread
+    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+    pthread_t t =
+        train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
+                     check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
+    thread_neural_network = &t;
+}
+
+void reset_nn()
+{
+    // Delete file
+    char cmd[200];
+    snprintf(cmd, sizeof(cmd), "rm -f %s", WEIGHTS_PATH);
+    if (!system(cmd))
+    {
+        printf("Error deleting file\n");
+    }
 }
 
 void cancel_nn(GtkWidget *widget, gpointer data)
 {
-    if (thread_2 != NULL)
+    // Avoid warning
+    (void)widget;
+    (void)data;
+
+    if (thread_neural_network != NULL)
     {
         // ask user if he wants to cancel
         GtkWidget *dialog = gtk_message_dialog_new(
@@ -410,8 +531,8 @@ void cancel_nn(GtkWidget *widget, gpointer data)
         if (response == GTK_RESPONSE_YES)
         {
             // cancel thread
-            pthread_cancel(*thread_2);
-            pthread_join(*thread_2, NULL);
+            pthread_cancel(*thread_neural_network);
+            pthread_join(*thread_neural_network, NULL);
         }
         else
         {
@@ -423,6 +544,187 @@ void cancel_nn(GtkWidget *widget, gpointer data)
 
     set_leftPannel_status(TRUE); // enable buttons
 }
+
+#pragma endregion "Neural Network"
+
+#pragma region "Terminal"
+
+void reset_terminal()
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // clear text buffer
+    gtk_text_buffer_set_text(text_buffer, "", -1);
+}
+
+void edit_terminal(char *string)
+{
+    // get text view
+    GtkTextView *text_view =
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+
+    // get text buffer
+    GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
+
+    // add string to text buffer
+    gtk_text_buffer_insert_at_cursor(text_buffer, string, -1);
+
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter(text_buffer, &start); // get start iter
+    gtk_text_buffer_get_end_iter(text_buffer, &end); // get end iter
+
+    if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
+    {
+        gtk_text_buffer_delete(text_buffer, &start, &end);
+    }
+}
+
+#pragma endregion "Terminal"
+
+#pragma region "Result"
+
+void show_result(unsigned int **grid)
+{
+    gtk_stack_set_visible_child_name(stack_2, "confirmation");
+
+    // Load image
+    change_image(&image, "selected_image1");
+
+    // get grid
+    GtkGrid *grid_widget = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+
+    GtkStack *stack_result =
+        GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid_widget));
+
+    // copy child of grid 0 0
+    GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
+
+    grid = allocGrid(9);
+
+    for (size_t i = 0; i < 9; i++)
+    {
+        for (size_t j = 0; j < 9; j++)
+        {
+            // get input at i,j and set value
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
+            char ch[40] = " ";
+            if (grid[i][j] > 9)
+            {
+                // Convert 10 to A
+                ch[0] = 'A' + (grid[i][j] - 10);
+            }
+            else
+            {
+                ch[0] = '0' + grid[i][j];
+            }
+            gtk_entry_set_text(entry, ch);
+        }
+    }
+    freeGrid(grid, 9);
+}
+
+void confirm_result()
+{
+    GtkComboBox *combo_box =
+        GTK_COMBO_BOX(gtk_builder_get_object(builder, "dim_input"));
+    char *dim_text =
+        gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
+
+    int dim = !strcmp(dim_text, "9x9") ? 9 : 16;
+
+    unsigned int **result = allocGrid(dim);
+
+    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+
+    char *str;
+    for (int i = 0; i < dim; i++)
+    {
+        for (int j = 0; j < dim; j++)
+        {
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
+            
+            str = gtk_entry_get_text(entry);
+            // Str length is 1 or 2
+            if (strlen(str) == 1)
+            {
+                // Is it a digit 
+                if (str[0] >= '0' && str[0] <= '9')
+                {
+                    result[i][j] = (unsigned int) str[0] - '0';
+                }
+                else if (str[0] >= 'A' && str[0] <= 'G')
+                {
+                   result[i][j] = (unsigned int) str[0] - 'A' + 10;
+                }
+                else
+                {
+                    printf("Error: Invalid input\n");
+                    return;
+                }
+            }
+            else if (strlen(str) == 2)
+            {
+                result[i][j] = (unsigned int) (str[0] - '0') * 10 + (str[1] - '0');
+            }
+            else
+            {
+                printf("Error : should write 1 or 2 digit long (1, 2, 3, 4, 5, 6, 7, 8, 9, to 16 with heca or digit notation)\n");
+                return;
+            }
+        }
+    }
+
+    if (!isSolvable(result, dim))
+    {
+       // display error message
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+            "The grid is not solvable, please correct the grid");
+        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+        gtk_widget_destroy(dialog); // destroy dialog
+    }
+
+    unsigned int **copy = allocGrid(dim);
+    // Copy array to have different color when saving the image
+    copyArray(result, copy, dim);
+
+    printf("\n    📊 Solving sudoku\n");
+
+    solveSuduko(result, 0, 0, dim);
+
+    saveGrid(result, "grid.result", 1, dim);
+
+    // Create, save and free the image
+    Image sudoku_image;
+    if (dim == 16)
+    {
+        sudoku_image = createHexaSudokuImage(result, copy, IMAGE_PATH);
+    }   
+    else
+    {
+        sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
+    }
+
+    freeGrid(result, dim); // Free grid
+    freeGrid(copy, dim); // Free copy
+
+    change_image(&sudoku_image, "selected_image");
+    edit_progress_bar(1, "Result");
+
+    // TODO : change the way we save image
+    saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
+
+    gtk_stack_set_visible_child_name(stack_2, "page_result");
+}
+
+#pragma endregion
 
 void *init_gui()
 {
@@ -481,19 +783,31 @@ void *init_gui()
     gtk_main(); // start main loop
 
     // End program
-    freeImage(image, 0);
-    freeImage(temp_image, 0);
     quit();
     pthread_exit(NULL);
 }
-
-void resetNeuralNetwork()
+void open_website()
 {
-    // Delete file
-    char cmd[200];
-    snprintf(cmd, sizeof(cmd), "rm -f %s", WEIGHTS_PATH);
-    if (!system(cmd))
+    // Check if the browser is installed
+    if (g_find_program_in_path("firefox") != NULL)
     {
-        printf("Error deleting file\n");
+        // Open the website
+        if (!system("firefox www.opticalloop.bugbear.com"))
+        {
+            printf("Error opening website\n");
+        }
     }
+}
+
+void quit()
+{
+    if (thread != NULL)
+    {
+        // cancel thread
+        pthread_cancel(*thread);
+        pthread_join(*thread, NULL);
+    }
+    freeImage(&image, 0);
+    freeImage(&temp_image, 0);
+    gtk_main_quit();
 }

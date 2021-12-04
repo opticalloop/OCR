@@ -346,9 +346,28 @@ void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect)
     {
         for (unsigned int y = rect->y; y < rect->y + rect->h; y++)
         {
-            dest->pixels[x][y].r = src->pixels[x - rect->x][y - rect->y].r;
-            dest->pixels[x][y].g = src->pixels[x - rect->x][y - rect->y].g;
-            dest->pixels[x][y].b = src->pixels[x - rect->x][y - rect->y].b;
+            if (x - rect->x < src->width && y - rect->y < src->height)
+            {
+                dest->pixels[x][y].r = src->pixels[x - rect->x][y - rect->y].r;
+                dest->pixels[x][y].g = src->pixels[x - rect->x][y - rect->y].g;
+                dest->pixels[x][y].b = src->pixels[x - rect->x][y - rect->y].b;
+            }
+        }
+    }
+}
+
+void cloneImage(Image *src, Image *dst)
+{
+    const unsigned int width = src->width;
+    const unsigned int height = src->height;
+
+    for (unsigned int i = 0; i < width; i++)
+    {
+        for (unsigned int j = 0; j < height; j++)
+        {
+            dst->pixels[i][j].r = src->pixels[i][j].r;
+            dst->pixels[i][j].g = src->pixels[i][j].g;
+            dst->pixels[i][j].b = src->pixels[i][j].b;
         }
     }
 }
