@@ -131,4 +131,6 @@ void compute_Square(Square *square);
  */
 double getPerimeter(Square *square);
 
+double getFactor(Square *square);
+
 #endif
