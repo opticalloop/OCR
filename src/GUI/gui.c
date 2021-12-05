@@ -764,9 +764,17 @@ void open_file(GtkWidget *widget, gpointer data)
     char *path = data;
     char command[100] = "xdg-open ";
     strcat(command, path);
-    if (!system(command))
+    if (system(command))
     {
         printf("Error: Could not open file\n");
+
+        // display error message
+        GtkWidget *dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Could not open file");
+
+        gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
+        gtk_widget_destroy(dialog); // destroy dialog
     }
 }
 
@@ -803,7 +811,8 @@ void set_recents_files()
         // set alignment horizontal to start and vertical to center
         gtk_button_set_alignment(button, 0, 0.5);
         g_signal_connect(button, "clicked", G_CALLBACK(open_file), path);
-        GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(button));
+        GtkStyleContext *context =
+            gtk_widget_get_style_context(GTK_WIDGET(button));
 
         gtk_box_pack_start(box, GTK_WIDGET(button), FALSE, FALSE, 0);
 
