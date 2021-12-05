@@ -164,6 +164,7 @@ void *OCR(void *Thread_args)
                 {
                     val = 0;
                 }
+                val = 0;
                 grid[i][j] = val;
 
                 // Free the case

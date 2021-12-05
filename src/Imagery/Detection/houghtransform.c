@@ -11,15 +11,11 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     // Surface without sobel filter
     Image tempImage = copyImage(drawImage, 0);
 
-    // Directly free
-    if (!save)
-    {
-        freeImage(drawImage, 0);
-    }
+    double maxTheta;
 
     // Call major fonction
-    LineList list =
-        houghtransform(image, drawImage, verbose, save, output_folder);
+    MyList list =
+        houghtransform(image, drawImage, verbose, save, output_folder,&maxTheta);
 
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
                 0);
@@ -27,23 +23,22 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     printVerbose(verbose, 0, "    📈 2.3 Simplyfing lines\n");
 
     // LINES SIMPLIFICATION
-
-    LineList resultingList = simplifyLines(&list);
+    MyList *resultingList = simplifyLines(&list);
 
     if (verbose)
-        printf("    📈 2.3.1 %d edges\n", resultingList.len);
+        printf("    📈 2.3.1 %zu edges\n", resultingList->length);
 
     if (save || gui)
     {
         // Draw simplifieds lines
         Image _simplifiedImage = copyImage(&tempImage, 0);
 
-        const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
-        for (unsigned int i = 0; i < len; i++)
+        Node *node = resultingList->head;
+        for (; node != NULL; node = node->next)
         {
-            Line line = resultingList.lines[i];
-            draw_line(&_simplifiedImage, w, h, &line, &color, 2, 1);
+            Line *line = (Line *)node->value;
+            draw_line(&_simplifiedImage, w, h, line, &color, 2, 1);
         }
 
         saveVerbose(verbose, &_simplifiedImage, output_folder,
@@ -53,11 +48,11 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // AUTO ROTATE
-    double angle = resultingList.maxTheta * 180.0 / M_PI;
+    double angle = maxTheta * 180.0 / M_PI;
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
         printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
-               resultingList.maxTheta);
+               maxTheta);
     if ((angleRounded >= 85 && angleRounded <= 95)
         || (angleRounded >= 0 && angleRounded <= 5))
 
@@ -69,7 +64,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     {
         printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n");
         four_angles[0] = angleRounded;
-        rotateAll(&tempImage, &resultingList, angleRounded);
+        rotateAll(&tempImage, resultingList, angleRounded);
     }
 
     // Draw auto rotated image
@@ -78,12 +73,12 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
         // Draw simplifieds lines
         Image __simplifiedImage = copyImage(&tempImage, 0);
 
-        const unsigned int len = resultingList.len;
+        const unsigned int len = resultingList->length;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
         for (unsigned int i = 0; i < len; i++)
         {
-            Line line = resultingList.lines[i];
-            draw_line(&__simplifiedImage, w, h, &line, &color, 2, 1);
+            Line *line = (Line *)get_value(resultingList, i);
+            draw_line(&__simplifiedImage, w, h, line, &color, 2, 1);
         }
 
         saveVerbose(verbose, &__simplifiedImage, output_folder,
@@ -97,28 +92,30 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n");
 
     // FIND ALL SQUARES
-    SquareList squares;
+    MyList squares;
     if (save || gui)
     {
         Image _squareImage = copyImage(&tempImage, 0);
-
-        squares = findSquare(&resultingList, w, h, &_squareImage, save);
+        
+        squares = findSquare(resultingList, w, h, &_squareImage, save);
         saveVerbose(verbose, &_squareImage, output_folder,
                     "2.6_Hough_squares_only", save, 0);
         changeImageGUI(&_squareImage, gui, 0.6, "Hough squares only", 1);
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, NULL, save || gui);
+        squares = findSquare(resultingList, w, h, NULL, save || gui);
     }
 
     if (verbose)
     {
-        printf("    🔼 2.5.1 %d squares\n", squares.len);
+        printf("    🔼 2.5.1 %zu squares\n", squares.length);
     }
 
     // SORTING SQUARES
     printVerbose(verbose, 0, "    📉 2.6 Finding the predominating square\n");
+
+    // FIND THE PREDOMINANT SQUARE
 
     Square lastSquare = sortSquares(&squares, image);
 
@@ -131,9 +128,9 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
                     "2.7_Hough_last_square", save, 0);
         changeImageGUI(&_lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
-    // Free square
-    free(squares.squares);
-    free(resultingList.lines);
+    // Free MyLists
+    free_list(&squares);
+    free_list(resultingList);
 
     // Correc perspective and crop
     Image img =
@@ -145,8 +142,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     return img;
 }
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder)
+MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                        char *output_folder, double *max_Theta)
 {
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
@@ -240,9 +237,7 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     }
 
     // Create line return line array
-    Line *allLines = malloc(sizeof(Line));
-
-    int nbEdges = 0;
+    MyList allLines = { NULL, NULL, 0};
 
     double tempMaxTheta = 0.0;
     unsigned int histogram[181] = { 0 };
@@ -317,11 +312,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                     draw_line(drawImage, width, height, &line, &pixel, 1, draw);
 
                 // Add line on our return list
-                allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
-
-                allLines[nbEdges] = line;
-
-                nbEdges++;
+                void *p = Line_tovptr(line);
+                append(&allLines, p);
             }
         }
     }
@@ -332,11 +324,9 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     freeMatrice(accumulator, nbTheta + 1);
 
     if (verbose)
-        printf("    📜 2.2.6 %d edges\n", nbEdges);
+        printf("    📜 2.2.6 %zu edges\n", allLines.length);
 
-    LineList list;
-    list.lines = allLines;
-    list.len = nbEdges;
+    MyList *list = &allLines;
 
     // Find best angle
     unsigned int angle = 0;
@@ -346,8 +336,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
             angle = i;
     }
 
-    list.maxTheta = degrees_ToRadians(angle);
-    return list;
+    *max_Theta = degrees_ToRadians(angle);
+    return *list;
 }
 
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
@@ -469,14 +459,16 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
-unsigned int findTheta(LineList *lineList)
+unsigned int findTheta(MyList *lineList)
 {
     unsigned int histogram[181] = { 0 };
 
     int value;
-    for (int i = 0; i < lineList->len; i++)
+    Node *node = lineList->head;
+    for (; node != NULL; node = node->next)
     {
-        value = (int)radian_To_Degree(lineList->lines[i].theta);
+        Line *l = (Line *)node->value;
+        value = (int)radian_To_Degree(l->theta);
         value++;
         printf("Value : %u\n", value);
 
@@ -499,7 +491,7 @@ unsigned int findTheta(LineList *lineList)
     return angle;
 }
 
-void rotateAll(Image *image, LineList *lineList, double angleDegree)
+void rotateAll(Image *image, MyList *lineList, double angleDegree)
 {
     rotate(image, angleDegree);
 
@@ -511,39 +503,39 @@ void rotateAll(Image *image, LineList *lineList, double angleDegree)
     double newX;
     double newY;
 
-    for (int i = 0; i < lineList->len; i++)
+    Node *node = lineList->head;
+    for (; node != NULL; node = node->next)
     {
+        Line *l = (Line *)node->value;
         // Calculate new position start
         newX =
-            ((double)(cos(angle) * ((double)lineList->lines[i].xStart - middleX)
-                      - sin(angle)
-                          * ((double)lineList->lines[i].yStart - middleY))
+            ((double)(cos(angle) * ((double)l->xStart - middleX)
+                      - sin(angle) * ((double)l->yStart - middleY))
              + middleX);
 
         newY =
-            ((double)(cos(angle) * ((double)lineList->lines[i].yStart - middleY)
-                      + sin(angle)
-                          * ((double)lineList->lines[i].xStart - middleX))
+            ((double)(cos(angle) * ((double)l->yStart - middleY)
+                      + sin(angle) * ((double)l->xStart - middleX))
              + middleY);
 
-        lineList->lines[i].xStart = (int)newX;
-        lineList->lines[i].yStart = (int)newY;
+        l->xStart = (int)newX;
+        l->yStart = (int)newY;
 
         // Calculate new position end
         newX =
-            ((double)(cos(angle) * ((double)lineList->lines[i].xEnd - middleX)
+            ((double)(cos(angle) * ((double)l->xEnd - middleX)
                       - sin(angle)
-                          * ((double)lineList->lines[i].yEnd - middleY))
+                          * ((double)l->yEnd - middleY))
              + middleX);
 
         newY =
-            ((double)(cos(angle) * ((double)lineList->lines[i].yEnd - middleY)
+            ((double)(cos(angle) * ((double)l->yEnd - middleY)
                       + sin(angle)
-                          * ((double)lineList->lines[i].xEnd - middleX))
+                          * ((double)l->xEnd - middleX))
              + middleY);
 
-        lineList->lines[i].xEnd = (int)newX;
-        lineList->lines[i].yEnd = (int)newY;
+        l->xEnd = (int)newX;
+        l->yEnd = (int)newY;
     }
 }
 
