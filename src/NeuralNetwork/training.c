@@ -1,7 +1,7 @@
 #include "NeuralNetwork/training.h"
 
-#define DATA_PATH "src/NeuralNetwork/Digits-Only/"
-#define DATA_FILE_PATH "src/NeuralNetwork/data.txt"
+#define DATA_PATH "src/NeuralNetwork/Digits-Only2/"
+#define DATA_FILE_PATH "src/NeuralNetwork/data2.txt"
 #define TEST_DATA_PATH "src/NeuralNetwork/Test_data"
 
 void printResult(double expected[], Neuron neuron[])
@@ -262,7 +262,7 @@ void *train(void *args)
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network, 0.001);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
@@ -276,7 +276,7 @@ void *train(void *args)
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
 
-                gradientDescent(network, 0.001);
+                gradientDescent(network, 0.01);
 
                 if (i == epoch && verbose)
                 {

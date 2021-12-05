@@ -399,6 +399,12 @@ int main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
+    if (!strcmp(argv[1], "-data"))
+    {
+        generateDataFile();
+        return;
+    }
+
     if (!strcmp(argv[1], "ocr"))
     {
         analyzeOCR(argc, argv);

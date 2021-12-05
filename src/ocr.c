@@ -26,12 +26,13 @@ static void checkFolderOutput(char *output_folder)
 pthread_t OCR_thread(char *input_path, char *output_path, int verbose,
                      int save, char *output_folder, int gui, int hexa)
 {
+    (void) output_path;
     pthread_t thread;
     SDL_Surface *surface = IMG_Load(input_path);
     Image img = newImage(surface, 1, surface->w, surface->h);
     img.path = input_path;
     Thread_argument arg = { .image = img,
-                            .output_path = output_path,
+                            .input_path = input_path,
                             .verbose = verbose,
                             .save = save,
                             .output_folder = output_folder,
@@ -47,8 +48,8 @@ void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
     Image image = arg.image;
-    char *image_path = image.path;
-    char *output_path = arg.output_path;
+    char *image_path = arg.input_path;
+    image.path = image_path;
     int verbose = arg.verbose;
     int save = arg.save;
     char *output_folder = arg.output_folder;
@@ -72,9 +73,6 @@ void *OCR(void *Thread_args)
     // }
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
-
-    // if (!strcmp("src/Imagery/image_06.jpeg", image_path))
-    //     correctDistortion(&image);
 
     // Preprocessing
     grayscale(&image);
@@ -156,7 +154,6 @@ void *OCR(void *Thread_args)
             {
                 val = 0;
             }
-            val = 0;
             grid[i][j] = val;
 
             // Free the case

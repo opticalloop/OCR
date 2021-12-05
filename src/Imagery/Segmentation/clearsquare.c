@@ -195,7 +195,7 @@ void clear_imperfections(Image *image)
             }
         }
     }
-    if (maxlen > 15)
+    if (maxlen > 10)
     {
         clear_matrice(res, image);
     }

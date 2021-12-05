@@ -95,6 +95,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     if (save || gui)
     {
         Image _squareImage = copyImage(&tempImage, 0);
+        _squareImage.path = image->path;
 
         squares = findSquare(&resultingList, w, h, &_squareImage, save);
         saveVerbose(verbose, &_squareImage, output_folder,

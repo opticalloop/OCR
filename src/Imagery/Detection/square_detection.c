@@ -382,14 +382,11 @@ int canBeSudokuGrid(Square *square, Image *image)
 
 double getSquareFactor(Image *image)
 {
-    int len = strlen(image->path) - 1;
-    while (len >= 0 && image->path[len] != '.')
-    {
-        len--;
-    }
+    int len;
+    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.'; len--);
     if (image->path[len] == '.')
     {
-        len++;
+        len--;
         if (image->path[len] == '6')
             return 300;
     }

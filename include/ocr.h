@@ -26,7 +26,7 @@
 typedef struct Thread_argument
 {
     Image image;
-    char *output_path;
+    char *input_path;
     int verbose;
     int save;
     char *output_folder;
