@@ -403,7 +403,7 @@ int main(int argc, char **argv)
     if (!strcmp(argv[1], "-data"))
     {
         generateDataFile();
-        return;
+        return EXIT_SUCCESS;
     }
 
     if (!strcmp(argv[1], "ocr"))
