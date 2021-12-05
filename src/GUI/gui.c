@@ -492,9 +492,7 @@ void start_nn(GtkWidget *widget, gpointer data)
             return;
         }
     }
-
-    // start training
-    // train_nn(image, epoch_input_value, hidden_input_value, node_input_value
+    reset_terminal("terminal_text");
     pthread_t t =
         train_thread(epoch_input_value, hidden_input_value, node_input_value, 1,
                      check_button_value ? WEIGHTS_PATH : "", WEIGHTS_PATH, 1);
@@ -549,11 +547,11 @@ void cancel_nn(GtkWidget *widget, gpointer data)
 
 #pragma region "Terminal"
 
-void reset_terminal()
+void reset_terminal(char *terminal_id)
 {
     // get text view
     GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, terminal_id));
 
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
@@ -562,11 +560,11 @@ void reset_terminal()
     gtk_text_buffer_set_text(text_buffer, "", -1);
 }
 
-void edit_terminal(char *string)
+void edit_terminal(char *terminal_id, char *string)
 {
     // get text view
     GtkTextView *text_view =
-        GTK_TEXT_VIEW(gtk_builder_get_object(builder, "terminal_text"));
+        GTK_TEXT_VIEW(gtk_builder_get_object(builder, terminal_id));
 
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
@@ -588,33 +586,46 @@ void edit_terminal(char *string)
 
 #pragma region "Result"
 
-void show_result(unsigned int **grid)
+void show_result(unsigned int **grid, int dimension)
 {
-    gtk_stack_set_visible_child_name(stack_2, "confirmation");
-
-    // Load image
-    change_image(&image, "selected_image1");
-
-    // get grid
-    GtkGrid *grid_widget =
-        GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
-
-    GtkStack *stack_result =
-        GTK_STACK(gtk_builder_get_object(builder, "stack1"));
-    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid_widget));
-
-    // copy child of grid 0 0
-    GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
-
-    grid = allocGrid(9);
-
-    for (size_t i = 0; i < 9; i++)
+    GtkGrid *grid_result;
+    GtkStack *stack_result;
+    if (dimension == 9)
     {
-        for (size_t j = 0; j < 9; j++)
+        gtk_stack_set_visible_child_name(stack_2, "confirmation");
+
+        // Load image
+        change_image(&image, "selected_image1");
+
+
+        // get grid
+        grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+
+        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+    }
+    else // dimension == 16
+    {
+        gtk_stack_set_visible_child_name(stack_2, "confirmation_hexa");
+
+        // Load image
+        change_image(&image, "selected_image_hexa");
+
+        // get grid
+        grid_result =
+            GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
+
+        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack2"));
+    }
+    gtk_stack_set_visible_child_name(stack_result, "Result");
+
+    for (size_t i = 0; i < dimension; i++)
+    {
+        for (size_t j = 0; j < dimension; j++)
         {
             // get input at i,j and set value
             GtkEntry *entry =
-                GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
+                GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
+
             char ch[40] = " ";
             if (grid[i][j] > 9)
             {
@@ -628,7 +639,7 @@ void show_result(unsigned int **grid)
             gtk_entry_set_text(entry, ch);
         }
     }
-    freeGrid(grid, 9);
+    freeGrid(grid, dimension);
 }
 
 void confirm_result()
@@ -642,7 +653,9 @@ void confirm_result()
 
     unsigned int **result = allocGrid(dim);
 
-    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+    GtkGrid *grid = dim == 9
+        ? GTK_GRID(gtk_builder_get_object(builder, "grid_result"))
+        : GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
 
     char *str;
     for (int i = 0; i < dim; i++)
@@ -652,8 +665,11 @@ void confirm_result()
             GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
 
             str = gtk_entry_get_text(entry);
+            int size = strlen(str);
             // Str length is 1 or 2
-            if (strlen(str) == 1)
+            if (size == 0)
+                result[i][j] = 0;
+            if (size == 1)
             {
                 // Is it a digit
                 if (str[0] >= '0' && str[0] <= '9')
@@ -670,7 +686,7 @@ void confirm_result()
                     return;
                 }
             }
-            else if (strlen(str) == 2)
+            else if (size == 2)
             {
                 result[i][j] =
                     (unsigned int)(str[0] - '0') * 10 + (str[1] - '0');
@@ -693,6 +709,7 @@ void confirm_result()
             "The grid is not solvable, please correct the grid");
         gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
         gtk_widget_destroy(dialog); // destroy dialog
+        return;
     }
 
     unsigned int **copy = allocGrid(dim);
@@ -700,6 +717,7 @@ void confirm_result()
     copyArray(result, copy, dim);
 
     printf("\n    📊 Solving sudoku\n");
+    printf("    ⏳ Please wait...\n");
 
     solveSuduko(result, 0, 0, dim);
 
@@ -726,10 +744,17 @@ void confirm_result()
     saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
+
+    change_image(&sudoku_image, "result_image");
+
+    freeImage(&sudoku_image, 9);
 }
 
 #pragma endregion
-
+void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
+{
+    change_image(&image, "selected_image");
+}
 void *init_gui()
 {
     builder = NULL;
@@ -781,6 +806,10 @@ void *init_gui()
     GtkProgressBar *progress_bar =
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
 
+    // on resize window
+    // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
+    // TODO: fix this
+
     // load UI
     gtk_widget_show_all(window); // show window
     gtk_widget_hide(GTK_WIDGET(progress_bar)); // hide progress bar
@@ -815,3 +844,6 @@ void quit()
     freeImage(&temp_image, 0);
     gtk_main_quit();
 }
+
+void end_process()
+{}

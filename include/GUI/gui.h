@@ -87,9 +87,9 @@ void cancel_nn(GtkWidget *widget, gpointer data);
 
 #pragma region "Terminal"
 
-void reset_terminal();
+void reset_terminal(char *terminal_id);
 
-void edit_terminal(char *string);
+void edit_terminal(char *terminal_id, char *string);
 
 #pragma endregion "Terminal"
 

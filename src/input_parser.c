@@ -351,7 +351,7 @@ static void analyzeNN(int argc, char **argv)
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
 
-        printVerbose(verbose, 0, "    🔨 Creating network\n");
+        printVerbose(verbose, 0, "    🔨 Creating network\n", "terminal_text1");
 
         // launchWeights(&network, WEIGHT_PATH, verbose);
 

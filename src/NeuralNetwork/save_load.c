@@ -98,7 +98,7 @@ void launchWeights(Network *network, char *path, int verbose, int gui)
 
     char text[200];
     snprintf(text, sizeof(text), "--> 💾 Initing weights from %s\n", path);
-    printVerbose(verbose, gui, text);
+    printVerbose(verbose, gui, text, "terminal_text");
 
     // Open file
     FILE *file;
