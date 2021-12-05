@@ -783,6 +783,30 @@ gboolean on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 
     //     // set the image
     //     gtk_image_set_from_pixbuf(imageWidget, resized_image);
+
+    //     GdkPixbuf *sourcePixbuf = data;	/* As read from a file */
+    //     GdkPixbuf *imagePixbuf;	/* pixbuf of the on-screen image */
+
+    //     imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
+    //     if (imagePixbuf == NULL) {
+    //     g_message("Can't get on-screen pixbuf");
+    //     return TRUE;
+    //     }
+    //     /* Recreate the displayed image if the image size has changed. */
+    //     if (allocation->width != gdk_pixbuf_get_width(imagePixbuf) ||
+    //         allocation->height != gdk_pixbuf_get_height(imagePixbuf)) {
+
+    //     gtk_image_set_from_pixbuf(
+    //         GTK_IMAGE(image),
+    //         gdk_pixbuf_scale_simple(sourcePixbuf,
+    //                     allocation->width,
+    //                     allocation->height,
+    //                     GDK_INTERP_BILINEAR)
+    //     );
+    //     g_object_unref(imagePixbuf); /* Free the old one */
+    // }
+
+    // return FALSE;
     // }
 
     // return TRUE;
