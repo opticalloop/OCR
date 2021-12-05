@@ -50,26 +50,26 @@ unsigned int isColumnSolvable(unsigned int **grid, unsigned int x,
     return true;
 }
 
-unsigned int isSquareSolvable(unsigned int **grid, unsigned int x,
-                              unsigned int y, unsigned int dimension)
+unsigned int isSquareSolvable(unsigned int **grid, int x,
+                              int y, unsigned int dimension)
 {
     int increment = (int)sqrt(dimension);
     x -= x % increment;
     y -= y % increment;
 
     unsigned int val;
-    for (unsigned int i = 0; i < increment; i++)
+    for (int i = 0; i < increment; i++)
     {
-        for (unsigned int j = 0; j < increment; j++)
+        for (int j = 0; j < increment; j++)
         {
             val = grid[x + i][y + j];
 
             if (val != 0)
             {
                 // Check if val is in the square
-                for (unsigned int k = x + i; k < x + increment; k++)
+                for (int k = x + i; k < x + increment; k++)
                 {
-                    for (unsigned int l = y + j + 1; l < y + increment; l++)
+                    for (int l = y + j + 1; l < y + increment; l++)
                     {
                         if (grid[k][l] == val)
                         {

@@ -108,6 +108,8 @@ int canBeSudokuGrid(Square *square, Image *image);
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness);
 
+double getSquareFactor(Image *image);
+
 /**
  * @brief Get the Better Corner object
  *

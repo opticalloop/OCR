@@ -23,12 +23,13 @@ static void checkFolderOutput(char *output_folder)
     {}
 }
 
-pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
+pthread_t OCR_thread(char *input_path, char *output_path, int verbose,
                      int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
-    SDL_Surface *surface = IMG_Load(intput_path);
+    SDL_Surface *surface = IMG_Load(input_path);
     Image img = newImage(surface, 1, surface->w, surface->h);
+    img.path = input_path;
     Thread_argument arg = { .image = img,
                             .output_path = output_path,
                             .verbose = verbose,
@@ -39,11 +40,6 @@ pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
     SDL_FreeSurface(surface);
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
-    if (gui == 0)
-    {
-        pthread_join(thread, NULL);
-    }
-
     return thread;
 }
 
@@ -52,7 +48,6 @@ void *OCR(void *Thread_args)
     Thread_argument arg = *(Thread_argument *)Thread_args;
     Image image = arg.image;
     char *image_path = image.path;
-    printf("%s\n", image_path);
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;
@@ -131,8 +126,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, 0, "    📑 3.2 Initing weights\n");
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
-    unsigned int angle_index;
-
     saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
                 0);
     changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
@@ -189,7 +182,7 @@ void *OCR(void *Thread_args)
         printf("\n    ❌ Please use the graphical interface to solve the grid "
                "easily\n");
         freeGrid(grid, dimension);
-        return;
+        pthread_exit(NULL); // Exit thread
     }
     else
     {
