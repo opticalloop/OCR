@@ -96,7 +96,7 @@ void edit_terminal(char *terminal_id, char *string);
 
 void show_result(unsigned int **grid, int dimension, Image *res);
 
-void *init_gui();
+void init_gui();
 
 void open_website();
 

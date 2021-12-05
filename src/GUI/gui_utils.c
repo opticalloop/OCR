@@ -15,7 +15,7 @@ static inline double get_quadrilateral_area(double x1, double y1, double x2,
                 / 2.0);
 }
 
-static inline isAlphaNumeric(char c)
+static inline int isAlphaNumeric(char c)
 {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
         || (c >= '0' && c <= '9');
