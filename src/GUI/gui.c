@@ -693,7 +693,6 @@ void confirm_result()
                        "6, 7, 8, 9, to 16 with heca or digit notation)\n");
                 return;
             }
-            result[i][j] = 0;
         }
     }
 
