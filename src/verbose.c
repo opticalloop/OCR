@@ -14,10 +14,10 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
         snprintf(output, sizeof(output), "%s/%s.bmp", output_folder,
                  output_path);
         saveImage(image, output);
-        if (free)
-        {
-            freeImage(image, 0);
-        }
+    }
+    if (free)
+    {
+        freeImage(image, 0);
     }
 }
 
@@ -43,7 +43,6 @@ void printVerbose(int verbose, int gui, char *message, char *terminal)
     }
     if (gui)
     {
-        edit_terminal(terminal,
-                      message);
+        edit_terminal(terminal, message);
     }
 }

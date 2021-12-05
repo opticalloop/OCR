@@ -13,8 +13,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     double maxTheta;
     // Call major fonction
-    MyList list =
-        houghtransform(image, drawImage, verbose, save, output_folder,&maxTheta);
+    MyList list = houghtransform(image, drawImage, verbose, save, output_folder,
+                                 &maxTheta);
 
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
                 0);
@@ -56,12 +56,14 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
         || (angleRounded >= 0 && angleRounded <= 5))
 
     {
-        printVerbose(verbose, 0, "    📐 2.4.1 Do not need to rotate image\n", "terminal_text");
+        printVerbose(verbose, 0, "    📐 2.4.1 Do not need to rotate image\n",
+                     "terminal_text");
         four_angles[0] = 0;
     }
     else
     {
-        printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n", "terminal_text");
+        printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n",
+                     "terminal_text");
         four_angles[0] = angleRounded;
         rotateAll(&tempImage, resultingList, angleRounded);
     }
@@ -88,7 +90,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     // FINDING SQUARES
 
-    printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n", "terminal_text");
+    printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n",
+                 "terminal_text");
 
     // FIND ALL SQUARES
     MyList squares;
@@ -98,14 +101,14 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
         _squareImage.path = image->path;
 
-        squares = findSquare(&resultingList, w, h, &_squareImage, save);
+        squares = findSquare(resultingList, w, h, &_squareImage, save);
         saveVerbose(verbose, &_squareImage, output_folder,
                     "2.6_Hough_squares_only", save, 0);
         changeImageGUI(&_squareImage, gui, 0.6, "Hough squares only", 1);
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, image, save || gui);
+        squares = findSquare(resultingList, w, h, image, save || gui);
     }
 
     if (verbose)
@@ -114,7 +117,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     }
 
     // SORTING SQUARES
-    printVerbose(verbose, 0, "    📉 2.6 Finding the predominating square\n", "terminal_text");
+    printVerbose(verbose, 0, "    📉 2.6 Finding the predominating square\n",
+                 "terminal_text");
 
     // FIND THE PREDOMINANT SQUARE
 
@@ -144,7 +148,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 }
 
 MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder, double *max_Theta)
+                      char *output_folder, double *max_Theta)
 {
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
@@ -176,7 +180,8 @@ MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         arrThetas[index] = val;
     }
 
-    printVerbose(verbose, 0, "    🎲 2.2.1 Computing cos and sin array\n", "terminal_text");
+    printVerbose(verbose, 0, "    🎲 2.2.1 Computing cos and sin array\n",
+                 "terminal_text");
     // Create a save of cos and sin value for each theta, to optimize
     // performance.
     double *saveCos = calloc(nbTheta + 1, sizeof(double));
@@ -191,7 +196,8 @@ MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         saveSin[theta] = sin(arrThetas[theta]);
     }
 
-    printVerbose(verbose, 0, "    📥 2.2.2 Filling accumulator\n", "terminal_text");
+    printVerbose(verbose, 0, "    📥 2.2.2 Filling accumulator\n",
+                 "terminal_text");
     unsigned int **accumulator = initMatrice(nbTheta + 1, nbRho + 1);
 
     // We intialize the accumulator with all the value
@@ -238,7 +244,7 @@ MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     }
 
     // Create line return line array
-    MyList allLines = { NULL, NULL, 0};
+    MyList allLines = { NULL, NULL, 0 };
 
     double tempMaxTheta = 0.0;
     unsigned int histogram[181] = { 0 };
@@ -509,31 +515,25 @@ void rotateAll(Image *image, MyList *lineList, double angleDegree)
     {
         Line *l = (Line *)node->value;
         // Calculate new position start
-        newX =
-            ((double)(cos(angle) * ((double)l->xStart - middleX)
-                      - sin(angle) * ((double)l->yStart - middleY))
-             + middleX);
+        newX = ((double)(cos(angle) * ((double)l->xStart - middleX)
+                         - sin(angle) * ((double)l->yStart - middleY))
+                + middleX);
 
-        newY =
-            ((double)(cos(angle) * ((double)l->yStart - middleY)
-                      + sin(angle) * ((double)l->xStart - middleX))
-             + middleY);
+        newY = ((double)(cos(angle) * ((double)l->yStart - middleY)
+                         + sin(angle) * ((double)l->xStart - middleX))
+                + middleY);
 
         l->xStart = (int)newX;
         l->yStart = (int)newY;
 
         // Calculate new position end
-        newX =
-            ((double)(cos(angle) * ((double)l->xEnd - middleX)
-                      - sin(angle)
-                          * ((double)l->yEnd - middleY))
-             + middleX);
+        newX = ((double)(cos(angle) * ((double)l->xEnd - middleX)
+                         - sin(angle) * ((double)l->yEnd - middleY))
+                + middleX);
 
-        newY =
-            ((double)(cos(angle) * ((double)l->yEnd - middleY)
-                      + sin(angle)
-                          * ((double)l->xEnd - middleX))
-             + middleY);
+        newY = ((double)(cos(angle) * ((double)l->yEnd - middleY)
+                         + sin(angle) * ((double)l->xEnd - middleX))
+                + middleY);
 
         l->xEnd = (int)newX;
         l->yEnd = (int)newY;

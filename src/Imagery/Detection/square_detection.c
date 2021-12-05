@@ -12,39 +12,36 @@ MyList *simplifyLines(MyList *linelist)
 
     Node *referenceNode = allLines->head;
     unsigned count = 0;
-    for (unsigned int i = 0 ; referenceNode != NULL; referenceNode = referenceNode->next, i++){
+    for (unsigned int i = 0; referenceNode != NULL;
+         referenceNode = referenceNode->next, i++)
+    {
         count++;
         Line *refLine = (Line *)referenceNode->value;
-        // printf("%u refLine xstart %i\n", i,refLine->xStart);
-        if (refLine->xStart != -1){
+        if (refLine->xStart != -1)
+        {
             Node *currentNode = allLines->head;
-            // printf("Ca passe ref\n");
-            for (unsigned j = 0; currentNode != NULL; currentNode = currentNode->next, j++){
-                if (i == j){
+            for (unsigned j = 0; currentNode != NULL;
+                 currentNode = currentNode->next, j++)
+            {
+                if (i == j)
+                {
                     continue;
                 }
                 Line *curLine = (Line *)currentNode->value;
-                if (curLine->xStart != -1){
-                    //printf("Ca passe cur\n");
-                    if (abs(refLine->xStart - curLine->xStart)
-                            < MIN_EQUAL
-                        && abs(refLine->xEnd - curLine->xEnd)
-                            < MIN_EQUAL
-                        && abs(refLine->yStart - curLine->yStart)
-                            < MIN_EQUAL
-                        && abs(refLine->yEnd - curLine->yEnd)
-                            < MIN_EQUAL)
+                if (curLine->xStart != -1)
+                {
+                    if (abs(refLine->xStart - curLine->xStart) < MIN_EQUAL
+                        && abs(refLine->xEnd - curLine->xEnd) < MIN_EQUAL
+                        && abs(refLine->yStart - curLine->yStart) < MIN_EQUAL
+                        && abs(refLine->yEnd - curLine->yEnd) < MIN_EQUAL)
                     {
                         refLine->xStart =
                             (refLine->xStart + curLine->xStart) / 2;
-                        refLine->xEnd =
-                            (refLine->xEnd + curLine->xEnd) / 2;
+                        refLine->xEnd = (refLine->xEnd + curLine->xEnd) / 2;
                         refLine->yStart =
                             (refLine->yStart + curLine->yStart) / 2;
-                        refLine->yEnd =
-                            (refLine->yEnd + curLine->yEnd) / 2;
+                        refLine->yEnd = (refLine->yEnd + curLine->yEnd) / 2;
                         curLine->xStart = -1;
-                        //printf("new curLine xstart %i", curLine->xStart);
                     }
                 }
             }
@@ -64,7 +61,8 @@ MyList *simplifyLines(MyList *linelist)
             free_node(tmp);
             allLines->length--;
         }
-        else{
+        else
+        {
             prev = node;
             node = node->next;
         }
@@ -73,7 +71,7 @@ MyList *simplifyLines(MyList *linelist)
     {
         Line *line = (Line *)node->value;
         if (line->xStart == -1)
-        {   
+        {
             Node *tmp = node;
             node = node->next;
             prev->next = node;
@@ -170,7 +168,7 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
 }
 
 MyList findSquare(MyList *lineList, int width, int height, Image *image,
-                      int draw)
+                  int draw)
 {
     MyList squareList = { NULL, NULL, 0 };
     double squareFactor = getSquareFactor(image);
@@ -183,7 +181,7 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
         {
             if (i == h)
                 continue;
-            
+
             Line *line1 = (Line *)n1->value;
             Line *line2 = (Line *)n2->value;
             // Get all line that actualLine have a intersection point with
@@ -199,9 +197,8 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
                         continue;
 
                     Line *line3 = (Line *)n3->value;
-                    
-                    Dot dot2 =
-                        getIntersection(line2, line3, width, height);
+
+                    Dot dot2 = getIntersection(line2, line3, width, height);
 
                     if (dot2.X != -1)
                     {
@@ -213,8 +210,8 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
                                 continue;
 
                             Line *line4 = (Line *)n4->value;
-                            Dot dot3 = getIntersection(line3, line4, width,
-                                                       height);
+                            Dot dot3 =
+                                getIntersection(line3, line4, width, height);
 
                             if (dot3.X != -1)
                             {
@@ -253,7 +250,8 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
                                     square.left = fourthLine;
 
                                     // Not a square
-                                    if (!isSquare(&square, width, height, squareFactor))
+                                    if (!isSquare(&square, width, height,
+                                                  squareFactor))
                                     {
                                         continue;
                                     }
@@ -278,7 +276,8 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
     return squareList;
 }
 
-int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR)
+int isSquare(Square *square, unsigned int width, unsigned int height,
+             double SQUARE_FACTOR)
 {
     // Avoid warning
     (void)width;
@@ -328,16 +327,16 @@ double getLineLength(Line *line)
 Square sortSquares(MyList *squareList, Image *image)
 {
     Node *n = squareList->head;
-    Square temp = *(Square *)n->value; 
+    Square temp = *(Square *)n->value;
 
     // Avoid warning
-    (void) image;
+    (void)image;
 
     int tempFactor = getPerimeter(&temp);
     n = n->next;
     for (; n != NULL; n = n->next)
     {
-        Square *square = (Square*)n->value;
+        Square *square = (Square *)n->value;
         int factor = getPerimeter(square);
         if (factor > tempFactor) // && canBeSudokuGrid(&square, image))
         {
@@ -401,7 +400,9 @@ int canBeSudokuGrid(Square *square, Image *image)
 double getSquareFactor(Image *image)
 {
     int len;
-    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.'; len--);
+    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.';
+         len--)
+        ;
     if (image->path[len] == '.')
     {
         len--;

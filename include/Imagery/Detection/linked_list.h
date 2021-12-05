@@ -1,22 +1,25 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#include "Imagery/Detection/struct.h"
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <err.h>
 
-typedef struct Node_T{
+#include "Imagery/Detection/struct.h"
+
+typedef struct Node_T
+{
     void *value;
     struct Node_T *next;
     struct Node_T *prev;
-}Node;
+} Node;
 
-typedef struct{
+typedef struct
+{
     Node *head;
     Node *tail;
     size_t length;
-}MyList;
+} MyList;
 
 void *Line_tovptr(Line line);
 void *Square_tovptr(Square square);
@@ -46,6 +49,6 @@ void free_list(MyList *list);
 // Display Node
 void printNode(Node node);
 // Display List
-void printMyList(MyList *list); 
+void printMyList(MyList *list);
 
 #endif

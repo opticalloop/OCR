@@ -1,23 +1,26 @@
 #include "Imagery/Detection/linked_list.h"
 
-void *Line_tovptr(Line line){
+void *Line_tovptr(Line line)
+{
     void *p = malloc(sizeof(Line));
-    if (p==NULL)
+    if (p == NULL)
         errx(1, "Not enough memory");
-    *(Line*)p = line;
+    *(Line *)p = line;
     return p;
 }
 
-void *Square_tovptr(Square square){
+void *Square_tovptr(Square square)
+{
     void *p = malloc(sizeof(Square));
-    if (p==NULL)
+    if (p == NULL)
         errx(1, "Not enough memory");
-    *(Square*)p = square;
+    *(Square *)p = square;
     return p;
 }
 
 // Initialization
-Node *initializeNode(void *value){
+Node *initializeNode(void *value)
+{
     Node *newNode = (Node *)malloc(sizeof(Node));
     if (newNode == NULL)
         errx(1, "Initialize Node: not enough memory");
@@ -27,16 +30,20 @@ Node *initializeNode(void *value){
     return newNode;
 }
 
-void initializeMyList(MyList *list, size_t nb, void *value){
-    if (nb){
+void initializeMyList(MyList *list, size_t nb, void *value)
+{
+    if (nb)
+    {
         list->head = initializeNode(value);
         list->tail = list->head;
         list->length = 1;
-        for(size_t i = 1; i < nb; i++){
+        for (size_t i = 1; i < nb; i++)
+        {
             append(list, value);
         }
     }
-    else{
+    else
+    {
         list->head = NULL;
         list->tail = NULL;
         list->length = 0;
@@ -44,43 +51,55 @@ void initializeMyList(MyList *list, size_t nb, void *value){
 }
 
 // Getting nodes and their values
-Node *get_node(MyList *list, size_t index){
-    if(index >= list->length)
+Node *get_node(MyList *list, size_t index)
+{
+    if (index >= list->length)
         return NULL;
     Node *node = list->head;
-    for(;index > 0;index--){
+    for (; index > 0; index--)
+    {
         node = node->next;
     }
     return node;
 }
 
-void *get_value(MyList *list, size_t index){
+void *get_value(MyList *list, size_t index)
+{
     Node *tmp = get_node(list, index);
-    if (tmp == NULL){
+    if (tmp == NULL)
+    {
         return NULL;
     }
     return tmp->value;
 }
 
 // Insertion of node
-void append(MyList *list, void *value){
+void append(MyList *list, void *value)
+{
     Node *node = initializeNode(value);
-    if (list->head == NULL){
+    if (list->head == NULL)
+    {
         list->head = node;
         list->tail = node;
-    } else {
+    }
+    else
+    {
         list->tail->next = node;
         node->prev = list->tail;
         list->tail = node;
     }
     list->length++;
 }
-void prepend(MyList *list, void *value){
+void prepend(MyList *list, void *value)
+{
     Node *node = initializeNode(value);
-    if (list->head == NULL){
+    if (list->head == NULL)
+    {
         list->head = node;
         list->tail = node;
-    } else {
+    }
+    else
+    {
         list->head->prev = node;
         node->next = list->head;
         list->head = node;
@@ -88,12 +107,18 @@ void prepend(MyList *list, void *value){
     list->length++;
 }
 
-void insert(MyList *list, size_t index, void *value){
-    if (index == 0){
+void insert(MyList *list, size_t index, void *value)
+{
+    if (index == 0)
+    {
         prepend(list, value);
-    } else if (index == list->length){
+    }
+    else if (index == list->length)
+    {
         append(list, value);
-    } else {
+    }
+    else
+    {
         Node *node = initializeNode(value);
         Node *tmp = get_node(list, index);
         tmp->prev->next = node;
@@ -105,43 +130,55 @@ void insert(MyList *list, size_t index, void *value){
 }
 
 // Removing node
-void *prepop(MyList *list){
-    if (list->head == NULL){
+void *prepop(MyList *list)
+{
+    if (list->head == NULL)
+    {
         return NULL;
     }
-    void * value = list->head->value;
+    void *value = list->head->value;
     list->head = list->head->next;
-    if (list->head != NULL){
+    if (list->head != NULL)
+    {
         list->head->prev = NULL;
     }
     list->length--;
     return value;
 }
 
-void *pop(MyList *list){
-    if (list->tail == NULL){
+void *pop(MyList *list)
+{
+    if (list->tail == NULL)
+    {
         return NULL;
     }
-    void * value = list->tail->value;
+    void *value = list->tail->value;
     list->tail = list->tail->prev;
     list->tail->next = NULL;
     list->length--;
     return value;
 }
 
-void *removeAt(MyList *list, size_t index){
-    if (index >= list->length){
+void *removeAt(MyList *list, size_t index)
+{
+    if (index >= list->length)
+    {
         return NULL;
     }
     Node *tmp = get_node(list, index);
-    if (tmp == list->head){
+    if (tmp == list->head)
+    {
         return prepop(list);
-    } else if (tmp == list->tail){
+    }
+    else if (tmp == list->tail)
+    {
         return pop(list);
-    } else {
+    }
+    else
+    {
         tmp->prev->next = tmp->next;
         tmp->next->prev = tmp->prev;
-        void * value = tmp->value;
+        void *value = tmp->value;
         free(tmp);
         list->length--;
         return value;
@@ -150,16 +187,19 @@ void *removeAt(MyList *list, size_t index){
 
 // Freeing memory
 // Free the memory of the node
-void free_node(Node *node){
+void free_node(Node *node)
+{
     node->next = NULL;
     node->prev = NULL;
     free(node->value);
     free(node);
 }
 
-void free_list(MyList *list){
+void free_list(MyList *list)
+{
     Node *tmp = list->head;
-    while(tmp != NULL){
+    while (tmp != NULL)
+    {
         Node *n = tmp->next;
         free_node(tmp);
         tmp = n;
@@ -167,16 +207,19 @@ void free_list(MyList *list){
 }
 
 // Display Node
-void printNode(Node node){
+void printNode(Node node)
+{
     printf("Node: %p\n", node.value);
 }
 
 // Display List
-void printMyList(MyList *list){
+void printMyList(MyList *list)
+{
     Node *tmp = list->head;
     printf("[");
-    for(;tmp->next != NULL;tmp = tmp->next){
+    for (; tmp->next != NULL; tmp = tmp->next)
+    {
         printf("  %d ;", *((int *)tmp->value));
     }
     printf("  %d ]\n", *((int *)tmp->value));
-}   
+}

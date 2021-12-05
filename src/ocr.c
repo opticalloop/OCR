@@ -15,18 +15,20 @@ static void checkFolderOutput(char *output_folder)
         char delete[200];
         snprintf(delete, sizeof(delete), "rm -rf %s", output_folder);
         if (system(delete))
-        {}
+        {
+        }
     }
     char directory[200];
     snprintf(directory, sizeof(directory), "mkdir %s", output_folder);
     if (system(directory))
-    {}
+    {
+    }
 }
 
-pthread_t OCR_thread(char *input_path, char *output_path, int verbose,
-                     int save, char *output_folder, int gui, int hexa)
+pthread_t OCR_thread(char *input_path, char *output_path, int verbose, int save,
+                     char *output_folder, int gui, int hexa)
 {
-    (void) output_path;
+    (void)output_path;
     pthread_t thread;
     SDL_Surface *surface = IMG_Load(input_path);
     Image img = newImage(surface, 1, surface->w, surface->h);
@@ -162,11 +164,11 @@ void *OCR(void *Thread_args)
             }
             else
             {
-              grid[i][j] = val;
-              // Free the case
-              freeImage(&(all_cases[i * dimension + j]), 0);
+                grid[i][j] = val;
+                // Free the case
+                freeImage(&(all_cases[i * dimension + j]), 0);
             }
-         }
+        }
     }
 
     basicPrint(grid, dimension);
@@ -184,7 +186,8 @@ void *OCR(void *Thread_args)
 
     if (!isSolvable(grid, dimension))
     {
-        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n", "terminal_text");
+        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n",
+                     "terminal_text");
         printf("\n    ❌ Please use the graphical interface to solve the grid "
                "easily\n");
         freeGrid(grid, dimension);
@@ -192,7 +195,8 @@ void *OCR(void *Thread_args)
     }
     else
     {
-        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n", "terminal_text");
+        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n",
+                     "terminal_text");
     }
 
     unsigned int **copy = allocGrid(dimension);

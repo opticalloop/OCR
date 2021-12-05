@@ -140,7 +140,7 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         // Display image
         change_image(&image, "selected_image");
-        
+
         loaded_image = 1;
 
         // update label
@@ -281,7 +281,7 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         printf("Processing...\n");
-        
+
         saveImage(&image, filename);
         // Run processing
         pthread_t t;
@@ -602,7 +602,6 @@ void show_result(unsigned int **grid, int dimension, Image *res)
         // Load image
         change_image(res, "selected_image1");
 
-
         // get grid
         grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
@@ -749,7 +748,6 @@ void confirm_result()
 
     change_image(&sudoku_image, "result_image");
 
-    
     freeGrid(result, dim); // Free grid
     freeGrid(copy, dim); // Free copy
 
@@ -764,18 +762,22 @@ gboolean on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 
     // if (loaded_image)
     // {
-    //     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+    //     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder,
+    //     "right_panel"));
 
-    //     int width = 
-    //         clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0, 1000);
-        
+    //     int width =
+    //         clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0,
+    //         1000);
+
     //     int height =
-    //         clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0, 1000);
+    //         clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0,
+    //         1000);
 
     //     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
 
     //     GtkImage *imageWidget =
-    //         GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); // get image
+    //         GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); //
+    //         get image
 
     //     // Change image
     //     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(

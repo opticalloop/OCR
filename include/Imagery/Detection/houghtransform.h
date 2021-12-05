@@ -1,11 +1,11 @@
 #ifndef HOUGHTRANSFORM_H
 #define HOUGHTRANSFORM_H
 
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/reverse_color.h"
 #include "Imagery/Detection/sobel.h"
 #include "Imagery/Detection/square_detection.h"
 #include "Imagery/Detection/struct.h"
-#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Rotations_Resize/rotations.h"
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
@@ -39,7 +39,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
  */
 
 MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder, double *max_Theta);
+                      char *output_folder, double *max_Theta);
 
 /**
  * @brief

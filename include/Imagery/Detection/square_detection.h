@@ -6,7 +6,6 @@
 #include "Imagery/Detection/houghtransform.h"
 #include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/struct.h"
-#include "Imagery/Detection/linked_list.h"
 
 /**
  * @brief
@@ -48,7 +47,7 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height);
  * @return MyList
  */
 MyList findSquare(MyList *lineList, int width, int height, Image *image,
-                      int draw);
+                  int draw);
 
 /**
  * @brief Get the All Square object
@@ -59,8 +58,7 @@ MyList findSquare(MyList *lineList, int width, int height, Image *image,
  * @param image
  * @return MyList
  */
-MyList *getAllSquare(MyList *lineList, int width, int height,
-                        Image *image);
+MyList *getAllSquare(MyList *lineList, int width, int height, Image *image);
 
 /**
  * @brief
@@ -70,7 +68,8 @@ MyList *getAllSquare(MyList *lineList, int width, int height,
  * @param height
  * @return int
  */
-int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR);
+int isSquare(Square *square, unsigned int width, unsigned int height,
+             double SQUARE_FACTOR);
 
 /**
  * @brief Get the Line Length object

@@ -17,7 +17,7 @@
  */
 
 void inverseMat(double cinMatrix[9][9], double coutMatrix[9][9],
-                 int sizeMatrix);
+                int sizeMatrix);
 
 /**
  * @brief
@@ -47,7 +47,7 @@ void multiplyMat(double **A, double **B, int size);
 void inverse3x3Mat(double **M, double **M_inv);
 
 void multiplyMatStat(double M[][_MAX], double v[_MAX], double v_out[_MAX],
-                         int size);
+                     int size);
 
 /**
  * @brief

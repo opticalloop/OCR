@@ -59,14 +59,13 @@ static int isNumber(char *text)
 
 static void printHelpOCR()
 {
-    printf(
-        "🎨 Options ocr :\n"
-        "      gui : open graphical interface\n"
-        "      -o <output_path> : specify an output path\n"
-        "      -v --verbose : print details of process\n"
-        "      -S <folder> : save all intermediate images in a folder\n"
-        "      -hexa : solve hexadecimal grid\n"
-        "      --help : print ocr help\n");
+    printf("🎨 Options ocr :\n"
+           "      gui : open graphical interface\n"
+           "      -o <output_path> : specify an output path\n"
+           "      -v --verbose : print details of process\n"
+           "      -S <folder> : save all intermediate images in a folder\n"
+           "      -hexa : solve hexadecimal grid\n"
+           "      --help : print ocr help\n");
 }
 
 static void printHelpNN()
@@ -306,7 +305,8 @@ static void analyzeNN(int argc, char **argv)
                 printf("    ❗ The file specified where to save weights already "
                        "exist, overwrite it ? [Y/n] : ");
                 if (scanf("%s", str) == EOF)
-                {}
+                {
+                }
                 toUp(str);
                 // While str != Y, YES, N and NO
                 while (strcmp(str, "Y") && strcmp(str, "YES")
@@ -314,7 +314,8 @@ static void analyzeNN(int argc, char **argv)
                 {
                     printf("\n[Y/n] : ");
                     if (scanf("%s", str) == EOF)
-                    {}
+                    {
+                    }
                     toUp(str);
                 }
                 if (!strcmp(str, "N") || !strcmp(str, "NO"))

@@ -14,7 +14,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     printVerbose(verbose, 0, "    🎨 1 Preprocessing image\n", "terminal_text");
 
     // CONTRAST
-    printVerbose(verbose, 0, "    📸 1.1 Applying constrast Filter\n", "terminal_text");
+    printVerbose(verbose, 0, "    📸 1.1 Applying constrast Filter\n",
+                 "terminal_text");
     image_levels(image, 10);
     invert(image);
     image_normalize_brightness(image);
@@ -23,7 +24,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.1, "Contrast filter", 0);
 
     // MEDIAN
-    printVerbose(verbose, 0, "    🎥 1.2 Applying Median Filter\n", "terminal_text");
+    printVerbose(verbose, 0, "    🎥 1.2 Applying Median Filter\n",
+                 "terminal_text");
     Pixel **mask = copyPixelsArray(image, 1);
     updateNeigbourgs(image);
     applyFilter(mask, image, MedianFilter, Median, w, h);
@@ -33,14 +35,15 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.15, "Median filter", 0);
 
     // AVERAGE
-    printVerbose(verbose, 0, "    🎬 1.3 Applying Average Filter\n", "terminal_text");
+    printVerbose(verbose, 0, "    🎬 1.3 Applying Average Filter\n",
+                 "terminal_text");
     applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     changeImageGUI(image, gui, 0.2, "Average filter", 0);
 
     // ADAPTATIVE THRESHOLD
-    printVerbose(verbose, 0,
-                 "    💻 1.4 Applying Adaptative Threshold Filter\n", "terminal_text");
+    printVerbose(verbose, 0, "    💻 1.4 Applying Adaptative Threshold Filter\n",
+                 "terminal_text");
     float noise = noiseLevel(image);
     if (verbose)
         printf("    👍 1.4.1 Noise level : %f\n", noise);
