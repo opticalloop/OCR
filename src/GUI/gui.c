@@ -586,29 +586,44 @@ void edit_terminal(char *terminal_id, char *string)
 
 #pragma region "Result"
 
-void show_result(unsigned int **grid)
+void show_result(unsigned int **grid, int dimension)
 {
-    gtk_stack_set_visible_child_name(stack_2, "confirmation");
+    if (dimension == 9)
+    {
+        gtk_stack_set_visible_child_name(stack_2, "confirmation");
 
-    // Load image
-    change_image(&image, "selected_image1");
+        // Load image
+        change_image(&image, "selected_image1");
 
-    // get grid
-    GtkGrid *grid_widget =
-        GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+        // get grid
+        GtkGrid *grid_widget =
+            GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
-    GtkStack *stack_result =
-        GTK_STACK(gtk_builder_get_object(builder, "stack1"));
-    gtk_stack_set_visible_child(stack_result, GTK_WIDGET(grid_widget));
+        GtkStack *stack_result =
+            GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+    }
+    else // dimension == 16
+    {
+        gtk_stack_set_visible_child_name(stack_2, "confirmation_hexa");
+
+        // Load image
+        change_image(&image, "selected_image_hexa");
+
+        // get grid
+        GtkGrid *grid_widget =
+            GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
+
+        GtkStack *stack_result =
+            GTK_STACK(gtk_builder_get_object(builder, "stack2"));
+    }
+    gtk_stack_set_visible_child_name(stack_result, "Result");
 
     // copy child of grid 0 0
     GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
 
-    grid = allocGrid(9);
-
-    for (size_t i = 0; i < 9; i++)
+    for (size_t i = 0; i < dimension; i++)
     {
-        for (size_t j = 0; j < 9; j++)
+        for (size_t j = 0; j < dimension; j++)
         {
             // get input at i,j and set value
             GtkEntry *entry =
@@ -626,7 +641,7 @@ void show_result(unsigned int **grid)
             gtk_entry_set_text(entry, ch);
         }
     }
-    freeGrid(grid, 9);
+    freeGrid(grid, dimension);
 }
 
 void confirm_result()
@@ -640,7 +655,9 @@ void confirm_result()
 
     unsigned int **result = allocGrid(dim);
 
-    GtkGrid *grid = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+    GtkGrid *grid = dim == 9
+        ? GTK_GRID(gtk_builder_get_object(builder, "grid_result"))
+        : GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
 
     char *str;
     for (int i = 0; i < dim; i++)
@@ -694,6 +711,7 @@ void confirm_result()
             "The grid is not solvable, please correct the grid");
         gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
         gtk_widget_destroy(dialog); // destroy dialog
+        return;
     }
 
     unsigned int **copy = allocGrid(dim);

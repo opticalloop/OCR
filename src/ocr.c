@@ -26,7 +26,7 @@ static void checkFolderOutput(char *output_folder)
 }
 
 pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
-                      int save, char *output_folder, int gui, int hexa)
+                     int save, char *output_folder, int gui, int hexa)
 {
     pthread_t thread;
     SDL_Surface *surface = IMG_Load(intput_path);
@@ -72,9 +72,9 @@ void *OCR(void *Thread_args)
 
     // if (image.width > 3000 || image.height > 3000)
     // {
-    //     printVerbose(verbose, "      📏 1.0 Simplifying image\n", "terminal_text1");
-    //     Image img = copyImage(&image, 1);
-    //     image = resize(&img, image.width * 0.5, image.height * 0.5, 1);
+    //     printVerbose(verbose, "      📏 1.0 Simplifying image\n",
+    //     "terminal_text1"); Image img = copyImage(&image, 1); image =
+    //     resize(&img, image.width * 0.5, image.height * 0.5, 1);
     // }
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
@@ -92,9 +92,10 @@ void *OCR(void *Thread_args)
 
     // DETECTION
 
-    printVerbose(verbose, 0, "\n    🔍 2 Grid detection (Hough Transform)\n", "terminal_text1");
-    printVerbose(verbose, 0,
-                 "    🎥 2.1 Applying sobel edge detection filter\n", "terminal_text1");
+    printVerbose(verbose, 0, "\n    🔍 2 Grid detection (Hough Transform)\n",
+                 "terminal_text1");
+    printVerbose(verbose, 0, "    🎥 2.1 Applying sobel edge detection filter\n",
+                 "terminal_text1");
 
     Image drawImage = copyImage(&image, 0);
 
@@ -103,7 +104,8 @@ void *OCR(void *Thread_args)
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
-    printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🔨 2.2 Launching Hough Transform\n",
+                 "terminal_text1");
 
     // Four possible angle
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
@@ -122,8 +124,10 @@ void *OCR(void *Thread_args)
     unsigned int **grid = allocGrid(dimension);
 
     // Recognisation + Construction
-    printVerbose(verbose, 0, "\n    ❓ 3 Initing digit recognition\n", "terminal_text1");
-    printVerbose(verbose, 0, "    📊 3.1 Creating neural network\n", "terminal_text1");
+    printVerbose(verbose, 0, "\n    ❓ 3 Initing digit recognition\n",
+                 "terminal_text1");
+    printVerbose(verbose, 0, "    📊 3.1 Creating neural network\n",
+                 "terminal_text1");
 
     Network network;
     network.sizeInput = NBINPUTS;
@@ -133,11 +137,12 @@ void *OCR(void *Thread_args)
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     unsigned int angle_index;
-    
-    saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image",
-                save, 0);
+
+    saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
+                0);
     changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
-    printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🪓 3.3 Segmenting cropped image\n",
+                 "terminal_text1");
 
     // Segmentation
     // Initialize all case at NULL
@@ -149,15 +154,16 @@ void *OCR(void *Thread_args)
     // Segmentation
     split(&cropped, all_cases, save, output_folder, hexa);
 
-    printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🔨 3.4 Creating sudoku grid\n",
+                 "terminal_text1");
     int val;
     for (unsigned int i = 0; i < dimension; i++)
     {
         for (unsigned int j = 0; j < dimension; j++)
         {
             // Get the value of the case
-            val = getNetworkOutput(&network,
-                                    &(all_cases[i * dimension + j]), 0);
+            val =
+                getNetworkOutput(&network, &(all_cases[i * dimension + j]), 0);
 
             if (!hexa && val > 9)
             {
@@ -171,12 +177,12 @@ void *OCR(void *Thread_args)
     }
 
     basicPrint(grid, dimension);
-    
+
     if (gui)
     {
-        show_result(grid);
-        freeGrid(grid, dimension);
+        show_result(grid, dimension);
         pthread_exit(NULL); // Exit thread
+        return NULL;
     }
 
     if (!isSolvable(grid, dimension))
@@ -193,7 +199,8 @@ void *OCR(void *Thread_args)
     copyArray(grid, copy, dimension);
 
     printVerbose(verbose, 0, "    ✅ 3.5 Grid is solvable\n", "terminal_text1");
-    printVerbose(verbose, 0, "\n    🎲 4 Solving sudoku grid\n", "terminal_text1");
+    printVerbose(verbose, 0, "\n    🎲 4 Solving sudoku grid\n",
+                 "terminal_text1");
     printVerbose(verbose, 0, "    🔍 4.2 Solving grid\n", "terminal_text1");
 
     solveSuduko(grid, 0, 0, dimension);
@@ -213,7 +220,7 @@ void *OCR(void *Thread_args)
     if (hexa)
     {
         sudoku_image = createHexaSudokuImage(grid, copy, IMAGE_PATH);
-    }   
+    }
     else
     {
         sudoku_image = createSudokuImage(grid, copy, IMAGE_PATH, dimension);
@@ -227,7 +234,6 @@ void *OCR(void *Thread_args)
         change_image(&sudoku_image, "selected_image");
         edit_progress_bar(1, "Result");
     }
-    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid",
-                save, 1);
+    saveVerbose(verbose, &sudoku_image, output_folder, "0.0_grid", save, 1);
     pthread_exit(NULL); // Exit thread
 }
