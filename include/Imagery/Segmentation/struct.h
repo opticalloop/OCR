@@ -8,8 +8,21 @@
 
 #include "Imagery/Utils/image.h"
 
+/**
+ * @brief
+ *
+ * @param x
+ * @param y
+ * @return int**
+ */
 int **initMatriceInt(int x, int y);
 
-void freeMatrice(int **matrice, size_t height);
+/**
+ * @brief
+ *
+ * @param matrice
+ * @param height
+ */
+void freeMatriceInt(int **matrice, int height);
 
 #endif

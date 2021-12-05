@@ -328,9 +328,9 @@ Image cropImage(Image *image, SDL_Rect *rect)
     }
 
     // Copy pixels from image to res
-    for (unsigned int x = rect->x; x < rect->x + rect->w; x++)
+    for (int x = rect->x; x < rect->x + rect->w; x++)
     {
-        for (unsigned int y = rect->y; y < rect->y + rect->h; y++)
+        for (int y = rect->y; y < rect->y + rect->h; y++)
         {
             res.pixels[x - rect->x][y - rect->y].r = image->pixels[x][y].r;
             res.pixels[x - rect->x][y - rect->y].g = image->pixels[x][y].g;
@@ -342,11 +342,11 @@ Image cropImage(Image *image, SDL_Rect *rect)
 
 void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect)
 {
-    for (unsigned int x = rect->x; x < rect->x + rect->w; x++)
+    for (int x = rect->x; x < rect->x + rect->w; x++)
     {
-        for (unsigned int y = rect->y; y < rect->y + rect->h; y++)
+        for (int y = rect->y; y < rect->y + rect->h; y++)
         {
-            if (x - rect->x < src->width && y - rect->y < src->height)
+            if (x - rect->x < (int)src->width && y - rect->y < (int)src->height)
             {
                 dest->pixels[x][y].r = src->pixels[x - rect->x][y - rect->y].r;
                 dest->pixels[x][y].g = src->pixels[x - rect->x][y - rect->y].g;

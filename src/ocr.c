@@ -67,7 +67,6 @@ void *OCR(void *Thread_args)
     // Create image
     printVerbose(verbose, gui, "--> 💾 Creating image\n", "terminal_text1");
 
-
     // if (image.width > 3000 || image.height > 3000)
     // {
     //     printVerbose(verbose, "      📏 1.0 Simplifying image\n",
@@ -104,7 +103,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, gui, "    🔨 2.2 Launching Hough Transform\n",
                  "terminal_text1");
 
-
     // Four possible angle
     double four_angles[4] = { 0.0, 90.0, 180.0, 270.0 };
 
@@ -127,7 +125,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, gui, "    📊 3.1 Creating neural network\n",
                  "terminal_text1");
 
-
     Network network;
     network.sizeInput = NBINPUTS;
     network.sizeOutput = NBOUTPUTS;
@@ -141,7 +138,6 @@ void *OCR(void *Thread_args)
     changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
     printVerbose(verbose, gui, "    🪓 3.3 Segmenting cropped image\n",
                  "terminal_text1");
-
 
     // Segmentation
     // Initialize all case at NULL
@@ -172,7 +168,6 @@ void *OCR(void *Thread_args)
             grid[i][j] = val;
             // Free the case
             freeImage(&(all_cases[i * dimension + j]), 0);
-            
         }
     }
 

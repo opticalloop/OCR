@@ -150,6 +150,8 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                       char *output_folder, double *max_Theta)
 {
+    (void)output_folder;
+
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
     // Calculate the diagonal of the image

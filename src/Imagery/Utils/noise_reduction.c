@@ -183,16 +183,16 @@ void adaptativeThreshold(Image *image, const double t)
     for (unsigned int i = 1; i < width; i++)
     {
         sum = 0;
-        for (int j = 0; j < height; j++)
+        for (unsigned int j = 0; j < height; j++)
         {
             sum += image->pixels[i][j].r;
             integral_image[i * height + j] =
                 integral_image[(i - 1) * height + j] + sum;
         }
     }
-    for (int i = 0; i < width; i++)
+    for (unsigned int i = 0; i < width; i++)
     {
-        for (int j = 0; j < height; j++)
+        for (unsigned int j = 0; j < height; j++)
         {
             x1 = fmax(i - s2, 1);
             x2 = fmin(i + s2, width - 1);
@@ -322,8 +322,15 @@ float noiseLevel(Image *image)
             }
             medium /= 9;
 
-            if (abs(1 - (image->pixels[i][j].r / medium)) > NOISE_THRESHOLD)
+            double val = 1.0 - (image->pixels[i][j].r / medium);
+            if (val < 0)
+            {
+                val *= -1;
+            }
+            if (val > NOISE_THRESHOLD)
+            {
                 count++;
+            }
         }
     }
 

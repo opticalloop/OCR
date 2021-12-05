@@ -89,6 +89,8 @@ pthread_t train_thread(const unsigned int epoch,
                        const unsigned int nbNodesPerHidden, const int verbose,
                        char *launch_path, char *save_path, int gui);
 
+void testTrain(Network *network);
+
 /**
  * @brief
  *
