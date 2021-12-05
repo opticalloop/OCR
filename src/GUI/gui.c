@@ -608,7 +608,7 @@ void show_result(unsigned int **grid, int dimension, Image *res)
         // get grid
         grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
-        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+        // stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack1"));
     }
     else // dimension == 16
     {
@@ -621,9 +621,9 @@ void show_result(unsigned int **grid, int dimension, Image *res)
         grid_result =
             GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
 
-        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack2"));
+        // stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack2"));
     }
-    gtk_stack_set_visible_child_name(stack_result, "Result");
+    // gtk_stack_set_visible_child_name(stack_result, "Result");
 
     for (int i = 0; i < dimension; i++)
     {
@@ -962,7 +962,7 @@ void open_website()
     if (g_find_program_in_path("firefox") != NULL)
     {
         // Open the website
-        if (!system("firefox www.opticalloop.bugbear.com"))
+        if (!system("firefox www.opticalloop.bugbear.fr"))
         {
             printf("Error opening website\n");
         }
