@@ -1,7 +1,7 @@
 #include "NeuralNetwork/training.h"
 
-#define DATA_PATH "src/NeuralNetwork/Digits-Only/"
-#define DATA_FILE_PATH "src/NeuralNetwork/data.txt"
+#define DATA_PATH "src/NeuralNetwork/Digits-Only2/"
+#define DATA_FILE_PATH "src/NeuralNetwork/data2.txt"
 #define TEST_DATA_PATH "src/NeuralNetwork/Test_data"
 
 void printResult(double expected[], Neuron neuron[])
@@ -193,7 +193,8 @@ void *train(void *args)
     Training_data *data = (Training_data *)args;
     const unsigned int epoch = data->epoch;
     const unsigned int nbHiddenLayers = data->nbHiddenLayers;
-    const unsigned int nbNodesPerHidden = 30; 
+    const unsigned int nbNodesPerHidden = 40; 
+  
     const int verbose = data->verbose;
     const int gui = data->gui;
     char *launch_path = data->launch_path;
@@ -205,9 +206,9 @@ void *train(void *args)
              "nodes per hidden\n",
              nbHiddenLayers, nbNodesPerHidden);
 
-    printVerbose(verbose, gui, print_message);
+    printVerbose(verbose, gui, print_message, "terminal_text");
     memset(print_message, 0, sizeof(print_message));
-    printVerbose(verbose, gui, "    🔨 Creating network\n");
+    printVerbose(verbose, gui, "    🔨 Creating network\n", "terminal_text1");
 
     Network n;
     n.sizeInput = NBINPUTS;
@@ -219,7 +220,7 @@ void *train(void *args)
         *network =
             newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
 
-        printVerbose(verbose, gui, "    🎰 Initing network\n");
+        printVerbose(verbose, gui, "    🎰 Initing network\n", "terminal_text1");
 
         initNetwork(network);
     }
@@ -235,10 +236,9 @@ void *train(void *args)
     // Init 0 expectation
 
     int zero_intput[NBINPUTS] = { 0.0 };
-    double zero_expected[NBOUTPUTS] = {
-        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-    };
+    double zero_expected[NBOUTPUTS] = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                        0.0, 0.0, 0.0, 0.0, 0.0 };
 
     // Open file where data is
     FILE *file;
@@ -252,7 +252,7 @@ void *train(void *args)
 
         snprintf(print_message, sizeof(print_message),
                  "\n    📊 ###### EPOCH %u ######\n", i);
-        printVerbose(verbose, gui, print_message);
+        printVerbose(verbose, gui, print_message, "terminal_text1");
         memset(print_message, 0, sizeof(print_message));
 
         file = fopen(DATA_FILE_PATH, "r");
@@ -262,7 +262,7 @@ void *train(void *args)
 
             frontPropagation(network, input);
             errorRate += backPropagation(network, expected);
-            gradientDescent(network, 0.001);
+            gradientDescent(network, 0.01);
 
             if (i == epoch && verbose)
             {
@@ -276,7 +276,7 @@ void *train(void *args)
                 frontPropagation(network, zero_intput);
                 errorRate += backPropagation(network, zero_expected);
 
-                gradientDescent(network, 0.001);
+                gradientDescent(network, 0.01);
 
                 if (i == epoch && verbose)
                 {
@@ -290,7 +290,7 @@ void *train(void *args)
 
         snprintf(print_message, sizeof(print_message),
                  "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
-        printVerbose(verbose, gui, print_message);
+        printVerbose(verbose, gui, print_message, "terminal_text1");
         memset(print_message, 0, sizeof(print_message));
     }
 
@@ -378,7 +378,7 @@ void testTrain(Network *network)
         }
 
         // Compute image path
-        strcpy(str,  TEST_DATA_PATH);
+        strcpy(str, TEST_DATA_PATH);
         strcat(str, "/");
         strcat(str, in_file->d_name);
 
@@ -406,9 +406,11 @@ void testTrain(Network *network)
 
     for (unsigned int i = 1; i < NBOUTPUTS; i++)
     {
-        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value > temp)
+        if (network->layers[(network->nbLayers - 2) + 1].neurons[i].value
+            > temp)
         {
-            temp = network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
+            temp =
+                network->layers[(network->nbLayers - 2) + 1].neurons[i].value;
             result = i;
         }
     }

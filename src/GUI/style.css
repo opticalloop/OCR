@@ -18,6 +18,7 @@ window button {
     border: 1px solid #794000;
     background:rgb(189, 120, 10);
 }
+
 .left_panel button:disabled {
     /* background-color: rgb(255, 136, 0); */
     border: 1px solid #794000;
@@ -45,6 +46,11 @@ window button {
     /* border-radius: 10px; */
     padding: 30px;
 }
+.right_panel button:hover {
+    /* background-color: rgb(255, 136, 0); */
+    border: 1px solid #794000;
+    background:rgb(189, 120, 10);
+}
 .right_panel spinbutton {
     background-color: rgb(38, 38, 47);
     /* border-radius: 10px; */
@@ -56,6 +62,30 @@ window button {
     border-radius: 0px;
     /* border: 1px solid red; */
     color: white;
+}
+
+.right_panel .stack-switcher {
+    background-color: rgb(38, 38, 47);
+    /* border-radius: 10px; */
+    border: 1px solid #ff8800;
+    color: white;
+}
+.right_panel .stack-switcher button {
+    background-color: #ff8800;
+    border-radius: 0px;
+    /* border: 1px solid red; */
+    color: white;
+}
+.right_panel .stack-switcher button .toogle {
+    background-color: rgb(51, 51, 51);
+    border: 1px solid #794000;
+    background:rgb(189, 120, 10);
+}
+
+.right_panel .terminal{
+    background-color: rgb(38, 38, 47);
+    border-radius: 10px;
+    /* color: white; */
 }
 .right_panel .terminal text{
     background-color: rgb(38, 38, 47);

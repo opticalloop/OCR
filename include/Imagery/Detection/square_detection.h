@@ -70,7 +70,7 @@ MyList *getAllSquare(MyList *lineList, int width, int height,
  * @param height
  * @return int
  */
-int isSquare(Square *square, unsigned int width, unsigned int height);
+int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR);
 
 /**
  * @brief Get the Line Length object
@@ -110,6 +110,8 @@ int canBeSudokuGrid(Square *square, Image *image);
 void drawSquare(Square *square, Image *image, int width, int height,
                 int thickness);
 
+double getSquareFactor(Image *image);
+
 /**
  * @brief Get the Better Corner object
  *
@@ -132,5 +134,7 @@ void compute_Square(Square *square);
  * @return double
  */
 double getPerimeter(Square *square);
+
+double getFactor(Square *square);
 
 #endif

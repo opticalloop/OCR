@@ -63,9 +63,9 @@ static void printHelpOCR()
         "🎨 Options ocr :\n"
         "      gui : open graphical interface\n"
         "      -o <output_path> : specify an output path\n"
-        "      -r <angle> : manually rotate the image by the angle in degree\n"
         "      -v --verbose : print details of process\n"
         "      -S <folder> : save all intermediate images in a folder\n"
+        "      -hexa : solve hexadecimal grid\n"
         "      --help : print ocr help\n");
 }
 
@@ -114,8 +114,6 @@ static void analyzeOCR(int argc, char **argv)
     char *output_folder = "";
     int save = 0;
 
-    double rotateAngle = 0.0;
-
     int hexa = 0;
 
     // Parse all input
@@ -151,21 +149,6 @@ static void analyzeOCR(int argc, char **argv)
             }
             output_path = argv[i];
         }
-        // Manually rotate
-        else if (!strcmp(argv[i], "-r"))
-        {
-            i++;
-            checkError(i >= argc || !isNumber(argv[i]),
-                       "⛔ You need to specify an rotation angle in degree "
-                       "after -r. See --help for more");
-
-            if (!strcmp(argv[i], "--help"))
-            {
-                printHelpOCR();
-                return;
-            }
-            rotateAngle = atof(argv[i]);
-        }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
             verbose = 1;
@@ -193,12 +176,9 @@ static void analyzeOCR(int argc, char **argv)
         }
     }
     pthread_t thread;
-    SDL_Surface *img = load_image(input_path);
-    Image image = newImage(img, 0, img->w, img->h);
-    saveImage(&image, "temp.bmp");
-    freeImage(&image, 0);
-    thread = OCR_thread("temp.bmp", output_path, verbose, save, output_folder,
+    thread = OCR_thread(input_path, output_path, verbose, save, output_folder,
                         0, hexa);
+    pthread_join(thread, NULL);
 }
 
 static void analyzeNN(int argc, char **argv)
@@ -326,8 +306,7 @@ static void analyzeNN(int argc, char **argv)
                 printf("    ❗ The file specified where to save weights already "
                        "exist, overwrite it ? [Y/n] : ");
                 if (scanf("%s", str) == EOF)
-                {
-                }
+                {}
                 toUp(str);
                 // While str != Y, YES, N and NO
                 while (strcmp(str, "Y") && strcmp(str, "YES")
@@ -335,8 +314,7 @@ static void analyzeNN(int argc, char **argv)
                 {
                     printf("\n[Y/n] : ");
                     if (scanf("%s", str) == EOF)
-                    {
-                    }
+                    {}
                     toUp(str);
                 }
                 if (!strcmp(str, "N") || !strcmp(str, "NO"))
@@ -373,7 +351,7 @@ static void analyzeNN(int argc, char **argv)
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
 
-        printVerbose(verbose, 0, "    🔨 Creating network\n");
+        printVerbose(verbose, 0, "    🔨 Creating network\n", "terminal_text1");
 
         // launchWeights(&network, WEIGHT_PATH, verbose);
 
@@ -383,11 +361,12 @@ static void analyzeNN(int argc, char **argv)
         }
 
         SDL_Surface *surface = load_image(test_input_path);
-
-        int output = getNetworkOutput(&network, surface, verbose);
+        Image img = newImage(surface, 0, surface->w, surface->h);
+        SDL_FreeSurface(surface);
+        int output = getNetworkOutput(&network, &img, verbose);
         printf("<-- ✅ Output : %d\n", output);
         freeNetwork(&network);
-        SDL_FreeSurface(surface);
+        freeImage(&img, 0);
     }
 
     if (trainOnImg)
@@ -418,6 +397,12 @@ int main(int argc, char **argv)
     {
         printHelp();
         return EXIT_SUCCESS;
+    }
+
+    if (!strcmp(argv[1], "-data"))
+    {
+        generateDataFile();
+        return;
     }
 
     if (!strcmp(argv[1], "ocr"))

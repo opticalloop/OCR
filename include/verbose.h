@@ -27,7 +27,7 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
  * @param gui
  * @param message
  */
-void printVerbose(int verbose, int gui, char *message);
+void printVerbose(int verbose, int gui, char *message, char *terminal);
 
 /**
  * @brief

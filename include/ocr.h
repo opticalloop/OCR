@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "GUI/gui.h"
 #include "Imagery/Color_Treatment/grayscale.h"
 #include "Imagery/Detection/distortion_correction.h"
 #include "Imagery/Detection/houghtransform.h"
@@ -25,7 +26,7 @@
 typedef struct Thread_argument
 {
     Image image;
-    char *output_path;
+    char *input_path;
     int verbose;
     int save;
     char *output_folder;
@@ -45,8 +46,8 @@ typedef struct Thread_argument
  * @param hexa
  * @return pthread_t*
  */
-pthread_t *OCR_thread(char *intput_path, char *output_path, int verbose,
-                      int save, char *output_folder, int gui, int hexa);
+pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
+                     int save, char *output_folder, int gui, int hexa);
 
 /**
  * @brief
