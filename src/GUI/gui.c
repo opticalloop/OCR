@@ -597,7 +597,6 @@ void show_result(unsigned int **grid, int dimension)
         // Load image
         change_image(&image, "selected_image1");
 
-
         // get grid
         grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
@@ -803,9 +802,8 @@ void set_recents_files()
         }
         GtkButton *button = gtk_button_new_with_label(name);
         gtk_widget_set_name(GTK_WIDGET(button), path);
-        // set alignment to center
-        gtk_button_set_alignment(button, 0.5, 0.5);
-
+        // set alignment horizontal to start and vertical to center
+        gtk_button_set_alignment(button, 0, 0.5);
         g_signal_connect(button, "clicked", G_CALLBACK(open_file), path);
         GtkStyleContext *context = gtk_widget_get_style_context(button);
 

@@ -121,12 +121,20 @@ window button {
 }
 
 .last_files button {
-    background-color: rgb(14, 158, 9);
-    /* border-radius: 10px; */
-    color: red;
+    background-color: rgb(38, 38, 47);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    color: white;
     /* padding: 30px; */
 }
 
+.last_items_category {
+    margin-top: 15px;
+    border: 2px solid #ff8800;
+    padding: 10px;
+    border-radius: 5px;
+}
 
 
 progress trough text {
