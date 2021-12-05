@@ -707,6 +707,9 @@ void confirm_result()
             "The grid is not solvable, please correct the grid");
         gtk_dialog_run(GTK_DIALOG(dialog)); // run dialog
         gtk_widget_destroy(dialog); // destroy dialog
+
+        gtk_stack_set_visible_child_name(stack_2,
+                                         "page_result"); // TODO: remove this
         return;
     }
 
@@ -738,7 +741,7 @@ void confirm_result()
     change_image(&sudoku_image, "selected_image");
     edit_progress_bar(1, "Result");
 
-    // TODO : change the way we save image
+    // TODO: change the way we save image
     saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
@@ -748,10 +751,71 @@ void confirm_result()
     freeImage(&sudoku_image, 9);
 }
 
-#pragma endregion
 void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
     change_image(&image, "selected_image");
+}
+
+#pragma endregion "Result"
+
+#pragma region "Main"
+void open_file(GtkWidget *widget, gpointer data)
+{
+    // open image in explorer
+    char *path = data;
+    char command[100] = "xdg-open ";
+    strcat(command, path);
+    if (!system(command))
+    {
+        printf("Error: Could not open file\n");
+    }
+}
+
+void set_recents_files()
+{
+    GtkRecentManager *recent_manager = gtk_recent_manager_get_default();
+
+    GList *items = gtk_recent_manager_get_items(recent_manager);
+
+    GtkBox *box = GTK_BOX(gtk_builder_get_object(builder, "box_recents"));
+    int i = 0;
+    while (items != NULL && i < 5)
+    {
+        GtkRecentInfo *info = (GtkRecentInfo *)items->data;
+        char *uri = gtk_recent_info_get_uri(info);
+        char *ext = get_filename_ext(uri);
+        // if file is not a picture, we don't add it to the list
+        if (strcmp(ext, "png") && strcmp(ext, "jpg") && strcmp(ext, "jpeg")
+            && strcmp(ext, "bmp"))
+        {
+            items = g_list_next(items);
+            continue;
+        }
+        char *name = gtk_recent_info_get_display_name(info);
+        char *path = g_filename_from_uri(uri, NULL, NULL);
+        if (path == NULL)
+        {
+            printf("Error: Could not get path : %s\n", uri);
+            items = g_list_next(items);
+            continue;
+        }
+        GtkButton *button = gtk_button_new_with_label(name);
+        gtk_widget_set_name(GTK_WIDGET(button), path);
+        // set alignment to center
+        gtk_button_set_alignment(button, 0.5, 0.5);
+
+        g_signal_connect(button, "clicked", G_CALLBACK(open_file), path);
+        GtkStyleContext *context = gtk_widget_get_style_context(button);
+
+        gtk_box_pack_start(box, button, FALSE, FALSE, 0);
+
+        // Free
+        g_free(uri);
+        g_free(name);
+
+        items = g_list_next(items);
+        i++;
+    }
 }
 void *init_gui()
 {
@@ -804,6 +868,8 @@ void *init_gui()
     GtkProgressBar *progress_bar =
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
 
+    set_recents_files();
+
     // on resize window
     // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
     // TODO: fix this
@@ -841,7 +907,88 @@ void quit()
     freeImage(&image, 0);
     freeImage(&temp_image, 0);
     gtk_main_quit();
+
+    // Free builder
+    g_object_unref(builder);
 }
 
 void end_process()
-{}
+{
+    // ask user where he wants to save the image
+    GtkWidget *dialog = gtk_file_chooser_dialog_new(
+        "Save image", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_SAVE,
+        "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+
+    // set filter
+    GtkFileFilter *filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "PNG image");
+    gtk_file_filter_add_pattern(filter, "*.png");
+    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
+    // set default file name
+    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), "image.png");
+
+    // run dialog
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+    {
+        char *filename =
+            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+        // if the file already exists
+        if (g_file_test(filename, G_FILE_TEST_EXISTS))
+        {
+            // ask user if he wants to overwrite the file
+            GtkWidget *dialog_overwrite = gtk_message_dialog_new(
+                GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION,
+                GTK_BUTTONS_YES_NO, "The file already exists. Overwrite?");
+
+            if (gtk_dialog_run(GTK_DIALOG(dialog_overwrite)) == GTK_RESPONSE_NO)
+            {
+                gtk_widget_destroy(dialog_overwrite);
+                gtk_widget_destroy(dialog);
+                return;
+            }
+            gtk_widget_destroy(dialog_overwrite);
+        }
+        saveImage(&image, filename); // TODO: change image by sudoku_image
+
+        // save filename in recent files
+        gtk_recent_manager_add_item(gtk_recent_manager_get_default(), filename);
+
+        free(filename);
+    }
+
+    gtk_widget_destroy(dialog);
+
+    // change to page1
+    gtk_stack_set_visible_child_name(stack_2, "page1");
+
+    // reset all GtkImage widgets to stock _id
+    GtkImage *image_1 =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image"));
+    GtkImage *image_2 =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image1"));
+    GtkImage *image_3 =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image_hexa"));
+    GtkImage *image_4 =
+        GTK_IMAGE(gtk_builder_get_object(builder, "selected_image3"));
+
+    gtk_image_set_from_icon_name(image_1, "image-x-generic",
+                                 GTK_ICON_SIZE_DIALOG);
+    gtk_image_set_from_icon_name(image_2, "image-x-generic",
+                                 GTK_ICON_SIZE_DIALOG);
+    gtk_image_set_from_icon_name(image_3, "image-x-generic",
+                                 GTK_ICON_SIZE_DIALOG);
+    gtk_image_set_from_icon_name(image_4, "image-x-generic",
+                                 GTK_ICON_SIZE_DIALOG);
+
+    // get filechooser button
+    GtkFileChooserButton *filechooser_button = GTK_FILE_CHOOSER_BUTTON(
+        gtk_builder_get_object(builder, "filechooser_button"));
+    // reset filechooser button
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(filechooser_button), NULL);
+    printf("reset filechooser button\n");
+    set_buttons_options_status(FALSE);
+}
+
+#pragma endregion "Main"

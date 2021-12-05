@@ -120,6 +120,13 @@ window button {
     background:rgb(38, 38, 47);
 }
 
+.last_files button {
+    background-color: rgb(14, 158, 9);
+    /* border-radius: 10px; */
+    color: red;
+    /* padding: 30px; */
+}
+
 
 
 progress trough text {
