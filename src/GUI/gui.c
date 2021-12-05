@@ -278,9 +278,11 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         printf("Processing...\n");
+        
+        saveImage(&image, filename);
         // Run processing
         pthread_t t;
-        t = OCR_thread(IMAGE_SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+        t = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE,
                        strcmp(dim, "9x9"));
         thread = &t;
     }
@@ -624,7 +626,7 @@ void show_result(unsigned int **grid, int dimension)
         {
             // get input at i,j and set value
             GtkEntry *entry =
-                GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
+                GTK_ENTRY(gtk_grid_get_child_at(grid_result, j, i));
 
             char ch[40] = " ";
             if (grid[i][j] > 9)

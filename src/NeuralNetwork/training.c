@@ -208,7 +208,7 @@ void *train(void *args)
 
     printVerbose(verbose, gui, print_message, "terminal_text");
     memset(print_message, 0, sizeof(print_message));
-    printVerbose(verbose, gui, "    🔨 Creating network\n", "terminal_text");
+    printVerbose(verbose, gui, "    🔨 Creating network\n", "terminal_text1");
 
     Network n;
     n.sizeInput = NBINPUTS;
@@ -220,7 +220,7 @@ void *train(void *args)
         *network =
             newNetwork(NBINPUTS, nbNodesPerHidden, nbHiddenLayers, NBOUTPUTS);
 
-        printVerbose(verbose, gui, "    🎰 Initing network\n", "terminal_text");
+        printVerbose(verbose, gui, "    🎰 Initing network\n", "terminal_text1");
 
         initNetwork(network);
     }
@@ -252,7 +252,7 @@ void *train(void *args)
 
         snprintf(print_message, sizeof(print_message),
                  "\n    📊 ###### EPOCH %u ######\n", i);
-        printVerbose(verbose, gui, print_message, "terminal_text");
+        printVerbose(verbose, gui, print_message, "terminal_text1");
         memset(print_message, 0, sizeof(print_message));
 
         file = fopen(DATA_FILE_PATH, "r");
@@ -290,7 +290,7 @@ void *train(void *args)
 
         snprintf(print_message, sizeof(print_message),
                  "    ❗ Error rate = %f\n", errorRate / NBIMAGES);
-        printVerbose(verbose, gui, print_message, "terminal_text");
+        printVerbose(verbose, gui, print_message, "terminal_text1");
         memset(print_message, 0, sizeof(print_message));
     }
 
