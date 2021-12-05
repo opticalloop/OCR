@@ -2,6 +2,7 @@
 #define SOLVABLE_H
 
 #include <stdio.h>
+#include <math.h>
 
 /**
  * @brief
@@ -34,8 +35,8 @@ unsigned int isColumnSolvable(unsigned int **grid, unsigned int x,
  * @param dimension
  * @return unsigned int
  */
-unsigned int isSquareSolvable(unsigned int **grid, unsigned int x,
-                              unsigned int y, unsigned int dimension);
+unsigned int isSquareSolvable(unsigned int **grid, int x,
+                              int y, unsigned int dimension);
 
 /**
  * @brief

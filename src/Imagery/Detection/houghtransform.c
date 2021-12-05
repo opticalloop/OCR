@@ -95,6 +95,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     if (save || gui)
     {
         Image _squareImage = copyImage(&tempImage, 0);
+        _squareImage.path = image->path;
 
         squares = findSquare(&resultingList, w, h, &_squareImage, save);
         saveVerbose(verbose, &_squareImage, output_folder,
@@ -103,7 +104,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, NULL, save || gui);
+        squares = findSquare(&resultingList, w, h, image, save || gui);
     }
 
     if (verbose)
@@ -131,7 +132,7 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
 
     // Correc perspective and crop
     Image img =
-        correct_perspective(&tempImage, &lastSquare, verbose, output_folder);
+        correctPerspective(&tempImage, &lastSquare, verbose, output_folder);
 
     // Save square to surface
     freeImage(&tempImage, 0);

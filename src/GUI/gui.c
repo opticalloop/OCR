@@ -431,7 +431,7 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     resizing = 0;
     printf("    👍 Finished resize\n");
 
-    Image img = correct_perspective(&image, &resized_square, 1, "temp/");
+    Image img = correctPerspective(&image, &resized_square, 1, "temp/");
     image = img;
 
     GtkWidget *page = data;
@@ -597,6 +597,7 @@ void show_result(unsigned int **grid, int dimension)
         // Load image
         change_image(&image, "selected_image1");
 
+
         // get grid
         grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
@@ -624,6 +625,7 @@ void show_result(unsigned int **grid, int dimension)
             // get input at i,j and set value
             GtkEntry *entry =
                 GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
+
             char ch[40] = " ";
             if (grid[i][j] > 9)
             {

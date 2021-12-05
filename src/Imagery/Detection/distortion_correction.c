@@ -1,33 +1,33 @@
 #include "Imagery/Detection/distortion_correction.h"
 
-void cross_product(double vect_A[], double vect_B[], double cross_P[])
+void crossProduct(double vect_A[], double vect_B[], double cross_P[])
 {
     cross_P[0] = vect_A[1] * vect_B[2] - vect_A[2] * vect_B[1];
     cross_P[1] = vect_A[2] * vect_B[0] - vect_A[0] * vect_B[2];
     cross_P[2] = vect_A[0] * vect_B[1] - vect_A[1] * vect_B[0];
 }
 
-void compute_perspective_matrix(int source[4][2], double dest[4][2],
+void perspectiveMatrix(int src[4][2], double dst[4][2],
                                 double **transformation_matrix,
                                 double **transformation_matrix_inv)
 {
     double P[][9] = {
-        { -source[0][0], -source[0][1], -1, 0, 0, 0, source[0][0] * dest[0][0],
-          source[0][1] * dest[0][0], dest[0][0] },
-        { 0, 0, 0, -source[0][0], -source[0][1], -1, source[0][0] * dest[0][1],
-          source[0][1] * dest[0][1], dest[0][1] },
-        { -source[1][0], -source[1][1], -1, 0, 0, 0, source[1][0] * dest[1][0],
-          source[1][1] * dest[1][0], dest[1][0] },
-        { 0, 0, 0, -source[1][0], -source[1][1], -1, source[1][0] * dest[1][1],
-          source[1][1] * dest[1][1], dest[1][1] },
-        { -source[2][0], -source[2][1], -1, 0, 0, 0, source[2][0] * dest[2][0],
-          source[2][1] * dest[2][0], dest[2][0] },
-        { 0, 0, 0, -source[2][0], -source[2][1], -1, source[2][0] * dest[2][1],
-          source[2][1] * dest[2][1], dest[2][1] },
-        { -source[3][0], -source[3][1], -1, 0, 0, 0, source[3][0] * dest[3][0],
-          source[3][1] * dest[3][0], dest[3][0] },
-        { 0, 0, 0, -source[3][0], -source[3][1], -1, source[3][0] * dest[3][1],
-          source[3][1] * dest[3][1], dest[3][1] },
+        { -src[0][0], -src[0][1], -1, 0, 0, 0, src[0][0] * dst[0][0],
+          src[0][1] * dst[0][0], dst[0][0] },
+        { 0, 0, 0, -src[0][0], -src[0][1], -1, src[0][0] * dst[0][1],
+          src[0][1] * dst[0][1], dst[0][1] },
+        { -src[1][0], -src[1][1], -1, 0, 0, 0, src[1][0] * dst[1][0],
+          src[1][1] * dst[1][0], dst[1][0] },
+        { 0, 0, 0, -src[1][0], -src[1][1], -1, src[1][0] * dst[1][1],
+          src[1][1] * dst[1][1], dst[1][1] },
+        { -src[2][0], -src[2][1], -1, 0, 0, 0, src[2][0] * dst[2][0],
+          src[2][1] * dst[2][0], dst[2][0] },
+        { 0, 0, 0, -src[2][0], -src[2][1], -1, src[2][0] * dst[2][1],
+          src[2][1] * dst[2][1], dst[2][1] },
+        { -src[3][0], -src[3][1], -1, 0, 0, 0, src[3][0] * dst[3][0],
+          src[3][1] * dst[3][0], dst[3][0] },
+        { 0, 0, 0, -src[3][0], -src[3][1], -1, src[3][0] * dst[3][1],
+          src[3][1] * dst[3][1], dst[3][1] },
         { 0, 0, 0, 0, 0, 0, 0, 0, 1 }
     };
 
@@ -36,11 +36,11 @@ void compute_perspective_matrix(int source[4][2], double dest[4][2],
     double P_inv[9][9] = { 0 };
 
     // Invert matrix P
-    inverse_mat(P, P_inv, 9);
+    inverseMat(P, P_inv, 9);
 
     // Compute H = P_inv * R
     double *H = calloc(9, sizeof(double));
-    multiply_mat_vector(P_inv, R, H, 9);
+    multiplyMatStat(P_inv, R, H, 9);
 
     // Convert H to 3x3 matrix
     int v = 0;
@@ -52,47 +52,43 @@ void compute_perspective_matrix(int source[4][2], double dest[4][2],
         }
     }
 
-    inverse_3x3_matrix(transformation_matrix, transformation_matrix_inv);
+    inverse3x3Mat(transformation_matrix, transformation_matrix_inv);
 
     free(H);
 }
 
-Image correct_perspective(Image *image, Square *selected_square,
-                          int verbose_mode, char *verbose_path)
+Image correctPerspective(Image *image, Square *square,
+                          int verbose, char *output_folder)
 {
-    if (verbose_mode)
+    if (verbose)
         printf("    🗺️ 2.7 Correcting perspective and cropping...\n");
 
-    int source[4][2] = {
-        { selected_square->top.xStart, selected_square->top.yStart },
-        { selected_square->right.xStart, selected_square->right.yStart },
-        { selected_square->bottom.xStart, selected_square->bottom.yStart },
-        { selected_square->left.xStart, selected_square->left.yStart }
+    int src[4][2] = {
+        { square->top.xStart, square->top.yStart },
+        { square->right.xStart, square->right.yStart },
+        { square->bottom.xStart, square->bottom.yStart },
+        { square->left.xStart, square->left.yStart }
     };
 
-    int edge_1_length = sqrt(pow(source[0][0] - source[1][0], 2)
-                             + pow(source[0][1] - source[1][1], 2));
-    int edge_2_length = sqrt(pow(source[1][0] - source[2][0], 2)
-                             + pow(source[1][1] - source[2][1], 2));
-    int edge_3_length = sqrt(pow(source[2][0] - source[3][0], 2)
-                             + pow(source[2][1] - source[3][1], 2));
-    int edge_4_length = sqrt(pow(source[3][0] - source[0][0], 2)
-                             + pow(source[3][1] - source[0][1], 2));
+    int top = getLineLength(&(square->top));
+    int right = getLineLength(&(square->right));
+    int bottom = getLineLength(&(square->bottom));
+    int left = getLineLength(&(square->left));
 
-    double max_edge_length = fmax(fmax(edge_1_length, edge_2_length),
-                                  fmax(edge_3_length, edge_4_length));
+    double max_edge_length = fmax(fmax(top, right),
+                                  fmax(bottom, left));
 
-    double destination[4][2] = { { 0, 0 },
+    double dst[4][2] = { { 0, 0 },
                                  { max_edge_length, 0 },
                                  { max_edge_length, max_edge_length },
                                  { 0, max_edge_length } };
 
-    double **transformation_matrix = alloc_matrix(3);
+    double **transformationMat = allocMat(3);
 
-    double **transformation_matrix_inv = alloc_matrix(3);
+    double **transformationMatInv = allocMat(3);
 
-    compute_perspective_matrix(source, destination, transformation_matrix,
-                               transformation_matrix_inv);
+    perspectiveMatrix(src, dst, transformationMat,
+                               transformationMatInv);
 
     Image corrected_image = newImage(NULL, 0, max_edge_length, max_edge_length);
 
@@ -107,13 +103,13 @@ Image correct_perspective(Image *image, Square *selected_square,
             double old_coordinates[3] = { ut, vt, wt };
             double new_coordinates[3] = { 0, 0, 0 };
 
-            multiply_mat_vector_pt(transformation_matrix_inv, old_coordinates,
+            multiplyMatBis(transformationMatInv, old_coordinates,
                                    new_coordinates, 3);
 
             int x = (int)(new_coordinates[0] / new_coordinates[2]);
             int y = (int)(new_coordinates[1] / new_coordinates[2]);
 
-            if (x >= 0 && y >= 0 && x < image->width && y < image->height)
+            if (x >= 0 && y >= 0 && x < (int) image->width && y < (int)image->height)
             {
                 corrected_image.pixels[i][j] = image->pixels[x][y];
             }
@@ -124,11 +120,11 @@ Image correct_perspective(Image *image, Square *selected_square,
         }
     }
 
-    saveVerbose(verbose_mode, &corrected_image, verbose_path,
-                "2.8-Perspective-corrected.bmp", 1, 0);
+    saveVerbose(verbose, &corrected_image, output_folder,
+                "2.8-Perspective-corrected", 1, 0);
 
-    free_mat(transformation_matrix, 3);
-    free_mat(transformation_matrix_inv, 3);
+    freeMat(transformationMat, 3);
+    freeMat(transformationMatInv, 3);
 
     return corrected_image;
 }

@@ -28,6 +28,12 @@ make
 
 ### Usage
 
+#### Graphical interface
+```sh
+./main ocr gui
+```
+
+#### Terminal
 ```sh
 ./main ocr <image_path> [options]
 OCR options : 
@@ -36,6 +42,7 @@ OCR options :
     -r <angle> : manually rotate the image by the angle in degree
     -v --verbose : print details of process
     -S <folder> : save all intermediate images in a folder
+    -hexa : solve an hexadecimal grid
     --help : print ocr help
 ./main nn [options]
 Options nn :

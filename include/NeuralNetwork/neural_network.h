@@ -158,9 +158,9 @@ double sigmoidPrime(double x);
 double softmax(double x);
 
 /**
- * @brief 
- * 
- * @param layer 
+ * @brief
+ *
+ * @param layer
  */
 void softmaxLayer(Layer *layer);
 

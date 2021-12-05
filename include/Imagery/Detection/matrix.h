@@ -16,7 +16,7 @@
  * @param sizeMatrix
  */
 
-void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
+void inverseMat(double cinMatrix[9][9], double coutMatrix[9][9],
                  int sizeMatrix);
 
 /**
@@ -26,7 +26,7 @@ void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
  * @param n
  */
 
-void free_mat(double **mat, int n);
+void freeMat(double **mat, int n);
 
 /**
  * @brief
@@ -36,7 +36,7 @@ void free_mat(double **mat, int n);
  * @param size
  */
 
-void multiply_mat(double **A, double **B, int size);
+void multiplyMat(double **A, double **B, int size);
 
 /**
  * @brief
@@ -44,17 +44,9 @@ void multiply_mat(double **A, double **B, int size);
  * @param M
  * @param M_inv
  */
-void inverse_3x3_matrix(double **M, double **M_inv);
+void inverse3x3Mat(double **M, double **M_inv);
 
-/**
- * @brief
- *
- * @param M
- * @param v
- * @param v_out
- * @param size
- */
-void multiply_mat_vector(double M[][_MAX], double v[_MAX], double v_out[_MAX],
+void multiplyMatStat(double M[][_MAX], double v[_MAX], double v_out[_MAX],
                          int size);
 
 /**
@@ -65,7 +57,7 @@ void multiply_mat_vector(double M[][_MAX], double v[_MAX], double v_out[_MAX],
  * @param v_out
  * @param size
  */
-void multiply_mat_vector_pt(double **M, double *v, double *v_out, int size);
+void multiplyMatBis(double **M, double *v, double *v_out, int size);
 
 /**
  * @brief
@@ -73,6 +65,6 @@ void multiply_mat_vector_pt(double **M, double *v, double *v_out, int size);
  * @param size
  * @return double**
  */
-double **alloc_matrix(int size);
+double **allocMat(int size);
 
 #endif

@@ -1,7 +1,5 @@
 #include "Imagery/Detection/matrix.h"
 
-//---------------------------------------------------
-//	calculate minor of matrix OR build new matrix : k-had = minor
 void Minor(double minorMatrix[9][9], int colMatrix, int sizeMatrix,
            double newMinorMatrix[9][9])
 {
@@ -24,10 +22,8 @@ void Minor(double minorMatrix[9][9], int colMatrix, int sizeMatrix,
         }
     }
     return;
-} // end function
+}
 
-//---------------------------------------------------
-//	calculate determinte of matrix
 double Determinte(double minorMatrix[9][9], int sizeMatrix)
 {
     int col;
@@ -52,10 +48,8 @@ double Determinte(double minorMatrix[9][9], int sizeMatrix)
         }
     }
     return sum;
-} // end function
+}
 
-//---------------------------------------------------
-//	calculate transpose of matrix
 void Transpose(double cofactorMatrix[9][9], double sizeMatrix,
                double determinte, double coutMatrix[9][9],
                double transposeMatrix[9][9])
@@ -71,10 +65,8 @@ void Transpose(double cofactorMatrix[9][9], double sizeMatrix,
         }
     }
     return;
-} // end function
+}
 
-//---------------------------------------------------
-//	calculate cofactor of matrix
 void Cofactor(double cinMatrix[9][9], double sizeMatrix, double determinte,
               double coutMatrix[9][9], double transposeMatrix[9][9])
 {
@@ -112,10 +104,8 @@ void Cofactor(double cinMatrix[9][9], double sizeMatrix, double determinte,
     Transpose(cofactorMatrix, sizeMatrix, determinte, coutMatrix,
               transposeMatrix); // function
     return;
-} // end function
+}
 
-//---------------------------------------------------
-//	calculate inverse of matrix
 void Inverse(double cinMatrix[9][9], int sizeMatrix, double determinte,
              double coutMatrix[9][9], double transposeMatrix[9][9])
 {
@@ -133,9 +123,9 @@ void Inverse(double cinMatrix[9][9], int sizeMatrix, double determinte,
                  transposeMatrix); // function
     }
     return;
-} // end function
+}
 
-void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
+void inverseMat(double cinMatrix[9][9], double coutMatrix[9][9],
                  int sizeMatrix)
 {
     double determinte, transposeMatrix[9][9];
@@ -145,7 +135,7 @@ void inverse_mat(double cinMatrix[9][9], double coutMatrix[9][9],
     Inverse(cinMatrix, sizeMatrix, determinte, coutMatrix, transposeMatrix);
 }
 
-void free_mat(double **mat, int n)
+void freeMat(double **mat, int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -157,30 +147,42 @@ void free_mat(double **mat, int n)
 /**
  * @brief In place multiplication of transform matrix A by B
  */
-void multiply_mat(double **A, double **B, int size)
+void multiplyMat(double **A, double **B, int size)
 {
     double **C = calloc(size, sizeof(double *));
     for (int i = 0; i < size; i++)
+    {
         C[i] = calloc(size, sizeof(double));
-
+    }
     for (int i = 0; i < size; i++)
+    {
         for (int j = 0; j < size; j++)
+        {
             for (int k = 0; k < size; k++)
+            {
                 C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
 
     for (int i = 0; i < size; i++)
+    {
         for (int j = 0; j < size; j++)
+        {
             A[i][j] = C[i][j];
-
+        }
+    }
     for (int i = 0; i < size; i++)
+    {
         free(C[i]);
+    }
     free(C);
 }
 
 /**
  * @brief Inverts a 3x3 matrix
  */
-void inverse_3x3_matrix(double **M, double **M_inv)
+void inverse3x3Mat(double **M, double **M_inv)
 {
     double MM = M[0][0] * M[1][1] * M[2][2] + M[0][1] * M[1][2] * M[2][0]
         + M[0][2] * M[2][1] * M[1][0] - M[0][2] * M[1][1] * M[2][0]
@@ -201,25 +203,30 @@ void inverse_3x3_matrix(double **M, double **M_inv)
             M_inv[i][j] = AM[i][j] / MM;
 }
 
-/**
- * @brief Multiply a size*size matrix by a column vector
- */
-void multiply_mat_vector(double M[][_MAX], double v[_MAX], double v_out[_MAX],
+void multiplyMatStat(double M[][_MAX], double v[_MAX], double v_out[_MAX],
                          int size)
 {
     for (int i = 0; i < size; i++)
+    {
         for (int j = 0; j < size; j++)
+        {
             v_out[i] += M[i][j] * v[j];
+        }
+    }
 }
 
-void multiply_mat_vector_pt(double **M, double *v, double *v_out, int size)
+void multiplyMatBis(double **M, double *v, double *v_out, int size)
 {
     for (int i = 0; i < size; i++)
+    {
         for (int j = 0; j < size; j++)
+        {
             v_out[i] += M[i][j] * v[j];
+        }
+    }
 }
 
-double **alloc_matrix(int size)
+double **allocMat(int size)
 {
     double **mat = calloc(size, sizeof(double *));
     if (mat == NULL)
