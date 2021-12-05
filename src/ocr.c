@@ -181,7 +181,7 @@ void *OCR(void *Thread_args)
 
     if (!isSolvable(grid, dimension))
     {
-        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n");
+        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n", "terminal_text1");
         printf("\n    ❌ Please use the graphical interface to solve the grid "
                "easily\n");
         freeGrid(grid, dimension);
@@ -189,7 +189,7 @@ void *OCR(void *Thread_args)
     }
     else
     {
-        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n");
+        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n", "terminal_text1");
     }
 
     unsigned int **copy = allocGrid(dimension);
