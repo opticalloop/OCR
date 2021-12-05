@@ -565,7 +565,7 @@ void edit_terminal(char *terminal_id, char *string)
     // get text view
     GtkTextView *text_view =
         GTK_TEXT_VIEW(gtk_builder_get_object(builder, terminal_id));
-
+    // printf("%s\n", terminal_id);
     // get text buffer
     GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(text_view);
 
@@ -578,6 +578,7 @@ void edit_terminal(char *terminal_id, char *string)
 
     if (gtk_text_iter_get_line(&end) > 30) // if more than 25 lines
     {
+        printf("too many lines\n");
         gtk_text_buffer_delete(text_buffer, &start, &end);
     }
 }
@@ -886,9 +887,7 @@ void *init_gui()
     gtk_widget_hide(GTK_WIDGET(progress_bar)); // hide progress bar
     gtk_main(); // start main loop
 
-    // End program
-    quit();
-    pthread_exit(NULL);
+    // pthread_exit(NULL);
 }
 void open_website()
 {
