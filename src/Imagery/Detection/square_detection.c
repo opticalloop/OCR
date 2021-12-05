@@ -2,8 +2,6 @@
 
 #define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 300
-
 LineList simplifyLines(LineList *linelist)
 {
     const unsigned int len = linelist->len;
@@ -142,10 +140,6 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
                     / (directCoeff1 - directCoeff2)
                 + ordOrigin1;
 
-            // In degree
-            double angleDiff = abs(radian_To_Degree(line1->theta)
-                                   - radian_To_Degree(line2->theta));
-
             if (x >= 0 && x < width && y >= 0 && y < height)
             {
                 dot.X = x;
@@ -165,6 +159,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
     SquareList squareList;
     squareList.squares = malloc(sizeof(Square));
     const unsigned int len = lineList->len;
+    double squareFactor = getSquareFactor(image);
     unsigned int nbSquares = 0;
 
     // FIRST COLUMN
@@ -237,7 +232,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                     square.left = fourthLine;
 
                                     // Not a square
-                                    if (!isSquare(&square, width, height))
+                                    if (!isSquare(&square, width, height, squareFactor))
                                     {
                                         continue;
                                     }
@@ -267,8 +262,12 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
     return squareList;
 }
 
-int isSquare(Square *square, unsigned int width, unsigned int height)
+int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR)
 {
+    // Avoid warning
+    (void)width;
+    (void)height;
+
     unsigned int lenLeft = getLineLength(&(square->left));
 
     unsigned int lenright = getLineLength(&(square->right));
@@ -312,6 +311,9 @@ double getLineLength(Line *line)
 
 Square sortSquares(SquareList *squareList, Image *image)
 {
+    // Avoid warning
+    (void) image;
+
     const unsigned int len = squareList->len;
     Square temp = squareList->squares[0];
     int tempFactor = getPerimeter(&temp);
@@ -376,6 +378,19 @@ int canBeSudokuGrid(Square *square, Image *image)
         }
     }
     return 1;
+}
+
+double getSquareFactor(Image *image)
+{
+    int len;
+    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.'; len--);
+    if (image->path[len] == '.')
+    {
+        len--;
+        if (image->path[len] == '6')
+            return 300;
+    }
+    return 40;
 }
 
 void drawSquare(Square *square, Image *image, int width, int height,

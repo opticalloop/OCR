@@ -15,24 +15,24 @@ static void checkFolderOutput(char *output_folder)
         char delete[200];
         snprintf(delete, sizeof(delete), "rm -rf %s", output_folder);
         if (system(delete))
-        {
-        }
+        {}
     }
     char directory[200];
     snprintf(directory, sizeof(directory), "mkdir %s", output_folder);
     if (system(directory))
-    {
-    }
+    {}
 }
 
-pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
+pthread_t OCR_thread(char *input_path, char *output_path, int verbose,
                      int save, char *output_folder, int gui, int hexa)
 {
+    (void) output_path;
     pthread_t thread;
-    SDL_Surface *surface = IMG_Load(intput_path);
+    SDL_Surface *surface = IMG_Load(input_path);
     Image img = newImage(surface, 1, surface->w, surface->h);
+    img.path = input_path;
     Thread_argument arg = { .image = img,
-                            .output_path = output_path,
+                            .input_path = input_path,
                             .verbose = verbose,
                             .save = save,
                             .output_folder = output_folder,
@@ -41,11 +41,6 @@ pthread_t OCR_thread(char *intput_path, char *output_path, int verbose,
     SDL_FreeSurface(surface);
     pthread_create(&thread, NULL, OCR, (void *)&arg);
 
-    if (gui == 0)
-    {
-        pthread_join(thread, NULL);
-    }
-
     return thread;
 }
 
@@ -53,8 +48,8 @@ void *OCR(void *Thread_args)
 {
     Thread_argument arg = *(Thread_argument *)Thread_args;
     Image image = arg.image;
-    char *image_path = image.path;
-    char *output_path = arg.output_path;
+    char *image_path = arg.input_path;
+    image.path = image_path;
     int verbose = arg.verbose;
     int save = arg.save;
     char *output_folder = arg.output_folder;
@@ -78,9 +73,6 @@ void *OCR(void *Thread_args)
     // }
 
     saveVerbose(verbose, &image, output_folder, "1.0_Base_Image", save, 0);
-
-    // if (!strcmp("src/Imagery/image_06.jpeg", image_path))
-    //     correctDistortion(&image);
 
     // Preprocessing
     grayscale(&image);
@@ -136,8 +128,6 @@ void *OCR(void *Thread_args)
     printVerbose(verbose, 0, "    📑 3.2 Initing weights\n", "terminal_text1");
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
-    unsigned int angle_index;
-
     saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
                 0);
     changeImageGUI(&cropped, 0, 0.8, "Cropped image", 0);
@@ -149,7 +139,8 @@ void *OCR(void *Thread_args)
     Image all_cases[dimension * dimension];
     if (verbose && save)
     {
-        printf("<-- 💾 Saving all 81 digit to %s\n", output_folder);
+        printf("<-- 💾 Saving all %d digit to %s\n", hexa ? 256 : 81,
+               output_folder);
     }
     // Segmentation
     split(&cropped, all_cases, save, output_folder, hexa);
@@ -178,6 +169,9 @@ void *OCR(void *Thread_args)
 
     basicPrint(grid, dimension);
 
+    freeNetwork(&network);
+    freeImage(&cropped, 0);
+
     if (gui)
     {
         show_result(grid, dimension);
@@ -187,11 +181,15 @@ void *OCR(void *Thread_args)
 
     if (!isSolvable(grid, dimension))
     {
-        printf("\n    ⚠️ The grid is not solvable\n");
+        printVerbose(verbose, 0, "\n    ⚠️ 3.5 The grid is not solvable\n", "terminal_text1");
+        printf("\n    ❌ Please use the graphical interface to solve the grid "
+               "easily\n");
+        freeGrid(grid, dimension);
+        pthread_exit(NULL); // Exit thread
     }
     else
     {
-        printf("\n    🎉 The grid is solvable\n");
+        printVerbose(verbose, 0, "\n    🎉 3.5 The grid is solvable\n", "terminal_text1");
     }
 
     unsigned int **copy = allocGrid(dimension);

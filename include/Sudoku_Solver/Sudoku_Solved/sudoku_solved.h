@@ -2,6 +2,7 @@
 #define SUDOKU_SOLVED_H
 
 #include <stdio.h>
+#include <math.h>
 
 /**
  * @brief
