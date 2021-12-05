@@ -7,20 +7,17 @@
 #include "Imagery/Rotations_Resize/bilinear_interpolation.h"
 #include "Imagery/Utils/image.h"
 
-/*
- *  Summary:
- *      Resize an image with the dimension wanted
- *      Usign the algorithme of bilinear interpolation
+/**
+ * @brief
  *
- *  Params:
- *      *image: the image we want to resize
- *      width: the width of the output image
- *      height: the height of the output image
- *
- *  Return:
- *      Return a new image, with the goods dimensions.
+ * @param image
+ * @param newwidth
+ * @param newheight
+ * @param matrix
+ * @return Image
  */
 
-Image resize(Image *image, unsigned int width, unsigned int height);
+Image resize(Image *image, unsigned int newwidth, unsigned int newheight,
+             unsigned int matrix);
 
 #endif

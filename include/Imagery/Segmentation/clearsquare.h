@@ -3,65 +3,74 @@
 
 #include "Imagery/Color_Treatment/blackandwhite.h"
 #include "Imagery/Segmentation/split.h"
+#include "Imagery/Segmentation/struct.h"
 #include "Imagery/Utils/image.h"
 
-/*
- *  Summary:
- *      Check if there is more than 50% black on the line
- *  Params:
- *      *image: The image to check
- *      y:  The line to check
+/**
+ * @brief
  *
- *  Return:
- *      1 if there is more than 50% black on the line
+ * @param image
+ * @param y
+ * @return int
  */
 int isLinePartialBlack(Image *image, unsigned int y);
 
-/*
- *  Summary:
- *      Check if there is more than 50% black on the column
- *  Params:
- *      *image: The image to check
- *      x: The colum to check
+/**
+ * @brief
  *
- *  Return:
- *      1 if there is more than 50% of black 1 otherwise
+ * @param image
+ * @param x
+ * @return int
  */
 int isColumnPartialBlack(Image *image, unsigned int x);
 
-/*
- *  Summary:
- *      Make the Line all white
- *  Params:
- *      *image: The image to clear
- *      y: the line to clear
+/**
+ * @brief
  *
- *  Return:
- *      Nothing clear is applied to the image directly
+ * @param image
+ * @param y
  */
 void clearLine(Image *image, unsigned int y);
 
-/*
- *  Summary:
- *      Make the Column all white
- *  Params:
- *      *image: The image to clear
- *      x: the column to clear
+/**
+ * @brief
  *
- *  Return:
- *      Nothing clear is applied to the image directly
+ * @param image
+ * @param x
  */
 void clearColumn(Image *image, unsigned int x);
 
-/*
- *  Summary:
- *      remove all the line from an image when the is more than 50% of black
- *  Params:
- *      *image: The image to clear
+/**
+ * @brief
  *
- *  Return:
- *      Nothing clear is applied to the image directly
+ * @param image
  */
 void clearsquare(Image *image);
 
+/**
+ * @brief
+ *
+ * @param M
+ * @param x
+ * @param y
+ * @param cur
+ * @param image
+ * @return int
+ */
+int __dfs(int **M, int x, int y, int **cur, Image *image);
+
+/**
+ * @brief
+ *
+ * @param M
+ * @param image
+ */
+void clear_matrice(int **M, Image *image);
+
+/**
+ * @brief
+ *
+ * @param image
+ */
+void clear_imperfections(Image *image);
 #endif

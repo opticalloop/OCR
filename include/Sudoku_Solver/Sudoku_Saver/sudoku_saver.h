@@ -9,21 +9,80 @@
 
 #include "Imagery/Utils/image.h"
 
-#define dim 9
 #define IMAGE_DIRECTORY "Sudoku_Saver/Images"
 #define IMAGE_SIZE 28
 
-void copyArray(unsigned int grid[dim][dim], unsigned int destination[dim][dim]);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param destination
+ * @param dimension
+ */
+void copyArray(unsigned int **grid, unsigned int **destination,
+               unsigned int dimension);
 
-void basicPrint(unsigned int grid[dim][dim]);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param dimension
+ */
+void basicPrint(unsigned int **grid, unsigned int dimension);
 
-void readGrid(unsigned int grid[dim][dim], char inputPath[], int verbose);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param inputPath
+ * @param verbose
+ * @param dimension
+ */
+void readGrid(unsigned int **grid, char inputPath[], int verbose,
+              unsigned int dimension);
 
-void saveGrid(unsigned int grid[dim][dim], char outputPath[], int verbose);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param outputPath
+ * @param verbose
+ * @param dimension
+ */
+void saveGrid(unsigned int **grid, char outputPath[], int verbose,
+              unsigned int dimension);
 
-Image createSudokuImage(unsigned int grid[dim][dim],
-                        unsigned int copy[dim][dim]);
+/**
+ * @brief Create a Sudoku Image object
+ *
+ * @param grid
+ * @param copy
+ * @param folder_path
+ * @param dimension
+ * @return Image
+ */
+Image createSudokuImage(unsigned int **grid, unsigned int **copy,
+                        char *folder_path, unsigned int dimension);
 
-SDL_Surface *getImage(unsigned int val, char *directory, unsigned int green);
+/**
+ * @brief Create a Hexa Sudoku Image object
+ *
+ * @param grid
+ * @param copy
+ * @param folder_path
+ * @return Image
+ */
+Image createHexaSudokuImage(unsigned int **grid, unsigned int **copy,
+                            char *folder_path);
+
+/**
+ * @brief Get the Image object
+ *
+ * @param val
+ * @param directory
+ * @param green
+ * @return Image
+ */
+Image getImage(unsigned int val, char *directory, unsigned int green);
 
 #endif

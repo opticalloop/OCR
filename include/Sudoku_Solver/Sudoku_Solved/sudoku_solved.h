@@ -1,17 +1,50 @@
 #ifndef SUDOKU_SOLVED_H
 #define SUDOKU_SOLVED_H
 
+#include <math.h>
 #include <stdio.h>
 
-#define dim 9
+/**
+ * @brief
+ *
+ * @param grid
+ * @param y
+ * @param dimension
+ * @return unsigned int
+ */
+unsigned int isRowSolved(unsigned int **grid, unsigned int y,
+                         unsigned int dimension);
 
-unsigned int isRowSolved(unsigned int grid[dim][dim], unsigned int y);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param x
+ * @param dimension
+ * @return unsigned int
+ */
+unsigned int isColumnSolved(unsigned int **grid, unsigned int x,
+                            unsigned int dimension);
 
-unsigned int isColumnSolved(unsigned int grid[dim][dim], unsigned int x);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param x
+ * @param y
+ * @param dimension
+ * @return unsigned int
+ */
+unsigned int isSquareSolved(unsigned int **grid, unsigned int x, unsigned int y,
+                            unsigned int dimension);
 
-unsigned int isSquareSolved(unsigned int grid[dim][dim], unsigned int x,
-                            unsigned int y);
-
-unsigned int isSolved(unsigned int grid[dim][dim]);
+/**
+ * @brief
+ *
+ * @param grid
+ * @param dimension
+ * @return unsigned int
+ */
+unsigned int isSolved(unsigned int **grid, unsigned int dimension);
 
 #endif

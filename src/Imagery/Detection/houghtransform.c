@@ -1,155 +1,164 @@
 #include "Imagery/Detection/houghtransform.h"
 
-#define THRESHOLD 0.3
+#define THRESHOLD 0.4
 
-SDL_Surface *detection(Image *image, Image *drawImage, int verbose, int save,
-                       char *output_folder)
+Image detection(Image *image, Image *drawImage, int verbose, int save,
+                char *output_folder, double four_angles[4], int gui)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
-    // Directly free
-    if (!save)
-    {
-        freeImage(drawImage, 0);
-    }
 
+    // Surface without sobel filter
+    Image tempImage = copyImage(drawImage, 0);
+
+    double maxTheta;
     // Call major fonction
-    LineList list =
-        houghtransform(image, drawImage, verbose, save, output_folder);
+    MyList list = houghtransform(image, drawImage, verbose, save, output_folder,
+                                 &maxTheta);
 
     saveVerbose(verbose, drawImage, output_folder, "2.3_Hough_all_lines", save,
-                1);
-    printVerbose(verbose, "    📈 2.3 Simplyfing lines\n");
+                0);
+    changeImageGUI(drawImage, gui, 0.45, "Hough all lines", 1);
+    printVerbose(verbose, 0, "    📈 2.3 Simplyfing lines\n", "terminal_text");
 
     // LINES SIMPLIFICATION
-
-    LineList resultingList = simplifyLines(&list);
+    MyList *resultingList = simplifyLines(&list);
 
     if (verbose)
-        printf("    📈 2.3.1 %d edges\n", resultingList.len);
-    double angle = resultingList.maxTheta * 180.0 / M_PI;
+        printf("    📈 2.3.1 %zu edges\n", resultingList->length);
 
-    if (save)
+    if (save || gui)
     {
         // Draw simplifieds lines
-        Image _simplifiedImage;
-        _simplifiedImage.path = image->path;
-        _simplifiedImage.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _simplifiedImage.surface, NULL);
-        Image *simplifiedImage = &_simplifiedImage;
-        newImage(simplifiedImage, 0);
+        Image _simplifiedImage = copyImage(&tempImage, 0);
 
-        const unsigned int len = resultingList.len;
         Pixel color = { .r = 255, .g = 0, .b = 0 };
-        for (unsigned int i = 0; i < len; i++)
+        Node *node = resultingList->head;
+        for (; node != NULL; node = node->next)
         {
-            Line line = resultingList.lines[i];
-            draw_line(simplifiedImage, w, h, &line, &color, 2, 1);
+            Line *line = (Line *)node->value;
+            draw_line(&_simplifiedImage, w, h, line, &color, 2, 1);
         }
 
-        saveVerbose(verbose, simplifiedImage, output_folder,
-                    "2.4_Hough_simplified_lines", save, 1);
+        saveVerbose(verbose, &_simplifiedImage, output_folder,
+                    "2.4_Hough_simplified_lines", save, 0);
+        changeImageGUI(&_simplifiedImage, gui, 0.5, "Hough simplified lines",
+                       1);
     }
 
     // AUTO ROTATE
+    double angle = maxTheta * 180.0 / M_PI;
     int angleRounded = (int)angle % 90; // ROTATE
     if (verbose)
-        printf("    📐 2.4 Angle found : %f degrees (%f rad)\n", angle,
-               list.maxTheta);
-    if (angleRounded >= 88 && angleRounded <= 91)
+        printf("    📐 2.4 Angle found : %d degrees (%f rad)\n", angleRounded,
+               maxTheta);
+    if ((angleRounded >= 85 && angleRounded <= 95)
+        || (angleRounded >= 0 && angleRounded <= 5))
+
     {
-        printVerbose(verbose, "    📐 2.4.1 Do not need to rotate image\n");
+        printVerbose(verbose, 0, "    📐 2.4.1 Do not need to rotate image\n",
+                     "terminal_text");
+        four_angles[0] = 0;
+    }
+    else
+    {
+        printVerbose(verbose, 0, "    📐 2.4.1 Rotating image\n",
+                     "terminal_text");
+        four_angles[0] = angleRounded;
+        rotateAll(&tempImage, resultingList, angleRounded);
+    }
+
+    // Draw auto rotated image
+    if (save || gui)
+    {
+        // Draw simplifieds lines
+        Image __simplifiedImage = copyImage(&tempImage, 0);
+
+        const unsigned int len = resultingList->length;
+        Pixel color = { .r = 255, .g = 0, .b = 0 };
+        for (unsigned int i = 0; i < len; i++)
+        {
+            Line *line = (Line *)get_value(resultingList, i);
+            draw_line(&__simplifiedImage, w, h, line, &color, 2, 1);
+        }
+
+        saveVerbose(verbose, &__simplifiedImage, output_folder,
+                    "2.5_Autorotated", save, 0);
+        changeImageGUI(&__simplifiedImage, gui, 0.55, "Hough autorotated lines",
+                       1);
     }
 
     // FINDING SQUARES
 
-    printVerbose(verbose, "    📦 2.5 Finding all squares\n");
+    printVerbose(verbose, 0, "    📦 2.5 Finding all squares\n",
+                 "terminal_text");
 
     // FIND ALL SQUARES
-    SquareList squares;
-    if (save)
+    MyList squares;
+    if (save || gui)
     {
-        Image _squareImage;
-        _squareImage.path = image->path;
-        _squareImage.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _squareImage.surface, NULL);
-        Image *squareImage = &_squareImage;
-        newImage(squareImage, 0);
+        Image _squareImage = copyImage(&tempImage, 0);
 
-        squares = findSquare(&resultingList, w, h, squareImage, save);
-        saveVerbose(verbose, squareImage, output_folder,
-                    "2.5_Hough_squares_only", save, 1);
+        _squareImage.path = image->path;
+
+        squares = findSquare(resultingList, w, h, &_squareImage, save);
+        saveVerbose(verbose, &_squareImage, output_folder,
+                    "2.6_Hough_squares_only", save, 0);
+        changeImageGUI(&_squareImage, gui, 0.6, "Hough squares only", 1);
     }
     else
     {
-        squares = findSquare(&resultingList, w, h, NULL, save);
+        squares = findSquare(resultingList, w, h, image, save || gui);
     }
 
     if (verbose)
     {
-        printf("    🔼 2.5.1 %d squares\n", squares.len);
+        printf("    🔼 2.5.1 %zu squares\n", squares.length);
     }
 
     // SORTING SQUARES
-    printVerbose(verbose, "    📉 2.6 Finding the predominating square\n");
+    printVerbose(verbose, 0, "    📉 2.6 Finding the predominating square\n",
+                 "terminal_text");
+
+    // FIND THE PREDOMINANT SQUARE
 
     Square lastSquare = sortSquares(&squares, image);
 
-    if (save)
+    if (save || gui)
     {
-        Image _lastSquareImg;
-        _lastSquareImg.path = image->path;
-        _lastSquareImg.surface = SDL_CreateRGBSurface(
-            0, image->width, image->height, 24, 0, 0, 0, 0);
-        SDL_BlitSurface(image->surface, NULL, _lastSquareImg.surface, NULL);
-        Image *lastSquareImg = &_lastSquareImg;
-        newImage(lastSquareImg, 0);
+        Image _lastSquareImg = copyImage(&tempImage, 0);
 
-        drawSquare(&lastSquare, lastSquareImg, w, h, 2);
-        saveVerbose(verbose, lastSquareImg, output_folder,
-                    "2.6_Hough_last_square", save, 1);
+        drawSquare(&lastSquare, &_lastSquareImg, w, h, 2);
+        saveVerbose(verbose, &_lastSquareImg, output_folder,
+                    "2.7_Hough_last_square", save, 0);
+        changeImageGUI(&_lastSquareImg, gui, 0.65, "Hough last square", 1);
     }
+    // Free MyLists
+    free_list(&squares);
+    free_list(resultingList);
 
-    // GETTING MAX SQUARE
-
-    printVerbose(verbose, "    📋 2.7 Computing cropped image\n");
-
-    // Get square dimension
-    int l1 = getLineLength(&(lastSquare.top));
-    int l3 = getLineLength(&(lastSquare.right));
-
-    // Croping image and getting final result
-    SDL_Surface *surface = SDL_CreateRGBSurface(0, l1, l3, 24, 0, 0, 0, 0);
-    SDL_Rect rect;
-    Dot dot = getBetterCorner(&lastSquare);
-    rect.x = dot.X;
-    rect.y = dot.Y;
-    rect.w = l1;
-    rect.h = l3;
+    // Correc perspective and crop
+    Image img =
+        correctPerspective(&tempImage, &lastSquare, verbose, output_folder);
 
     // Save square to surface
-    SDL_BlitSurface(image->surface, &rect, surface, NULL);
+    freeImage(&tempImage, 0);
 
-    // Free squares
-    free(squares.squares);
-
-    free(resultingList.lines);
-
-    return surface;
+    return img;
 }
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder)
+MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                      char *output_folder, double *max_Theta)
 {
+    (void)output_folder;
+
     // Save the image dimensions
     const double width = drawImage->width, height = drawImage->height;
     // Calculate the diagonal of the image
     const double diagonal = sqrt(width * width + height * height);
 
     // Initialize the constant values for theta and rho
-    const double maxTheta = 90.0, minTheta = -90.0;
+    const double maxTheta = 180.0, minTheta = 0.0;
     const double maxRho = diagonal, minRho = -diagonal;
     const double nbRho = 2 * diagonal, nbTheta = nbRho;
 
@@ -173,7 +182,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         arrThetas[index] = val;
     }
 
-    printVerbose(verbose, "    🎲 2.2.1 Computing cos and sin array\n");
+    printVerbose(verbose, 0, "    🎲 2.2.1 Computing cos and sin array\n",
+                 "terminal_text");
     // Create a save of cos and sin value for each theta, to optimize
     // performance.
     double *saveCos = calloc(nbTheta + 1, sizeof(double));
@@ -188,12 +198,16 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
         saveSin[theta] = sin(arrThetas[theta]);
     }
 
-    printVerbose(verbose, "    📥 2.2.2 Filling accumulator\n");
+    printVerbose(verbose, 0, "    📥 2.2.2 Filling accumulator\n",
+                 "terminal_text");
     unsigned int **accumulator = initMatrice(nbTheta + 1, nbRho + 1);
 
     // We intialize the accumulator with all the value
     // In the same time, we search for the max value in the accumulator
+
     unsigned int max = 0;
+    double rho;
+    int croppedRho;
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
@@ -202,8 +216,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
             {
                 for (int theta = 0; theta <= nbTheta; theta++)
                 {
-                    double rho = x * saveCos[theta] + y * saveSin[theta];
-                    int croppedRho = rho + diagonal;
+                    rho = x * saveCos[theta] + y * saveSin[theta];
+                    croppedRho = rho + diagonal;
                     accumulator[croppedRho][theta]++;
                     if (accumulator[croppedRho][theta] > max)
                     {
@@ -218,9 +232,9 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     free(saveSin);
 
     // 5000 * 5000, don't draw it !a
-    if (draw)
-        accToBmp(accumulator, nbTheta + 1, nbRho + 1, max, verbose,
-                 output_folder);
+    // if (draw)
+    //     accToBmp(accumulator, nbTheta + 1, nbRho + 1, max, verbose,
+    //              output_folder);
 
     // Finding edges
     // Computing threshold
@@ -232,16 +246,17 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     }
 
     // Create line return line array
-    Line *allLines = malloc(sizeof(Line));
+    MyList allLines = { NULL, NULL, 0 };
 
-    int nbEdges = 0;
     double tempMaxTheta = 0.0;
+    unsigned int histogram[181] = { 0 };
+    unsigned int rounded_angle;
 
     int prev = accumulator[0][0];
     int prev_theta = 0, prev_rho = 0;
     int boolIsIncreasing = 1;
 
-    printVerbose(verbose, "    📜 2.2.5 Drawing on image\n");
+    printVerbose(verbose, 0, "    📜 2.2.5 Drawing on image\n", "terminal_text");
     Pixel pixel = { .r = 40, .g = 40, .b = 200 };
 
     for (int theta = 0; theta <= nbTheta; theta++)
@@ -277,6 +292,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                 if (t > tempMaxTheta)
                 {
                     tempMaxTheta = t;
+                    rounded_angle = (unsigned int)radian_To_Degree(t);
+                    histogram[rounded_angle]++;
                 }
 
                 double c = cos(t), s = sin(t);
@@ -304,11 +321,8 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
                     draw_line(drawImage, width, height, &line, &pixel, 1, draw);
 
                 // Add line on our return list
-                allLines = realloc(allLines, sizeof(Line) * (nbEdges + 1));
-
-                allLines[nbEdges] = line;
-
-                nbEdges++;
+                void *p = Line_tovptr(line);
+                append(&allLines, p);
             }
         }
     }
@@ -319,13 +333,20 @@ LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
     freeMatrice(accumulator, nbTheta + 1);
 
     if (verbose)
-        printf("    📜 2.2.6 %d edges\n", nbEdges);
+        printf("    📜 2.2.6 %zu edges\n", allLines.length);
 
-    LineList list;
-    list.lines = allLines;
-    list.len = nbEdges;
-    list.maxTheta = tempMaxTheta;
-    return list;
+    MyList *list = &allLines;
+
+    // Find best angle
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    *max_Theta = degrees_ToRadians(angle);
+    return *list;
 }
 
 void drawLineFromDot(unsigned int **matrice, Dot *d1, Dot *d2, double width,
@@ -434,14 +455,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
 void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
               unsigned int max, int verbose, char *output_folder)
 {
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
-    image.surface = NULL;
-    image.pixels = NULL;
-    newImage(&image, 0);
+    Image image = newImage(NULL, 0, width, height);
     for (size_t y = 0; y < height; y++)
     {
         for (size_t x = 0; x < width; x++)
@@ -454,32 +468,86 @@ void accToBmp(unsigned int **matrice, unsigned int width, unsigned int height,
     saveVerbose(verbose, &image, output_folder, "2.2_Hough_accumulator", 1, 1);
 }
 
-void matriceToBmp(unsigned int **matrice, unsigned int width,
-                  unsigned int height)
+unsigned int findTheta(MyList *lineList)
 {
-    Image image;
-    image.width = width;
-    image.height = height;
-    image.path = ""; // To create an RGB surface
-    image.averageColor = 0;
-    image.surface = NULL;
-    image.pixels = NULL;
-    newImage(&image, 0);
-    for (size_t y = 0; y < height; y++)
-    {
-        for (size_t x = 0; x < width; x++)
-        {
-            image.pixels[x][y].r = matrice[y][x] ? 255 : 0;
-            image.pixels[x][y].g = 0;
-            image.pixels[x][y].b = 0;
-        }
-    }
-    saveImage(&image, "2.0_Hough_accumulator.bmp");
+    unsigned int histogram[181] = { 0 };
 
-    freeImage(&image, 0);
+    int value;
+    Node *node = lineList->head;
+    for (; node != NULL; node = node->next)
+    {
+        Line *l = (Line *)node->value;
+        value = (int)radian_To_Degree(l->theta);
+        value++;
+        printf("Value : %u\n", value);
+
+        if (value - 1 >= 0 && value - 1 <= 180)
+            histogram[value - 1]++;
+
+        if (value >= 0 && value <= 180)
+            histogram[value]++;
+
+        if (value + 1 >= 0 && value + 1 <= 180)
+            histogram[value + 1]++;
+    }
+    unsigned int angle = 0;
+    for (unsigned int i = 0; i < 181; i++)
+    {
+        if (histogram[i] > histogram[angle])
+            angle = i;
+    }
+
+    return angle;
+}
+
+void rotateAll(Image *image, MyList *lineList, double angleDegree)
+{
+    rotate(image, angleDegree);
+
+    double angle = angleDegree * M_PI / 180.0;
+    angle += 5.08;
+    const double middleX = ((double)image->width / 2.0);
+    const double middleY = ((double)image->height / 2.0);
+
+    double newX;
+    double newY;
+
+    Node *node = lineList->head;
+    for (; node != NULL; node = node->next)
+    {
+        Line *l = (Line *)node->value;
+        // Calculate new position start
+        newX = ((double)(cos(angle) * ((double)l->xStart - middleX)
+                         - sin(angle) * ((double)l->yStart - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)l->yStart - middleY)
+                         + sin(angle) * ((double)l->xStart - middleX))
+                + middleY);
+
+        l->xStart = (int)newX;
+        l->yStart = (int)newY;
+
+        // Calculate new position end
+        newX = ((double)(cos(angle) * ((double)l->xEnd - middleX)
+                         - sin(angle) * ((double)l->yEnd - middleY))
+                + middleX);
+
+        newY = ((double)(cos(angle) * ((double)l->yEnd - middleY)
+                         + sin(angle) * ((double)l->xEnd - middleX))
+                + middleY);
+
+        l->xEnd = (int)newX;
+        l->yEnd = (int)newY;
+    }
 }
 
 double degrees_ToRadians(double degrees)
 {
     return degrees * M_PI / 180.0;
+}
+
+double radian_To_Degree(double radian)
+{
+    return radian * 180.0 / M_PI;
 }

@@ -2,33 +2,24 @@
 #define SAVE_LOAD_H
 
 #include "NeuralNetwork/neural_network.h"
+#include "verbose.h"
 
-/*
- * Summary:
- *      Save the weights of the network in the speicied path
+/**
+ * @brief
  *
- * Params :
- *      *network : the network
- *      *path : path where to save the weights
- *
- * Return :
- *      Write in a file so void
+ * @param network
+ * @param path
  */
-
 void saveWeights(Network *network, char *path);
 
-/*
- * Summary:
- *       Load weights of the file in paramter
+/**
+ * @brief
  *
- * Params :
- *      *network : the network where to load the weights
- *      *path : path where from where to load the weights
- *
- * Return :
- *      directly change the network in paramters so void
+ * @param network
+ * @param path
+ * @param verbose
+ * @param gui
  */
-
-void launchWeights(Network *network, char *path, int verbose);
+void launchWeights(Network *network, char *path, int verbose, int gui);
 
 #endif

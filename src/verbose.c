@@ -14,17 +14,35 @@ void saveVerbose(int verbose, Image *image, char *output_folder,
         snprintf(output, sizeof(output), "%s/%s.bmp", output_folder,
                  output_path);
         saveImage(image, output);
-        if (free)
-        {
-            freeImage(image, 0);
-        }
+    }
+    if (free)
+    {
+        freeImage(image, 0);
     }
 }
 
-void printVerbose(int verbose, char *message)
+void changeImageGUI(Image *image, int gui, double value, char *message,
+                    int free)
+{
+    if (gui)
+    {
+        change_image(image, "selected_image");
+        edit_progress_bar(value, message);
+    }
+    if (free)
+    {
+        freeImage(image, 0);
+    }
+}
+
+void printVerbose(int verbose, int gui, char *message, char *terminal)
 {
     if (verbose)
     {
         printf("%s", message);
+    }
+    if (gui)
+    {
+        edit_terminal(terminal, message);
     }
 }

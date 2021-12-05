@@ -1,7 +1,3 @@
-//
-// Created by dov on 11/09/2021.
-//
-
 #ifndef OCR_NOISE_REDUCTION_H
 #define OCR_NOISE_REDUCTION_H
 
@@ -13,103 +9,162 @@
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
 
-/*
- * Summary:
- *    Apply all filters
+enum Filter
+{
+    Median,
+    Binomial
+};
+
+/**
+ * @brief
  *
- * Params :
- *      *image : the image
- *
- * Return:
- *      void
+ * @param image
+ * @param pathToSave
+ * @param verbose
+ * @param save
+ * @param gui
  */
-void Preprocessing(Image *image, char pathToSave[], int verbose, int save);
+void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
+                   int gui);
 
-/*
- * Summary:
+/**
+ * @brief
  *
- * Params :
- *      *matrix : neighbours pixels
- *      *binomialFilter : Binomial filter
- *
- * Return :
- *      average value of the pixel, based on Average Formula with
- * BinominalFilter
+ * @param mask
+ * @param image
+ * @param f
+ * @param filter
+ * @param width
+ * @param height
  */
+void applyFilter(Pixel **mask, Image *image, unsigned int (*f)(Pixel *pixel),
+                 enum Filter filter, unsigned int width, unsigned int height);
 
-unsigned int AverageFilter(Pixel *matrix, float *binomialFilter);
+/**
+ * @brief
+ *
+ * @param image
+ * @return int
+ */
+int isWhiteImage(Image *image);
 
-/*
- * Summary:
+/**
+ * @brief
  *
- * Params :
- *  *matrix : neighbours pixels
+ * @param image
+ */
+void invert(Image *image);
+
+/**
+ * @brief
  *
- * Return :
- *  Median value of the pixel, based on Median Formula
+ * @param image
+ */
+void NegativePictureIfNormal(Image *image);
+
+/**
+ * @brief
+ *
+ * @param image
+ * @param mask
+ * @param w
+ * @param h
+ */
+void ApplyMaskToImage(Image *image, Pixel **mask, unsigned int w,
+                      unsigned int h);
+
+/**
+ * @brief
+ *
+ * @param matrix
+ * @return unsigned int
+ */
+unsigned int AverageFilter(Pixel *matrix);
+
+/**
+ * @brief
+ *
+ * @param matrix
+ * @return unsigned int
  */
 unsigned int MedianFilter(Pixel *matrix);
 
-/*
- * Summary:
+/**
+ * @brief
  *
- * Params :
- *      *pixel : the image
- *
- * Return :
- *      median value of the pixel, based on Median Formula
- */
-unsigned int ConstrastFilter(Pixel *pixel, unsigned int *histogram, int max);
-
-/*
- * Summary:
- *      fill the histogram array based on image
- *
- * Params :
- *      *histogram : the image
- *      **pixels : image matrix
- *      w : width of the image
- *      h : height of the image
- *
- * Return:
- *      void
- */
-void GetHistogram(unsigned int *histogram, Pixel **pixels, unsigned int w,
-                  unsigned h);
-
-/*
- * Summary:
- *      Apply Otsu Filter on a matrix
- * Params :
- *      **pixels : image matrix
- *      w : width of the image
- *      h : height of the image
- *      *histogram : the image histogram
- *
- * Return:
- *
- */
-void OtsuFilter(Pixel **pixels, unsigned int w, unsigned int h,
-                unsigned int *histogram, int verbose);
-
-/*
- * Summary:
- *
- * Params :
- *      *histogram : the image histogram
- *
- * Return :
- *      return Threshold value based on the histogram
+ * @param histogram
+ * @return double
  */
 double Thresholding(unsigned int *histogram);
 
-/*
- * Summary:
- *      If the picture contain more white pixels than black, he reverse the
- * picture Params : *image : the image
+/**
+ * @brief
  *
- * Return:
- *      void
+ * @param image
  */
 void NegativePictureIfNormal(Image *image);
-#endif // OCR_NOISE_REDUCTION_H
+
+/**
+ * @brief
+ *
+ * @param image
+ * @param t
+ */
+void adaptativeThreshold(Image *image, const double t);
+
+/**
+ * @brief
+ *
+ * @param image
+ */
+void dilate(Image *image);
+
+/**
+ * @brief
+ *
+ * @param image
+ */
+void erode(Image *image);
+
+/**
+ * @brief
+ *
+ * @param image
+ * @return float
+ */
+float max_color(Image *image);
+
+/**
+ * @brief
+ *
+ * @param image
+ */
+void image_normalize_brightness(Image *image);
+
+/**
+ * @brief
+ *
+ * @param mat
+ * @param n
+ */
+void image_levels(Image *mat, size_t n);
+
+/**
+ * @brief
+ *
+ * @param image
+ * @return float
+ */
+float noiseLevel(Image *image);
+
+/**
+ * @brief
+ *
+ * @param value
+ * @param min
+ * @param max
+ * @return unsigned int
+ */
+unsigned int clamp(unsigned int value, unsigned int min, unsigned int max);
+
+#endif

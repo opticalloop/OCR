@@ -59,14 +59,13 @@ static int isNumber(char *text)
 
 static void printHelpOCR()
 {
-    printf(
-        "🎨 Options ocr :\n"
-        "      gui : open graphical interface\n"
-        "      -o <output_path> : specify an output path\n"
-        "      -r <angle> : manually rotate the image by the angle in degree\n"
-        "      -v --verbose : print details of process\n"
-        "      -S <folder> : save all intermediate images in a folder\n"
-        "      --help : print ocr help\n");
+    printf("🎨 Options ocr :\n"
+           "      gui : open graphical interface\n"
+           "      -o <output_path> : specify an output path\n"
+           "      -v --verbose : print details of process\n"
+           "      -S <folder> : save all intermediate images in a folder\n"
+           "      -hexa : solve hexadecimal grid\n"
+           "      --help : print ocr help\n");
 }
 
 static void printHelpNN()
@@ -114,7 +113,7 @@ static void analyzeOCR(int argc, char **argv)
     char *output_folder = "";
     int save = 0;
 
-    double rotateAngle = 0.0;
+    int hexa = 0;
 
     // Parse all input
     for (int i = 2; i < argc; i++)
@@ -122,7 +121,11 @@ static void analyzeOCR(int argc, char **argv)
         // GUI
         if (!strcmp(argv[i], "gui"))
         {
-            // TODO : Launch GUI
+            // pthread_t thread;
+            // pthread_create(&thread, NULL, init_gui, NULL);
+            // pthread_join(thread, NULL);
+
+            init_gui();
             return;
         }
         else if (!strcmp(argv[i], "--help"))
@@ -145,21 +148,6 @@ static void analyzeOCR(int argc, char **argv)
             }
             output_path = argv[i];
         }
-        // Manually rotate
-        else if (!strcmp(argv[i], "-r"))
-        {
-            i++;
-            checkError(i >= argc || !isNumber(argv[i]),
-                       "⛔ You need to specify an rotation angle in degree "
-                       "after -r. See --help for more");
-
-            if (!strcmp(argv[i], "--help"))
-            {
-                printHelpOCR();
-                return;
-            }
-            rotateAngle = atof(argv[i]);
-        }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--verbose"))
         {
             verbose = 1;
@@ -180,9 +168,16 @@ static void analyzeOCR(int argc, char **argv)
             save = 1;
             output_folder = argv[i];
         }
+        // Parse hexa
+        else if (!strcmp(argv[i], "-hexa"))
+        {
+            hexa = 1;
+        }
     }
-    OCR(input_path, output_path, verbose, save, output_folder);
-    printf("%s %s %f", input_path, output_path, rotateAngle);
+    pthread_t thread;
+    thread = OCR_thread(input_path, output_path, verbose, save, output_folder,
+                        0, hexa);
+    pthread_join(thread, NULL);
 }
 
 static void analyzeNN(int argc, char **argv)
@@ -357,9 +352,9 @@ static void analyzeNN(int argc, char **argv)
         network.sizeInput = NBINPUTS;
         network.sizeOutput = NBOUTPUTS;
 
-        printVerbose(verbose, "    🔨 Creating network\n");
+        printVerbose(verbose, 0, "    🔨 Creating network\n", "terminal_text1");
 
-        launchWeights(&network, WEIGHT_PATH, verbose);
+        // launchWeights(&network, WEIGHT_PATH, verbose);
 
         if (verbose)
         {
@@ -367,11 +362,12 @@ static void analyzeNN(int argc, char **argv)
         }
 
         SDL_Surface *surface = load_image(test_input_path);
-
-        int output = getNetworkOutput(&network, surface, verbose);
+        Image img = newImage(surface, 0, surface->w, surface->h);
+        SDL_FreeSurface(surface);
+        int output = getNetworkOutput(&network, &img, verbose);
         printf("<-- ✅ Output : %d\n", output);
         freeNetwork(&network);
-        SDL_FreeSurface(surface);
+        freeImage(&img, 0);
     }
 
     if (trainOnImg)
@@ -380,8 +376,10 @@ static void analyzeNN(int argc, char **argv)
                    "⛔ You're not supposed to train the network and "
                    "test it at the same time"
                    ". See --help for more");
-        train(epoch, nbHidden, sizeHidden, verbose, launch_path, save_path,
-              "src/NeuralNetwork/Digits-Only/");
+        pthread_t thread;
+        thread = train_thread(epoch, nbHidden, sizeHidden, verbose, launch_path,
+                              save_path, 0);
+        pthread_join(thread, NULL);
     }
     else if (xor)
     {
@@ -399,6 +397,12 @@ int main(int argc, char **argv)
     if (argc == 1)
     {
         printHelp();
+        return EXIT_SUCCESS;
+    }
+
+    if (!strcmp(argv[1], "-data"))
+    {
+        generateDataFile();
         return EXIT_SUCCESS;
     }
 

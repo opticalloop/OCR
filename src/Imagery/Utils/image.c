@@ -49,30 +49,17 @@ static void FillMatrix(Pixel **pixels, unsigned int x, unsigned int y,
     }
 }
 
-void newImage(Image *image, int matrix)
+Image newImage(SDL_Surface *surface, int matrix, unsigned int width,
+               unsigned height)
 {
-    SDL_Surface *surface;
-    if (image->surface != NULL)
-    {
-        surface = image->surface;
-    }
+    Image image;
 
-    else
-    {
-        surface = !strcmp(image->path, "") ? SDL_CreateRGBSurface(
-                      0, image->width, image->height, 32, 0, 0, 0, 0)
-                                           : load_image(image->path);
-    }
+    image.width = width;
+    image.height = height;
 
-    const unsigned int width = surface->w;
-    const unsigned int height = surface->h;
+    image.pixels = calloc(width, sizeof(Pixel *));
 
-    image->width = width;
-    image->height = height;
-
-    image->pixels = calloc(width, sizeof(Pixel *));
-
-    if (image->pixels == NULL)
+    if (image.pixels == NULL)
     {
         errx(EXIT_FAILURE,
              "Error while allocating pixels pointers for the image");
@@ -81,8 +68,8 @@ void newImage(Image *image, int matrix)
     unsigned int x;
     for (x = 0; x < width; x++)
     {
-        image->pixels[x] = calloc(height, sizeof(Pixel));
-        if (image->pixels[x] == NULL)
+        image.pixels[x] = calloc(height, sizeof(Pixel));
+        if (image.pixels[x] == NULL)
         {
             errx(EXIT_FAILURE,
                  "Error while allocating pixels pointers for the image");
@@ -97,34 +84,39 @@ void newImage(Image *image, int matrix)
     {
         for (unsigned int y = 0; y < height; y++)
         {
-            // Get pixel from surface
-            pixel = get_pixel(surface, x, y);
+            if (surface == NULL)
+            {
+                updatePixelToSameValue(&image.pixels[x][y], 255);
+                averageColor += 255;
+            }
+            else
+            {
+                // Get pixel from surface
+                pixel = get_pixel(surface, x, y);
 
-            // Get RGB values from pixel
-            SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
+                // Get RGB values from pixel
+                SDL_GetRGB(pixel, surface->format, &rgb.r, &rgb.g, &rgb.b);
 
-            image->pixels[x][y].r = rgb.r;
-            image->pixels[x][y].g = rgb.g;
-            image->pixels[x][y].b = rgb.b;
+                image.pixels[x][y].r = rgb.r;
+                image.pixels[x][y].g = rgb.g;
+                image.pixels[x][y].b = rgb.b;
+                averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
+            }
 
             if (matrix)
             {
-                image->pixels[x][y].matrix = NULL;
-                image->pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
-                if (image->pixels[x][y].matrix == NULL)
+                image.pixels[x][y].matrix = malloc(sizeof(Pixel) * (9 + 1));
+                if (image.pixels[x][y].matrix == NULL)
                 {
                     errx(EXIT_FAILURE,
                          "Error while allocating pixels pointers for the image "
                          "(matrix creation)");
                 }
             }
-
-            averageColor += ((rgb.r + rgb.g + rgb.b) / 3);
         }
     }
     averageColor /= (width * height);
-    image->averageColor = averageColor;
-    image->surface = surface;
+    image.averageColor = averageColor;
 
     if (matrix)
     {
@@ -133,13 +125,84 @@ void newImage(Image *image, int matrix)
         {
             for (unsigned int j = 0; j < height; ++j)
             {
-                FillMatrix(image->pixels, i, j, width, height);
+                FillMatrix(image.pixels, i, j, width, height);
             }
         }
     }
+    return image;
 }
 
-Pixel **copyPixelsArray(Image *image)
+void freeMatrixArray(Pixel **mask, int w, int h)
+{
+    for (int i = 0; i < w; ++i)
+    {
+        for (int j = 0; j < h; ++j)
+        {
+            free(mask[i][j].matrix);
+        }
+        free(mask[i]);
+    }
+    free(mask);
+}
+
+SDL_Surface *createSurface(Image *image)
+{
+    const unsigned int width = image->width;
+    const unsigned int height = image->height;
+
+    // Create rgb surface from image
+    SDL_Surface *surface =
+        SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+
+    // For each pixel in the source image
+    for (unsigned int x = 0; x < width; x++)
+    {
+        for (unsigned int y = 0; y < height; y++)
+        {
+            // Get pixel from image
+            Pixel _pixel = image->pixels[x][y];
+
+            // Get pixel value for SDL
+            Uint32 pixel =
+                SDL_MapRGB(surface->format, _pixel.r, _pixel.g, _pixel.b);
+
+            // Put pixel in img
+            put_pixel(surface, x, y, pixel);
+        }
+    }
+    return surface;
+}
+
+void saveImage(Image *image, char *path)
+{
+    // Update SDL_Surface inside Image struct
+    SDL_Surface *surface = createSurface(image);
+
+    if (SDL_SaveBMP(surface, path) != 0)
+    {
+        errx(EXIT_FAILURE, "Error while saving file");
+    }
+    SDL_FreeSurface(surface);
+}
+
+void updatePixelToSameValue(Pixel *pixel, unsigned int value)
+{
+    pixel->r = value;
+    pixel->g = value;
+    pixel->b = value;
+}
+
+Pixel InstantiatePixelZero()
+{
+    Pixel pixel;
+    pixel.b = 0;
+    pixel.r = 0;
+    pixel.g = 0;
+
+    return pixel;
+}
+
+Pixel **copyPixelsArray(Image *image, int matrix)
 {
     const unsigned int w = image->width;
     const unsigned int h = image->height;
@@ -166,121 +229,43 @@ Pixel **copyPixelsArray(Image *image)
             mask[i][j].r = image->pixels[i][j].r;
             mask[i][j].g = image->pixels[i][j].g;
             mask[i][j].b = image->pixels[i][j].b;
-            mask[i][j].matrix = NULL;
-            mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
-
-            if (mask[i][j].matrix == NULL)
+            if (matrix)
             {
-                errx(EXIT_FAILURE,
-                     "Error while allocating pixels pointers for the image "
-                     "(matrix)");
+                mask[i][j].matrix = malloc(sizeof(Pixel) * (9 + 1));
+
+                if (mask[i][j].matrix == NULL)
+                {
+                    errx(EXIT_FAILURE,
+                         "Error while allocating pixels pointers for the image "
+                         "(matrix)");
+                }
             }
         }
     }
-    // fill the neighbours matrix
-    for (unsigned int i = 0; i < w; ++i)
+    if (matrix)
     {
-        for (unsigned int j = 0; j < h; ++j)
+        // fill the neighbours matrix
+        for (unsigned int i = 0; i < w; ++i)
         {
-            FillMatrix(mask, i, j, w, h);
+            for (unsigned int j = 0; j < h; ++j)
+            {
+                FillMatrix(mask, i, j, w, h);
+            }
         }
     }
     return mask;
 }
 
-void freeMatrixArray(Pixel **mask, int w, int h)
+Image copyImage(Image *image, int matrix)
 {
-    for (int i = 0; i < w; ++i)
-    {
-        for (int j = 0; j < h; ++j)
-        {
-            free(mask[i][j].matrix);
-        }
-        free(mask[i]);
-    }
-    free(mask);
-}
+    Image res;
+    res.pixels = copyPixelsArray(image, matrix);
+    res.width = image->width;
+    res.height = image->height;
+    res.averageColor = image->averageColor;
+    res.path = image->path;
 
-void displayImage(Image *image)
-{
-    // Init SDL (malloc inside so need to free at the end)
-    if (SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(EXIT_FAILURE, "Could not initialize SDL: %s.\n", SDL_GetError());
-    updateSurface(image);
-    // Display img on screen
-    display_image(image->surface);
-
-    wait_for_keypressed();
-
-    // Free memory took by SDL
-    SDL_Quit();
-}
-
-void updateSurface(Image *image)
-{
-    // Get pixel format for the given image
-    SDL_PixelFormat *pixel_format = image->surface->format;
-
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
-
-    // For each pixel in the source image
-    for (unsigned int x = 0; x < width; x++)
-    {
-        for (unsigned int y = 0; y < height; y++)
-        {
-            // Get pixel from image
-            Pixel _pixel = image->pixels[x][y];
-
-            // Get pixel value for SDL
-            Uint32 pixel =
-                SDL_MapRGB(pixel_format, _pixel.r, _pixel.g, _pixel.b);
-
-            // Put pixel in img
-            put_pixel(image->surface, x, y, pixel);
-        }
-    }
-}
-
-void saveImage(Image *image, char *path)
-{
-    // Update SDL_Surface inside Image struct
-    updateSurface(image);
-
-    if (SDL_SaveBMP(image->surface, path) != 0)
-    {
-        errx(EXIT_FAILURE, "Error while saving file");
-    }
-}
-
-void updatePixelToSameValue(Pixel *pixel, unsigned int value)
-{
-    pixel->r = value;
-    pixel->g = value;
-    pixel->b = value;
-}
-
-Pixel InstantiatePixelZero()
-{
-    Pixel pixel;
-    pixel.b = 0;
-    pixel.r = 0;
-    pixel.g = 0;
-
-    return pixel;
-}
-
-void updateNeigbourgs(Image *image)
-{
-    unsigned int h = image->height;
-    unsigned int w = image->width;
-    for (unsigned int i = 0; i < w; ++i)
-    {
-        for (unsigned int j = 0; j < h; ++j)
-        {
-            FillMatrix(image->pixels, i, j, w, h);
-        }
-    }
+    return res;
 }
 
 void freeImage(Image *image, int matrix)
@@ -301,5 +286,88 @@ void freeImage(Image *image, int matrix)
     }
 
     free(image->pixels);
-    SDL_FreeSurface(image->surface);
+}
+
+void updateNeigbourgs(Image *image)
+{
+    unsigned int h = image->height;
+    unsigned int w = image->width;
+    for (unsigned int i = 0; i < w; ++i)
+    {
+        for (unsigned int j = 0; j < h; ++j)
+        {
+            FillMatrix(image->pixels, i, j, w, h);
+        }
+    }
+}
+
+Image cropImage(Image *image, SDL_Rect *rect)
+{
+    Image res;
+    res.width = rect->w;
+    res.height = rect->h;
+
+    // Allocate pixels form dimension of rect
+    res.pixels = malloc((rect->w + 1) * sizeof(Pixel *));
+    if (res.pixels == NULL)
+    {
+        errx(EXIT_FAILURE,
+             "Error while allocating pixels pointers for the image "
+             "(crop) 1");
+    }
+    for (unsigned int i = 0; i < rect->w; i++)
+    {
+        res.pixels[i] = (Pixel *)malloc((rect->h + 1) * sizeof(Pixel));
+
+        if (res.pixels[i] == NULL)
+        {
+            errx(EXIT_FAILURE,
+                 "Error while allocating pixels pointers for the image "
+                 "(crop) 2");
+        }
+    }
+
+    // Copy pixels from image to res
+    for (int x = rect->x; x < rect->x + rect->w; x++)
+    {
+        for (int y = rect->y; y < rect->y + rect->h; y++)
+        {
+            res.pixels[x - rect->x][y - rect->y].r = image->pixels[x][y].r;
+            res.pixels[x - rect->x][y - rect->y].g = image->pixels[x][y].g;
+            res.pixels[x - rect->x][y - rect->y].b = image->pixels[x][y].b;
+        }
+    }
+    return res;
+}
+
+void pasteOnImage(Image *src, Image *dest, SDL_Rect *rect)
+{
+    for (int x = rect->x; x < rect->x + rect->w; x++)
+    {
+        for (int y = rect->y; y < rect->y + rect->h; y++)
+        {
+            if (x - rect->x < (int)src->width && y - rect->y < (int)src->height)
+            {
+                dest->pixels[x][y].r = src->pixels[x - rect->x][y - rect->y].r;
+                dest->pixels[x][y].g = src->pixels[x - rect->x][y - rect->y].g;
+                dest->pixels[x][y].b = src->pixels[x - rect->x][y - rect->y].b;
+            }
+        }
+    }
+}
+
+void cloneImage(Image *src, Image *dst)
+{
+    const unsigned int width = src->width;
+    const unsigned int height = src->height;
+
+    for (unsigned int i = 0; i < width; i++)
+    {
+        for (unsigned int j = 0; j < height; j++)
+        {
+            dst->pixels[i][j].r = src->pixels[i][j].r;
+            dst->pixels[i][j].g = src->pixels[i][j].g;
+            dst->pixels[i][j].b = src->pixels[i][j].b;
+        }
+    }
 }

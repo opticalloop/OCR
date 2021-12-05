@@ -9,23 +9,15 @@
 
 #include "Imagery/Rotations_Resize/bilinear_interpolation.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Utils/noise_reduction.h"
 
-/*
- *  Summary:
- *       left rotation with bilinear interpolation
- *
- *  Params:
- *      *image: the image to rotate
- *      angleDegree: the degree to rotate
- *
- *  Return:
- *      Nothing, the rotation is applied to the image directly
+/**
+ * @brief Rotate an image
+ * @param Image The image to rotate
+ * @param angleDegree The angle of rotation in degree
+ * @return The rotated image
  */
 
 void rotate(Image *image, double angleDegree);
-
-double detectDiffAngle(Image *image, float precision);
-
-void autoRotate2(Image *image, float precision);
 
 #endif

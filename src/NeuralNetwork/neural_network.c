@@ -131,7 +131,7 @@ void initNetwork(Network *network)
     }
 }
 
-void frontPropagation(Network *network, double input[])
+void frontPropagation(Network *network, int input[])
 {
     // First layer
     Layer *layer = &(network->layers[0]);
@@ -166,6 +166,28 @@ void frontPropagation(Network *network, double input[])
             layer->neurons[j].value = sigmoid(sum);
         }
     }
+
+    // Output layer
+    // Layer prevLayer = network->layers[network->nbLayers - 2];
+    layer = &(network->layers[network->nbLayers - 1]);
+    softmaxLayer(layer);
+    // nbNeurons = layer->nbNeurons;
+
+    // // For each neuron of the actual layer
+    // for (unsigned int j = 0; j < nbNeurons; j++)
+    // {
+    //     Neuron *neuron = &(layer->neurons[j]);
+    //     double sum = 0.0;
+
+    //     // Calcul new neuron value based on his weights and the value of
+    //     // previous layer
+    //     for (unsigned int k = 0; k <= prevLayer.nbNeurons; k++)
+    //     {
+    //         sum += neuron->weights[k] * prevLayer.neurons[k].value;
+    //     }
+    //     sum += neuron->bias;
+    //     layer->neurons[j].value = softmax(sum);
+    // }
 }
 
 void freeNetwork(Network *network)
@@ -223,7 +245,7 @@ double backPropagation(Network *network, double expected[])
     return errorRate;
 }
 
-void gradientDescent(Network *network)
+void gradientDescent(Network *network, double learningRate)
 {
     // Gradient descent
     for (unsigned int i = network->nbLayers - 1; i >= 1; i--)
@@ -238,8 +260,11 @@ void gradientDescent(Network *network)
             for (unsigned int k = 0; k < previousLayer->nbNeurons; k++)
             {
                 // For each weights on the neuron of the previous layer
-                neuron->weights[k] +=
-                    neuron->delta * previousLayer->neurons[k].value;
+                neuron->weights[k] += neuron->delta
+                    * previousLayer->neurons[k].value * learningRate;
+
+                neuron->bias += neuron->delta * previousLayer->neurons[k].value
+                    * learningRate;
             }
         }
     }
@@ -247,13 +272,50 @@ void gradientDescent(Network *network)
 
 double sigmoid(double x)
 {
-    return 1 / (1 + exp(-x));
+    // return 1 / (1 + exp(-x));
+    if (x > 0)
+    {
+        return x;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 double sigmoidPrime(double x)
 {
-    return x * (1 - x);
+    // return x * (1 - x);
+    if (x > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
+
+double softmax(double x)
+{
+    return exp(x) / (1 + exp(x));
+}
+
+void softmaxLayer(Layer *layer)
+{
+    double sum = 0.0;
+    for (unsigned int i = 0; i < layer->nbNeurons; i++)
+    {
+        layer->neurons[i].value = exp(layer->neurons[i].value);
+        sum += layer->neurons[i].value;
+    }
+    for (unsigned int i = 0; i < layer->nbNeurons; i++)
+    {
+        layer->neurons[i].value = layer->neurons[i].value / sum;
+    }
+}
+
+// Apply softmax with cross entropy
 
 void printWeights(Network *network)
 {

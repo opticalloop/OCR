@@ -35,37 +35,25 @@ typedef struct Network
 
 // ------ Neuron ------
 
-/*
- *  Summary:
- *      Create a new neuron based the number of weight
- *  Params:
- *      nbWeights: number of weights related to this neuron, basically number of
- * neuron of the previous layer
+/**
+ * @brief
  *
- *  Return:
- *      the Neuron
+ * @param nbWeights
+ * @return Neuron
  */
 Neuron newNeuron(unsigned int nbWeights);
 
-/*
- *  Summary:
- *      Randomly initialize weights of the neuron
- *  Params:
- *      *neuron: the neuron to initialize weights
+/**
+ * @brief
  *
- *  Return:
- *      Directly change the neuron, so void
+ * @param neuron
  */
 void initNeuron(Neuron *neuron);
 
-/*
- *  Summary:
- *      Free the neuron in parameter
- *  Params:
- *      *neuron: the neuron to be free
+/**
+ * @brief
  *
- *  Return:
- *      Free the neuron so void
+ * @param neuron
  */
 void freeNeuron(Neuron *neuron);
 
@@ -73,157 +61,122 @@ void freeNeuron(Neuron *neuron);
 
 // ------ Layer ------
 
-/*
- *  Summary:
- *      Initialize a new Layer based on the previous layer
- *  Params:
- *      sizeInput: number of neuron of the layer
- *      sizePreviousLayer: number neuron of the previous layer
+/**
+ * @brief
  *
- *  Return:
- *      The created layer
+ * @param sizeLayer
+ * @param sizePreviousLayer
+ * @return Layer
  */
 Layer newLayer(unsigned int sizeLayer, unsigned int sizePreviousLayer);
 
-/*
- *  Summary:
- *      Free the layer
- *  Params:
- *      layer: the layer to be free
+/**
+ * @brief
  *
- *  Return:
- *      Free the layer so void
+ * @param layer
  */
 void freeLayer(Layer *layer);
 // ------ /Layer ------
 
 // ------ Network ------
 
-/*
- *  Summary:
- *      Create the network
- *  Params:
- *      sizeInput: number of neuron of the first layer
- *      sizeHidden: number of neuron of the hidden layers
- *      nbHiddenLayers: number of hidden layers
- *      sizeOutput: number of neuron of the output layer
+/**
+ * @brief
  *
- *  Return:
- *      The created network
+ * @param sizeInput
+ * @param sizeHidden
+ * @param nbHiddenLayers
+ * @param sizeOutput
+ * @return Network
  */
-
 Network newNetwork(unsigned int sizeInput, unsigned int sizeHidden,
                    unsigned int nbHiddenLayers, unsigned int sizeOutput);
 
-/*
- *  Summary:
- *      Initialize all the weights of the network, call initNeuron
- *  Params:
- *      network: the network to initialize weights
+/**
+ * @brief
  *
- *  Return:
- *      Directly initialize the network, so void
+ * @param network
  */
-
 void initNetwork(Network *network);
 
-/*
- *  Summary:
- *      Perform the front propagation
- *  Params:
- *      network: the network to perform the front propagation
- *      input[]: input (normally same size of the input layer)
+/**
+ * @brief
  *
- *  Return:
- *      Directly affect the network in parameter, so void
+ * @param network
+ * @param input
  */
+void frontPropagation(Network *network, int input[]);
 
-void frontPropagation(Network *network, double input[]);
-
-/*
- *  Summary:
- *      Free the network
- *  Params:
- *      network: the network to free
+/**
+ * @brief
  *
- *  Return:
- *      Free the network, so void
+ * @param network
  */
-
 void freeNetwork(Network *network);
 
-/*
- *  Summary:
- *      Perform the back propagation to check if there is error and inform the
- * network Params: network: the network to be checked expected[]: expected
- * output (normally same size as the last layer)
+/**
+ * @brief
  *
- *  Return:
- *      The errorRate of this back propagation
+ * @param network
+ * @param expected
+ * @return double
  */
-
 double backPropagation(Network *network, double expected[]);
 
-/*
- *  Summary:
- *      Perform the gradient descent to update weights
- *  Params:
- *      network: the network to be updated
+/**
+ * @brief
  *
- *  Return:
- *      Directly updated the network weights, so void
+ * @param network
+ * @param learningRate
  */
-
-void gradientDescent(Network *network);
+void gradientDescent(Network *network, double learningRate);
 
 // ------ /Network ------
 
-/*
- *  Summary:
- *      Sigmoid activation function
- *  Params:
- *      x: value
+/**
+ * @brief
  *
- *  Return:
- *      Result
+ * @param x
+ * @return double
  */
-
 double sigmoid(double x);
 
-/*
- *  Summary:
- *      Sigmoid prime for the back propagation
- *  Params:
- *      x: value
+/**
+ * @brief
  *
- *  Return:
- *      Result
+ * @param x
+ * @return double
  */
-
 double sigmoidPrime(double x);
 
-/*
- *  Summary:
- *      Print weigts of the network
- *  Params:
- *      network: the network to print
+/**
+ * @brief
  *
- *  Return:
- *      Print, so void
+ * @param x
+ * @return double
  */
+double softmax(double x);
 
+/**
+ * @brief
+ *
+ * @param layer
+ */
+void softmaxLayer(Layer *layer);
+
+/**
+ * @brief
+ *
+ * @param network
+ */
 void printWeights(Network *network);
 
-/*
- *  Summary:
- *      Get the average error rate of the network
- *  Params:
- *      network: the network to get the average error
+/**
+ * @brief
  *
- *  Return:
- *      The average rate of the network
+ * @param network
+ * @return double
  */
-
 double averageErrorRate(Network *network);
 
 #endif

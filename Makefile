@@ -1,9 +1,9 @@
 CC = gcc -Iinclude/
 
-CPPFLAGS = `pkg-config --cflags sdl` -MMD -D__NO_INLINE__
-CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address
-LDLFLAGS = -lm
-LDLIBS = `pkg-config --libs sdl SDL_image`
+CPPFLAGS = `pkg-config --cflags sdl gtk+-3.0` -MMD -D__NO_INLINE__
+CFLAGS = -Wall -Wextra -std=c99 -O1 -g -fsanitize=address -Wno-unknown-pragmas
+LDLFLAGS = -lm -lpthread
+LDLIBS = `pkg-config --libs sdl SDL_image gtk+-3.0` -rdynamic
 
 BUILD := build
 SOURCE_DIR := src
@@ -24,14 +24,8 @@ init:
 main: $(OBJ)
 	gcc -o $@ $(CFLAGS) $^ $(LDLFLAGS) $(LDLIBS)
 
-nn:
-	make -C NeuralNetwork nn
-
 sudoku:
 	make -C Sudoku_Solver
-
-xor:
-	make -C NeuralNetwork xor
 
 utils:
 	make -C Imagery
@@ -39,12 +33,23 @@ utils:
 tests:
 	make -C Tests
 
+gui:
+	make -C GUI
+
 $(BUILD)/%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDLFLAGS) $(CPPFLAGS) $(LDLIBS)
 
 # Format all files
 format:
 	find -name "*.[ch]" -exec clang-format --verbose -i {} \;
+
+test:
+	./main ocr src/Imagery/image_01.jpeg -v -S output_1 \
+	&& ./main ocr src/Imagery/image_02.jpeg -v -S output_2 \
+	&& ./main ocr src/Imagery/image_03.jpeg -v -S output_3 \
+	&& ./main ocr src/Imagery/image_04.jpeg -v -S output_4 \
+	&& ./main ocr src/Imagery/image_05.jpeg -v -S output_5 \
+	&& ./main ocr src/Imagery/image_06.jpeg -v -S output_6
 
 # Clean all trash files
 clean:
