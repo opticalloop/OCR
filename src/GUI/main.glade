@@ -1901,7 +1901,7 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                         </child>
                         <child>
                           <object class="GtkButton">
-                            <property name="label" translatable="yes">Chocolatine</property>
+                            <property name="label" translatable="yes">Save and go back</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
