@@ -164,8 +164,8 @@ unsigned int MedianFilter(Pixel *matrix)
 
 void adaptativeThreshold(Image *image, const double t)
 {
-    const unsigned int width = image->width;
-    const unsigned int height = image->height;
+    const int width = image->width;
+    const int height = image->height;
 
     const int s2 = fmax(width, height) / 16;
     unsigned long *integral_image =
@@ -180,7 +180,7 @@ void adaptativeThreshold(Image *image, const double t)
         integral_image[y] = sum;
     }
 
-    for (unsigned int i = 1; i < width; i++)
+    for (int i = 1; i < width; i++)
     {
         sum = 0;
         for (unsigned int j = 0; j < height; j++)
@@ -190,9 +190,9 @@ void adaptativeThreshold(Image *image, const double t)
                 integral_image[(i - 1) * height + j] + sum;
         }
     }
-    for (unsigned int i = 0; i < width; i++)
+    for (int i = 0; i < width; i++)
     {
-        for (unsigned int j = 0; j < height; j++)
+        for (int j = 0; j < height; j++)
         {
             x1 = fmax(i - s2, 1);
             x2 = fmin(i + s2, width - 1);
@@ -322,7 +322,7 @@ float noiseLevel(Image *image)
             }
             medium /= 9;
 
-            double val = 1.0 - (image->pixels[i][j].r / medium);
+            double val = 1 - (image->pixels[i][j].r / medium);
             if (val < 0)
             {
                 val *= -1;
