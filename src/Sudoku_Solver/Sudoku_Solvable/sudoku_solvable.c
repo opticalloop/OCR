@@ -50,8 +50,8 @@ unsigned int isColumnSolvable(unsigned int **grid, unsigned int x,
     return true;
 }
 
-unsigned int isSquareSolvable(unsigned int **grid, int x,
-                              int y, unsigned int dimension)
+unsigned int isSquareSolvable(unsigned int **grid, int x, int y,
+                              unsigned int dimension)
 {
     int increment = (int)sqrt(dimension);
     x -= x % increment;

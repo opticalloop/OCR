@@ -4,15 +4,16 @@
 #include <math.h>
 
 #include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/struct.h"
 
 /**
  * @brief
  *
  * @param linelist
- * @return LineList
+ * @return MyList
  */
-LineList simplifyLines(LineList *linelist);
+MyList *simplifyLines(MyList *linelist);
 
 /**
  * @brief Get the Square object
@@ -22,7 +23,7 @@ LineList simplifyLines(LineList *linelist);
  * @param index
  * @return Square
  */
-Square getSquare(LineList *lineList, Line *line, int index);
+Square getSquare(MyList *lineList, Line *line, int index);
 
 /**
  * @brief Get the Intersection object
@@ -43,10 +44,10 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height);
  * @param height
  * @param image
  * @param draw
- * @return SquareList
+ * @return MyList
  */
-SquareList findSquare(LineList *lineList, int width, int height, Image *image,
-                      int draw);
+MyList findSquare(MyList *lineList, int width, int height, Image *image,
+                  int draw);
 
 /**
  * @brief Get the All Square object
@@ -55,10 +56,9 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
  * @param width
  * @param height
  * @param image
- * @return SquareList
+ * @return MyList
  */
-SquareList getAllSquare(LineList *lineList, int width, int height,
-                        Image *image);
+MyList *getAllSquare(MyList *lineList, int width, int height, Image *image);
 
 /**
  * @brief
@@ -68,7 +68,8 @@ SquareList getAllSquare(LineList *lineList, int width, int height,
  * @param height
  * @return int
  */
-int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR);
+int isSquare(Square *square, unsigned int width, unsigned int height,
+             double SQUARE_FACTOR);
 
 /**
  * @brief Get the Line Length object
@@ -85,7 +86,7 @@ double getLineLength(Line *line);
  * @param image
  * @return Square
  */
-Square sortSquares(SquareList *squareList, Image *image);
+Square sortSquares(MyList *squareList, Image *image);
 
 /**
  * @brief

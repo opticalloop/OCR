@@ -125,8 +125,7 @@ void Inverse(double cinMatrix[9][9], int sizeMatrix, double determinte,
     return;
 }
 
-void inverseMat(double cinMatrix[9][9], double coutMatrix[9][9],
-                 int sizeMatrix)
+void inverseMat(double cinMatrix[9][9], double coutMatrix[9][9], int sizeMatrix)
 {
     double determinte, transposeMatrix[9][9];
 
@@ -204,7 +203,7 @@ void inverse3x3Mat(double **M, double **M_inv)
 }
 
 void multiplyMatStat(double M[][_MAX], double v[_MAX], double v_out[_MAX],
-                         int size)
+                     int size)
 {
     for (int i = 0; i < size; i++)
     {

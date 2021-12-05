@@ -8,7 +8,7 @@ int **initMatriceInt(int x, int y)
     {
         errx(1, "Memory error");
     }
-    for (size_t j = 0; j < y; j++)
+    for (int j = 0; j < y; j++)
     {
         matrice[j] = calloc(x + 1, sizeof(int));
         if (matrice[j] == NULL)
@@ -19,9 +19,9 @@ int **initMatriceInt(int x, int y)
     return matrice;
 }
 
-void freeMatriceInt(int **matrice, size_t height)
+void freeMatriceInt(int **matrice, int height)
 {
-    for (size_t y = 0; y < height; y++)
+    for (int y = 0; y < height; y++)
     {
         free(matrice[y]);
     }

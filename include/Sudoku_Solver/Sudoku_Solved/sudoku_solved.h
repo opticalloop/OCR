@@ -1,8 +1,8 @@
 #ifndef SUDOKU_SOLVED_H
 #define SUDOKU_SOLVED_H
 
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 
 /**
  * @brief

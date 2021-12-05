@@ -9,6 +9,7 @@
 
 Image image;
 Image temp_image;
+int loaded_image = 0;
 
 GtkBuilder *builder;
 gchar *filename;
@@ -119,6 +120,8 @@ char *get_filename_ext(const char *filename)
 
 void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 {
+    (void)data;
+
     // select filename and update image
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
     char *ext = get_filename_ext(filename);
@@ -139,6 +142,8 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         // Display image
         change_image(&image, "selected_image");
+
+        loaded_image = 1;
 
         // update label
         GtkLabel *label =
@@ -278,9 +283,11 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         printf("Processing...\n");
+
+        saveImage(&image, filename);
         // Run processing
         pthread_t t;
-        t = OCR_thread(IMAGE_SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+        t = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE,
                        strcmp(dim, "9x9"));
         thread = &t;
     }
@@ -389,8 +396,8 @@ void edit_resize(GtkWidget *widget, gpointer data)
 
     // get picture
 
-    GtkImage *imageWidget = GTK_IMAGE(
-        gtk_builder_get_object(builder, "selected_image3")); // get image
+    // GtkImage *imageWidget = GTK_IMAGE(
+    //    gtk_builder_get_object(builder, "selected_image3")); // get image
 
     // get image size
     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
@@ -618,13 +625,13 @@ void show_result(unsigned int **grid, int dimension, Image *res)
     }
     // gtk_stack_set_visible_child_name(stack_result, "Result");
 
-    for (size_t i = 0; i < dimension; i++)
+    for (int i = 0; i < dimension; i++)
     {
-        for (size_t j = 0; j < dimension; j++)
+        for (int j = 0; j < dimension; j++)
         {
             // get input at i,j and set value
             GtkEntry *entry =
-                GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
+                GTK_ENTRY(gtk_grid_get_child_at(grid_result, j, i));
 
             char ch[40] = " ";
             if (grid[i][j] > 9)
@@ -657,14 +664,13 @@ void confirm_result()
         ? GTK_GRID(gtk_builder_get_object(builder, "grid_result"))
         : GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
 
-    char *str;
     for (int i = 0; i < dim; i++)
     {
         for (int j = 0; j < dim; j++)
         {
             GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
 
-            str = gtk_entry_get_text(entry);
+            const gchar *str = gtk_entry_get_text(entry);
             int size = strlen(str);
             // Str length is 1 or 2
             if (size == 0)
@@ -737,23 +743,82 @@ void confirm_result()
         sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
     }
 
-    freeGrid(result, dim); // Free grid
-    freeGrid(copy, dim); // Free copy
-
     change_image(&sudoku_image, "selected_image");
     edit_progress_bar(1, "Result");
 
-    // TODO: change the way we save image
-    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 1);
+    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 0);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
     change_image(&sudoku_image, "result_image");
+
+    freeGrid(result, dim); // Free grid
+    freeGrid(copy, dim); // Free copy
+
+    freeImage(&sudoku_image, 0);
 }
+
+#pragma endregion
 
 void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
-    change_image(&image, "selected_image");
+    (void)widget;
+    (void)data;
+    (void)allocation;
+    // printf("    🔨 Resizing %d %d\n", allocation->width, allocation->height);
+
+    // if (loaded_image)
+    // {
+    //     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder,
+    //     "right_panel"));
+
+    //     int width =
+    //         clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0,
+    //         1000);
+
+    //     int height =
+    //         clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0,
+    //         1000);
+
+    //     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
+
+    //     GtkImage *imageWidget =
+    //         GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); //
+    //         get image
+
+    //     // Change image
+    //     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
+    //     pixbuf, width, height, GDK_INTERP_BILINEAR); // resize image
+
+    //     // set the image
+    //     gtk_image_set_from_pixbuf(imageWidget, resized_image);
+
+    //     GdkPixbuf *sourcePixbuf = data;	/* As read from a file */
+    //     GdkPixbuf *imagePixbuf;	/* pixbuf of the on-screen image */
+
+    //     imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
+    //     if (imagePixbuf == NULL) {
+    //     g_message("Can't get on-screen pixbuf");
+    //     return TRUE;
+    //     }
+    //     /* Recreate the displayed image if the image size has changed. */
+    //     if (allocation->width != gdk_pixbuf_get_width(imagePixbuf) ||
+    //         allocation->height != gdk_pixbuf_get_height(imagePixbuf)) {
+
+    //     gtk_image_set_from_pixbuf(
+    //         GTK_IMAGE(image),
+    //         gdk_pixbuf_scale_simple(sourcePixbuf,
+    //                     allocation->width,
+    //                     allocation->height,
+    //                     GDK_INTERP_BILINEAR)
+    //     );
+    //     g_object_unref(imagePixbuf); /* Free the old one */
+    // }
+
+    // return FALSE;
+    // }
+
+    // return TRUE;
 }
 
 #pragma endregion "Result"
@@ -761,6 +826,7 @@ void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 #pragma region "Main"
 void open_file(GtkWidget *widget, gpointer data)
 {
+    (void)widget;
     // open image in explorer
     char *path = data;
     char command[100] = "xdg-open ";
@@ -790,7 +856,7 @@ void set_recents_files()
     while (items != NULL && i < 5)
     {
         GtkRecentInfo *info = (GtkRecentInfo *)items->data;
-        char *uri = gtk_recent_info_get_uri(info);
+        const gchar *uri = gtk_recent_info_get_uri(info);
         char *ext = get_filename_ext(uri);
         // if file is not a picture, we don't add it to the list
         if (strcmp(ext, "png") && strcmp(ext, "jpg") && strcmp(ext, "jpeg")
@@ -799,7 +865,7 @@ void set_recents_files()
             items = g_list_next(items);
             continue;
         }
-        char *name = gtk_recent_info_get_display_name(info);
+        const gchar *name = gtk_recent_info_get_display_name(info);
         char *path = g_filename_from_uri(uri, NULL, NULL);
         if (path == NULL)
         {
@@ -807,25 +873,26 @@ void set_recents_files()
             items = g_list_next(items);
             continue;
         }
-        GtkButton *button = gtk_button_new_with_label(name);
+        GtkButton *button = GTK_BUTTON(gtk_button_new_with_label(name));
         gtk_widget_set_name(GTK_WIDGET(button), path);
         // set alignment horizontal to start and vertical to center
         gtk_button_set_alignment(button, 0, 0.5);
         g_signal_connect(button, "clicked", G_CALLBACK(open_file), path);
-        GtkStyleContext *context =
-            gtk_widget_get_style_context(GTK_WIDGET(button));
+        // GtkStyleContext *context =
+        //    gtk_widget_get_style_context(GTK_WIDGET(button));
 
         gtk_box_pack_start(box, GTK_WIDGET(button), FALSE, FALSE, 0);
 
         // Free
-        g_free(uri);
-        g_free(name);
+        g_free((void *)uri);
+        g_free((void *)name);
 
         items = g_list_next(items);
         i++;
     }
 }
-void *init_gui()
+
+void init_gui()
 {
     builder = NULL;
     GError *error = NULL;
@@ -879,8 +946,7 @@ void *init_gui()
     set_recents_files();
 
     // on resize window
-    // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
-    // TODO: fix this
+    g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
 
     // load UI
     gtk_widget_show_all(window); // show window
@@ -889,6 +955,7 @@ void *init_gui()
 
     // pthread_exit(NULL);
 }
+
 void open_website()
 {
     // Check if the browser is installed

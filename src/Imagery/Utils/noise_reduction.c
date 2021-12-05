@@ -11,10 +11,11 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     const unsigned int w = image->width;
     const unsigned int h = image->height;
 
-    printVerbose(verbose, 0, "    🎨 1 Preprocessing image\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🎨 1 Preprocessing image\n", "terminal_text");
 
     // CONTRAST
-    printVerbose(verbose, 0, "    📸 1.1 Applying constrast Filter\n", "terminal_text1");
+    printVerbose(verbose, 0, "    📸 1.1 Applying constrast Filter\n",
+                 "terminal_text");
     image_levels(image, 10);
     invert(image);
     image_normalize_brightness(image);
@@ -23,7 +24,8 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.1, "Contrast filter", 0);
 
     // MEDIAN
-    printVerbose(verbose, 0, "    🎥 1.2 Applying Median Filter\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🎥 1.2 Applying Median Filter\n",
+                 "terminal_text");
     Pixel **mask = copyPixelsArray(image, 1);
     updateNeigbourgs(image);
     applyFilter(mask, image, MedianFilter, Median, w, h);
@@ -33,14 +35,15 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.15, "Median filter", 0);
 
     // AVERAGE
-    printVerbose(verbose, 0, "    🎬 1.3 Applying Average Filter\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🎬 1.3 Applying Average Filter\n",
+                 "terminal_text");
     applyFilter(mask, image, AverageFilter, Binomial, w, h);
     saveVerbose(verbose, image, pathToSave, "1.3_Average_filter", save, 0);
     changeImageGUI(image, gui, 0.2, "Average filter", 0);
 
     // ADAPTATIVE THRESHOLD
-    printVerbose(verbose, 0,
-                 "    💻 1.4 Applying Adaptative Threshold Filter\n", "terminal_text1");
+    printVerbose(verbose, 0, "    💻 1.4 Applying Adaptative Threshold Filter\n",
+                 "terminal_text");
     float noise = noiseLevel(image);
     if (verbose)
         printf("    👍 1.4.1 Noise level : %f\n", noise);
@@ -50,13 +53,13 @@ void Preprocessing(Image *image, char pathToSave[], int verbose, int save,
     changeImageGUI(image, gui, 0.25, "Adaptative threshold", 0);
 
     // DILATE
-    printVerbose(verbose, 0, "    🧱 1.5 Smoothing image\n", "terminal_text1");
+    printVerbose(verbose, 0, "    🧱 1.5 Smoothing image\n", "terminal_text");
     dilate(image);
     saveVerbose(verbose, image, pathToSave, "1.5_Smooth_filter", save, 0);
     changeImageGUI(image, gui, 0.3, "Smoothed image", 0);
 
     // INTERTING
-    printVerbose(verbose, 0, "    ❓ 1.6 Inverting image\n", "terminal_text1");
+    printVerbose(verbose, 0, "    ❓ 1.6 Inverting image\n", "terminal_text");
     NegativePictureIfNormal(image);
     saveVerbose(verbose, image, pathToSave, "1.6_Inverted_filter", save, 0);
     changeImageGUI(image, gui, 0.35, "Inverted image", 0);
@@ -180,16 +183,16 @@ void adaptativeThreshold(Image *image, const double t)
     for (unsigned int i = 1; i < width; i++)
     {
         sum = 0;
-        for (int j = 0; j < height; j++)
+        for (unsigned int j = 0; j < height; j++)
         {
             sum += image->pixels[i][j].r;
             integral_image[i * height + j] =
                 integral_image[(i - 1) * height + j] + sum;
         }
     }
-    for (int i = 0; i < width; i++)
+    for (unsigned int i = 0; i < width; i++)
     {
-        for (int j = 0; j < height; j++)
+        for (unsigned int j = 0; j < height; j++)
         {
             x1 = fmax(i - s2, 1);
             x2 = fmin(i + s2, width - 1);
@@ -319,8 +322,15 @@ float noiseLevel(Image *image)
             }
             medium /= 9;
 
-            if (abs(1 - (image->pixels[i][j].r / medium)) > NOISE_THRESHOLD)
+            double val = 1.0 - (image->pixels[i][j].r / medium);
+            if (val < 0)
+            {
+                val *= -1;
+            }
+            if (val > NOISE_THRESHOLD)
+            {
                 count++;
+            }
         }
     }
 

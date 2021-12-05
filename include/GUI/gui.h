@@ -10,6 +10,7 @@
 #include "GUI/draw.h"
 #include "GUI/gui_utils.h"
 #include "Imagery/Detection/distortion_correction.h"
+#include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/op.h"
 #include "NeuralNetwork/training.h"
@@ -95,7 +96,7 @@ void edit_terminal(char *terminal_id, char *string);
 
 void show_result(unsigned int **grid, int dimension, Image *res);
 
-void *init_gui();
+void init_gui();
 
 void open_website();
 

@@ -1,6 +1,7 @@
 #ifndef SUDOKU_SOLVER_H
 #define SUDOKU_SOLVER_H
 
+#include <err.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

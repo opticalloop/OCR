@@ -99,6 +99,7 @@ void *OCR(void *Thread_args)
 
     saveVerbose(verbose, &image, output_folder, "2.1_Sobel_filter", save, 0);
     changeImageGUI(&image, gui, 0.4, "Sobel filter", 0);
+
     printVerbose(verbose, gui, "    🔨 2.2 Launching Hough Transform\n",
                  "terminal_text1");
 
@@ -129,6 +130,7 @@ void *OCR(void *Thread_args)
     network.sizeOutput = NBOUTPUTS;
 
     printVerbose(verbose, gui, "    📑 3.2 Initing weights\n", "terminal_text1");
+
     launchWeights(&network, WEIGHT_PATH, verbose, gui);
 
     saveVerbose(verbose, &cropped, output_folder, "2.9_Inverted_image", save,
@@ -164,7 +166,6 @@ void *OCR(void *Thread_args)
                 val = 0;
             }
             grid[i][j] = val;
-
             // Free the case
             freeImage(&(all_cases[i * dimension + j]), 0);
         }

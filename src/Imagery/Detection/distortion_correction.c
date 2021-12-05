@@ -8,8 +8,8 @@ void crossProduct(double vect_A[], double vect_B[], double cross_P[])
 }
 
 void perspectiveMatrix(int src[4][2], double dst[4][2],
-                                double **transformation_matrix,
-                                double **transformation_matrix_inv)
+                       double **transformation_matrix,
+                       double **transformation_matrix_inv)
 {
     double P[][9] = {
         { -src[0][0], -src[0][1], -1, 0, 0, 0, src[0][0] * dst[0][0],
@@ -57,38 +57,34 @@ void perspectiveMatrix(int src[4][2], double dst[4][2],
     free(H);
 }
 
-Image correctPerspective(Image *image, Square *square,
-                          int verbose, char *output_folder)
+Image correctPerspective(Image *image, Square *square, int verbose,
+                         char *output_folder)
 {
     if (verbose)
         printf("    🗺️ 2.7 Correcting perspective and cropping...\n");
 
-    int src[4][2] = {
-        { square->top.xStart, square->top.yStart },
-        { square->right.xStart, square->right.yStart },
-        { square->bottom.xStart, square->bottom.yStart },
-        { square->left.xStart, square->left.yStart }
-    };
+    int src[4][2] = { { square->top.xStart, square->top.yStart },
+                      { square->right.xStart, square->right.yStart },
+                      { square->bottom.xStart, square->bottom.yStart },
+                      { square->left.xStart, square->left.yStart } };
 
     int top = getLineLength(&(square->top));
     int right = getLineLength(&(square->right));
     int bottom = getLineLength(&(square->bottom));
     int left = getLineLength(&(square->left));
 
-    double max_edge_length = fmax(fmax(top, right),
-                                  fmax(bottom, left));
+    double max_edge_length = fmax(fmax(top, right), fmax(bottom, left));
 
     double dst[4][2] = { { 0, 0 },
-                                 { max_edge_length, 0 },
-                                 { max_edge_length, max_edge_length },
-                                 { 0, max_edge_length } };
+                         { max_edge_length, 0 },
+                         { max_edge_length, max_edge_length },
+                         { 0, max_edge_length } };
 
     double **transformationMat = allocMat(3);
 
     double **transformationMatInv = allocMat(3);
 
-    perspectiveMatrix(src, dst, transformationMat,
-                               transformationMatInv);
+    perspectiveMatrix(src, dst, transformationMat, transformationMatInv);
 
     Image corrected_image = newImage(NULL, 0, max_edge_length, max_edge_length);
 
@@ -104,12 +100,13 @@ Image correctPerspective(Image *image, Square *square,
             double new_coordinates[3] = { 0, 0, 0 };
 
             multiplyMatBis(transformationMatInv, old_coordinates,
-                                   new_coordinates, 3);
+                           new_coordinates, 3);
 
             int x = (int)(new_coordinates[0] / new_coordinates[2]);
             int y = (int)(new_coordinates[1] / new_coordinates[2]);
 
-            if (x >= 0 && y >= 0 && x < (int) image->width && y < (int)image->height)
+            if (x >= 0 && y >= 0 && x < (int)image->width
+                && y < (int)image->height)
             {
                 corrected_image.pixels[i][j] = image->pixels[x][y];
             }

@@ -2,89 +2,103 @@
 
 #define MIN_EQUAL 30
 
-LineList simplifyLines(LineList *linelist)
+MyList *simplifyLines(MyList *linelist)
 {
-    const unsigned int len = linelist->len;
-    Line *allLines = linelist->lines;
-    if (len <= 0)
+    MyList *allLines = linelist;
+    if (linelist->length <= 0)
     {
         errx(EXIT_FAILURE, "Got no line\n");
     }
-    int lastLinesCount = 0;
 
-    // If xstart = -1, we don't want the line
-    Line currentLine;
-    Line referenceLine;
-    for (unsigned int i = 0; i < len; i++)
+    Node *referenceNode = allLines->head;
+    unsigned count = 0;
+    for (unsigned int i = 0; referenceNode != NULL;
+         referenceNode = referenceNode->next, i++)
     {
-        if (allLines[i].xStart != -1)
+        count++;
+        Line *refLine = (Line *)referenceNode->value;
+        if (refLine->xStart != -1)
         {
-            referenceLine = allLines[i];
-            for (unsigned int j = 0; j < len; j++)
+            Node *currentNode = allLines->head;
+            for (unsigned j = 0; currentNode != NULL;
+                 currentNode = currentNode->next, j++)
             {
                 if (i == j)
                 {
                     continue;
                 }
-
-                if (allLines[j].xStart != -1)
+                Line *curLine = (Line *)currentNode->value;
+                if (curLine->xStart != -1)
                 {
-                    currentLine = allLines[j];
-                    // Line are approximately equals
-                    if (abs(referenceLine.xStart - currentLine.xStart)
-                            < MIN_EQUAL
-                        && abs(referenceLine.xEnd - currentLine.xEnd)
-                            < MIN_EQUAL
-                        && abs(referenceLine.yStart - currentLine.yStart)
-                            < MIN_EQUAL
-                        && abs(referenceLine.yEnd - currentLine.yEnd)
-                            < MIN_EQUAL)
+                    if (abs(refLine->xStart - curLine->xStart) < MIN_EQUAL
+                        && abs(refLine->xEnd - curLine->xEnd) < MIN_EQUAL
+                        && abs(refLine->yStart - curLine->yStart) < MIN_EQUAL
+                        && abs(refLine->yEnd - curLine->yEnd) < MIN_EQUAL)
                     {
-                        allLines[i].xStart =
-                            (referenceLine.xStart + currentLine.xStart) / 2;
-                        allLines[i].xEnd =
-                            (referenceLine.xEnd + currentLine.xEnd) / 2;
-                        allLines[i].yStart =
-                            (referenceLine.yStart + currentLine.yStart) / 2;
-                        allLines[i].yEnd =
-                            (referenceLine.yEnd + currentLine.yEnd) / 2;
-                        allLines[j].xStart = -1;
-                        lastLinesCount++;
+                        refLine->xStart =
+                            (refLine->xStart + curLine->xStart) / 2;
+                        refLine->xEnd = (refLine->xEnd + curLine->xEnd) / 2;
+                        refLine->yStart =
+                            (refLine->yStart + curLine->yStart) / 2;
+                        refLine->yEnd = (refLine->yEnd + curLine->yEnd) / 2;
+                        curLine->xStart = -1;
                     }
                 }
             }
         }
     }
-    Line *resultingLines = malloc(lastLinesCount * sizeof(Line) + 1);
-    int index = 0;
-    for (unsigned int j = 0; j < len; j++)
+
+    Node *node = allLines->head;
+    Node *prev = NULL;
+    while (node != NULL && prev == NULL)
     {
-        if (allLines[j].xStart != -1)
+        Line *line = (Line *)node->value;
+        if (line->xStart == -1)
         {
-            resultingLines[index] = allLines[j];
-            index++;
+            Node *tmp = node;
+            node = node->next;
+            allLines->head = node;
+            free_node(tmp);
+            allLines->length--;
+        }
+        else
+        {
+            prev = node;
+            node = node->next;
+        }
+    }
+    while (node != NULL)
+    {
+        Line *line = (Line *)node->value;
+        if (line->xStart == -1)
+        {
+            Node *tmp = node;
+            node = node->next;
+            prev->next = node;
+            free_node(tmp);
+            allLines->length--;
+        }
+        else
+        {
+            prev = node;
+            node = node->next;
         }
     }
 
-    LineList lines;
-    lines.lines = resultingLines;
-    lines.len = index;
-    lines.maxTheta = linelist->maxTheta;
-    free(linelist->lines);
-    return lines;
+    return allLines;
 }
 
-Square getSquare(LineList *lineList, Line *line, int index)
+Square getSquare(MyList *lineList, Line *line, int index)
 {
-    const unsigned int len = lineList->len;
     Square square;
     Line actual = *line;
     // Degree
     double actualAngle = actual.theta * 180.0 / M_PI;
     int i = 0;
-    for (unsigned int j = index + 1; j < len; j++)
+    Node *node = get_node(lineList, index);
+    for (; node != NULL; node = node->next)
     {
-        Line temp = lineList->lines[j];
+        Line temp = *(Line *)node->value;
         // Degree
         double tempAngle = temp.theta * 180.0 / M_PI;
         double angleDiff = actualAngle - tempAngle;
@@ -153,56 +167,60 @@ Dot getIntersection(Line *line1, Line *line2, int width, int height)
     return dot;
 }
 
-SquareList findSquare(LineList *lineList, int width, int height, Image *image,
-                      int draw)
+MyList findSquare(MyList *lineList, int width, int height, Image *image,
+                  int draw)
 {
-    SquareList squareList;
-    squareList.squares = malloc(sizeof(Square));
-    const unsigned int len = lineList->len;
+    MyList squareList = { NULL, NULL, 0 };
     double squareFactor = getSquareFactor(image);
-    unsigned int nbSquares = 0;
-
     // FIRST COLUMN
-    for (unsigned int h = 0; h < len; h++)
+    Node *n1 = lineList->head;
+    for (unsigned int h = 0; n1 != NULL; h++, n1 = n1->next)
     {
-        for (unsigned int i = 0; i < len; i++)
+        Node *n2 = lineList->head;
+        for (unsigned int i = 0; n2 != NULL; i++, n2 = n2->next)
         {
             if (i == h)
                 continue;
+
+            Line *line1 = (Line *)n1->value;
+            Line *line2 = (Line *)n2->value;
             // Get all line that actualLine have a intersection point with
-            Dot dot1 = getIntersection(&(lineList->lines[h]),
-                                       &(lineList->lines[i]), width, height);
+            Dot dot1 = getIntersection(line1, line2, width, height);
 
             if (dot1.X != -1)
             {
                 // ALL INTERSECTED EDGES
-                for (unsigned int j = 0; j < len; j++)
+                Node *n3 = lineList->head;
+                for (unsigned int j = 0; n3 != NULL; j++, n3 = n3->next)
                 {
                     if (i == j)
                         continue;
-                    Dot dot2 =
-                        getIntersection(&(lineList->lines[i]),
-                                        &(lineList->lines[j]), width, height);
+
+                    Line *line3 = (Line *)n3->value;
+
+                    Dot dot2 = getIntersection(line2, line3, width, height);
 
                     if (dot2.X != -1)
                     {
                         // ALL INTERSECTED EDGES
-                        for (unsigned int k = 0; k < len; k++)
+                        Node *n4 = lineList->head;
+                        for (unsigned int k = 0; n4 != NULL; k++, n4 = n4->next)
                         {
                             if (k == j)
                                 continue;
-                            Dot dot3 = getIntersection(&(lineList->lines[j]),
-                                                       &(lineList->lines[k]),
-                                                       width, height);
+
+                            Line *line4 = (Line *)n4->value;
+                            Dot dot3 =
+                                getIntersection(line3, line4, width, height);
 
                             if (dot3.X != -1)
                             {
                                 if (k == h)
                                     continue;
+
                                 // DOES K have intersection with h
-                                Dot dot4 = getIntersection(
-                                    &(lineList->lines[k]),
-                                    &(lineList->lines[h]), width, height);
+                                Dot dot4 = getIntersection(line4, line1, width,
+                                                           height);
 
                                 if (dot4.X != -1)
                                 {
@@ -232,24 +250,21 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                     square.left = fourthLine;
 
                                     // Not a square
-                                    if (!isSquare(&square, width, height, squareFactor))
+                                    if (!isSquare(&square, width, height,
+                                                  squareFactor))
                                     {
                                         continue;
                                     }
 
                                     compute_Square(&square);
 
-                                    squareList.squares = realloc(
-                                        squareList.squares,
-                                        (nbSquares + 1) * sizeof(Square));
-                                    squareList.squares[nbSquares] = square;
+                                    append(&squareList, Square_tovptr(square));
 
                                     if (draw)
                                     {
                                         drawSquare(&square, image, width,
                                                    height, 2);
                                     }
-                                    nbSquares++;
                                 }
                             }
                         }
@@ -258,11 +273,11 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
             }
         }
     }
-    squareList.len = nbSquares;
     return squareList;
 }
 
-int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR)
+int isSquare(Square *square, unsigned int width, unsigned int height,
+             double SQUARE_FACTOR)
 {
     // Avoid warning
     (void)width;
@@ -309,22 +324,24 @@ double getLineLength(Line *line)
                 + ((line->yEnd - line->yStart) * (line->yEnd - line->yStart)));
 }
 
-Square sortSquares(SquareList *squareList, Image *image)
+Square sortSquares(MyList *squareList, Image *image)
 {
-    // Avoid warning
-    (void) image;
+    Node *n = squareList->head;
+    Square temp = *(Square *)n->value;
 
-    const unsigned int len = squareList->len;
-    Square temp = squareList->squares[0];
+    // Avoid warning
+    (void)image;
+
     int tempFactor = getPerimeter(&temp);
-    for (unsigned int i = 1; i < len; i++)
+    n = n->next;
+    for (; n != NULL; n = n->next)
     {
-        Square square = squareList->squares[i];
-        int factor = getPerimeter(&square);
+        Square *square = (Square *)n->value;
+        int factor = getPerimeter(square);
         if (factor > tempFactor) // && canBeSudokuGrid(&square, image))
         {
             tempFactor = factor;
-            temp = square;
+            temp = *square;
         }
     }
     return temp;
@@ -383,7 +400,9 @@ int canBeSudokuGrid(Square *square, Image *image)
 double getSquareFactor(Image *image)
 {
     int len;
-    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.'; len--);
+    for (len = strlen(image->path) - 1; len >= 0 && image->path[len] != '.';
+         len--)
+        ;
     if (image->path[len] == '.')
     {
         len--;

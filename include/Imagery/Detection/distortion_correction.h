@@ -6,8 +6,8 @@
 #include <stdlib.h>
 
 #include "Imagery/Detection/matrix.h"
-#include "Imagery/Detection/struct.h"
 #include "Imagery/Detection/square_detection.h"
+#include "Imagery/Detection/struct.h"
 #include "Imagery/Utils/image.h"
 #include "verbose.h"
 
@@ -31,8 +31,8 @@ void crossProduct(double vect_A[], double vect_B[], double cross_P[]);
  */
 
 void perspectiveMatrix(int src[4][2], double dst[4][2],
-                                double **transformation_matrix,
-                                double **transformation_matrix_inv);
+                       double **transformation_matrix,
+                       double **transformation_matrix_inv);
 
 /**
  * @brief
@@ -45,6 +45,6 @@ void perspectiveMatrix(int src[4][2], double dst[4][2],
  */
 
 Image correctPerspective(Image *image, Square *selected_square,
-                          int verbose_mode, char *verbose_path);
+                         int verbose_mode, char *verbose_path);
 
 #endif
