@@ -586,7 +586,7 @@ void edit_terminal(char *terminal_id, char *string)
 
 #pragma region "Result"
 
-void show_result(unsigned int **grid, int dimension)
+void show_result(unsigned int **grid, int dimension, Image *res)
 {
     GtkGrid *grid_result;
     GtkStack *stack_result;
@@ -595,7 +595,7 @@ void show_result(unsigned int **grid, int dimension)
         gtk_stack_set_visible_child_name(stack_2, "confirmation");
 
         // Load image
-        change_image(&image, "selected_image1");
+        change_image(res, "selected_image1");
 
 
         // get grid
@@ -608,7 +608,7 @@ void show_result(unsigned int **grid, int dimension)
         gtk_stack_set_visible_child_name(stack_2, "confirmation_hexa");
 
         // Load image
-        change_image(&image, "selected_image_hexa");
+        change_image(res, "selected_image_hexa");
 
         // get grid
         grid_result =
@@ -744,13 +744,11 @@ void confirm_result()
     edit_progress_bar(1, "Result");
 
     // TODO: change the way we save image
-    saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
+    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 1);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
     change_image(&sudoku_image, "result_image");
-
-    freeImage(&sudoku_image, 9);
 }
 
 void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
@@ -807,9 +805,9 @@ void set_recents_files()
         gtk_button_set_alignment(button, 0.5, 0.5);
 
         g_signal_connect(button, "clicked", G_CALLBACK(open_file), path);
-        GtkStyleContext *context = gtk_widget_get_style_context(button);
+        GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(button));
 
-        gtk_box_pack_start(box, button, FALSE, FALSE, 0);
+        gtk_box_pack_start(box, GTK_WIDGET(button), FALSE, FALSE, 0);
 
         // Free
         g_free(uri);

@@ -170,14 +170,15 @@ void *OCR(void *Thread_args)
     basicPrint(grid, dimension);
 
     freeNetwork(&network);
-    freeImage(&cropped, 0);
 
     if (gui)
     {
-        show_result(grid, dimension);
+        show_result(grid, dimension, &cropped);
+        freeImage(&cropped, 0);
         pthread_exit(NULL); // Exit thread
         return NULL;
     }
+    freeImage(&cropped, 0);
 
     if (!isSolvable(grid, dimension))
     {
