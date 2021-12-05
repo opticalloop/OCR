@@ -9,6 +9,7 @@
 
 Image image;
 Image temp_image;
+int loaded_image = 0;
 
 GtkBuilder *builder;
 gchar *filename;
@@ -139,6 +140,8 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         // Display image
         change_image(&image, "selected_image");
+        
+        loaded_image = 1;
 
         // update label
         GtkLabel *label =
@@ -588,7 +591,7 @@ void edit_terminal(char *terminal_id, char *string)
 
 #pragma region "Result"
 
-void show_result(unsigned int **grid, int dimension)
+void show_result(unsigned int **grid, int dimension, Image *res)
 {
     GtkGrid *grid_result;
     GtkStack *stack_result;
@@ -597,7 +600,7 @@ void show_result(unsigned int **grid, int dimension)
         gtk_stack_set_visible_child_name(stack_2, "confirmation");
 
         // Load image
-        change_image(&image, "selected_image1");
+        change_image(res, "selected_image1");
 
 
         // get grid
@@ -610,7 +613,7 @@ void show_result(unsigned int **grid, int dimension)
         gtk_stack_set_visible_child_name(stack_2, "confirmation_hexa");
 
         // Load image
-        change_image(&image, "selected_image_hexa");
+        change_image(res, "selected_image_hexa");
 
         // get grid
         grid_result =
@@ -736,27 +739,55 @@ void confirm_result()
         sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
     }
 
-    freeGrid(result, dim); // Free grid
-    freeGrid(copy, dim); // Free copy
-
     change_image(&sudoku_image, "selected_image");
     edit_progress_bar(1, "Result");
 
     // TODO : change the way we save image
-    saveVerbose(1, &sudoku_image, "temp", "0.0_grid", 1, 1);
+    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 0);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
     change_image(&sudoku_image, "result_image");
 
-    freeImage(&sudoku_image, 9);
+    
+    freeGrid(result, dim); // Free grid
+    freeGrid(copy, dim); // Free copy
+
+    freeImage(&sudoku_image, 1);
 }
 
 #pragma endregion
-void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
+
+gboolean on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
-    change_image(&image, "selected_image");
+    // printf("    🔨 Resizing %d %d\n", allocation->width, allocation->height);
+
+    // if (loaded_image)
+    // {
+    //     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder, "right_panel"));
+
+    //     int width = 
+    //         clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0, 1000);
+        
+    //     int height =
+    //         clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0, 1000);
+
+    //     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
+
+    //     GtkImage *imageWidget =
+    //         GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); // get image
+
+    //     // Change image
+    //     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
+    //     pixbuf, width, height, GDK_INTERP_BILINEAR); // resize image
+
+    //     // set the image
+    //     gtk_image_set_from_pixbuf(imageWidget, resized_image);
+    // }
+
+    // return TRUE;
 }
+
 void *init_gui()
 {
     builder = NULL;
@@ -809,8 +840,7 @@ void *init_gui()
         GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_bar"));
 
     // on resize window
-    // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
-    // TODO: fix this
+    g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
 
     // load UI
     gtk_widget_show_all(window); // show window
@@ -821,6 +851,7 @@ void *init_gui()
     quit();
     pthread_exit(NULL);
 }
+
 void open_website()
 {
     // Check if the browser is installed

@@ -11,6 +11,7 @@
 #include "GUI/gui_utils.h"
 #include "Imagery/Detection/distortion_correction.h"
 #include "Imagery/Utils/image.h"
+#include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Utils/op.h"
 #include "NeuralNetwork/training.h"
 #include "Sudoku_Solver/Sudoku_Solvable/sudoku_solvable.h"
@@ -93,7 +94,7 @@ void edit_terminal(char *terminal_id, char *string);
 
 #pragma endregion "Terminal"
 
-void show_result(unsigned int **grid, int dimension);
+void show_result(unsigned int **grid, int dimension, Image *res);
 
 void *init_gui();
 

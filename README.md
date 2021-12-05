@@ -54,6 +54,9 @@ Options nn :
     -L --load <weight_path> : launch the network before trade
     -S --save <weight_path> : save the network after train
     --help : print neural network help
+./main data : generate the data in the directory src/NeuralNetwork/Digits-Only/
+              If you want to add your own image to train the network on, make sure 
+              the last character are : ...<digit repre>
 ```
 
 #### The entire code is fully documented in the .h files, all in the include folder
