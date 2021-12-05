@@ -2,9 +2,6 @@
 
 #define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 300
-
-
 MyList *simplifyLines(MyList *linelist)
 {
     MyList *allLines = linelist;
