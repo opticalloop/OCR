@@ -588,6 +588,8 @@ void edit_terminal(char *terminal_id, char *string)
 
 void show_result(unsigned int **grid, int dimension)
 {
+    GtkGrid *grid_result;
+    GtkStack *stack_result;
     if (dimension == 9)
     {
         gtk_stack_set_visible_child_name(stack_2, "confirmation");
@@ -596,11 +598,9 @@ void show_result(unsigned int **grid, int dimension)
         change_image(&image, "selected_image1");
 
         // get grid
-        GtkGrid *grid_widget =
-            GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
+        grid_result = GTK_GRID(gtk_builder_get_object(builder, "grid_result"));
 
-        GtkStack *stack_result =
-            GTK_STACK(gtk_builder_get_object(builder, "stack1"));
+        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack1"));
     }
     else // dimension == 16
     {
@@ -610,16 +610,12 @@ void show_result(unsigned int **grid, int dimension)
         change_image(&image, "selected_image_hexa");
 
         // get grid
-        GtkGrid *grid_widget =
+        grid_result =
             GTK_GRID(gtk_builder_get_object(builder, "grid_result_hexa"));
 
-        GtkStack *stack_result =
-            GTK_STACK(gtk_builder_get_object(builder, "stack2"));
+        stack_result = GTK_STACK(gtk_builder_get_object(builder, "stack2"));
     }
     gtk_stack_set_visible_child_name(stack_result, "Result");
-
-    // copy child of grid 0 0
-    GtkWidget *child = gtk_grid_get_child_at(grid_widget, 0, 0);
 
     for (size_t i = 0; i < dimension; i++)
     {
@@ -627,7 +623,7 @@ void show_result(unsigned int **grid, int dimension)
         {
             // get input at i,j and set value
             GtkEntry *entry =
-                GTK_ENTRY(gtk_grid_get_child_at(grid_widget, i, j));
+                GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
             char ch[40] = " ";
             if (grid[i][j] > 9)
             {
