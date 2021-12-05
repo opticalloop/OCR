@@ -5238,8 +5238,8 @@ after that you load the picture of the sudoku you have taken in photo, and TADA 
                     </child>
                   </object>
                   <packing>
-                    <property name="name">confirmation_Hexa</property>
-                    <property name="title" translatable="yes">confirmation_Hexa</property>
+                    <property name="name">confirmation_hexa</property>
+                    <property name="title" translatable="yes">confirmation_hexa</property>
                     <property name="position">6</property>
                   </packing>
                 </child>
