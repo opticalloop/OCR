@@ -162,12 +162,10 @@ void *OCR(void *Thread_args)
             {
                 val = 0;
             }
-            else
-            {
-                grid[i][j] = val;
-                // Free the case
-                freeImage(&(all_cases[i * dimension + j]), 0);
-            }
+            grid[i][j] = val;
+            // Free the case
+            freeImage(&(all_cases[i * dimension + j]), 0);
+            
         }
     }
 
