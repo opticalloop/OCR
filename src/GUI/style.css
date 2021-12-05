@@ -118,8 +118,16 @@ window button {
     border: 1px solid #ff8800;
     border-radius: 15px;
     background:rgb(38, 38, 47);
-}
+}   
 
+entry {
+    background-color: rgb(38, 38, 47);
+    border-radius: 0px;
+    color: white;
+}
+.right_panel separator {
+    background-color: #ff8800;
+}
 .last_files button {
     background-color: rgb(38, 38, 47);
     margin-top: 5px;
