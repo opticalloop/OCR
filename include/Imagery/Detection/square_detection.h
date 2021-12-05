@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "Imagery/Detection/houghtransform.h"
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/struct.h"
 #include "Imagery/Detection/linked_list.h"
 
