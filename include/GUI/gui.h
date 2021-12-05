@@ -10,6 +10,7 @@
 #include "GUI/draw.h"
 #include "GUI/gui_utils.h"
 #include "Imagery/Detection/distortion_correction.h"
+#include "Imagery/Rotations_Resize/resize.h"
 #include "Imagery/Utils/image.h"
 #include "Imagery/Utils/op.h"
 #include "NeuralNetwork/training.h"

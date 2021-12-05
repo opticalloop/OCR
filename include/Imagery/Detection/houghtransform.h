@@ -1,6 +1,7 @@
 #ifndef HOUGHTRANSFORM_H
 #define HOUGHTRANSFORM_H
 
+#include "Imagery/Detection/linked_list.h"
 #include "Imagery/Detection/reverse_color.h"
 #include "Imagery/Detection/sobel.h"
 #include "Imagery/Detection/square_detection.h"
@@ -33,11 +34,12 @@ Image detection(Image *image, Image *drawImage, int verbose, int save,
  * @param verbose
  * @param draw
  * @param output_folder
- * @return LineList
+ * @param maxTheta
+ * @return MyList
  */
 
-LineList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
-                        char *output_folder);
+MyList houghtransform(Image *image, Image *drawImage, int verbose, int draw,
+                      char *output_folder, double *max_Theta);
 
 /**
  * @brief
@@ -85,7 +87,7 @@ void draw_line(Image *image, int w, int h, Line *line, Pixel *color,
  * @param lineList
  * @return unsigned int
  */
-unsigned int findTheta(LineList *lineList);
+unsigned int findTheta(MyList *lineList);
 
 /**
  * @brief
@@ -94,7 +96,7 @@ unsigned int findTheta(LineList *lineList);
  * @param lineList
  * @param angleDegree
  */
-void rotateAll(Image *image, LineList *lineList, double angleDegree);
+void rotateAll(Image *image, MyList *lineList, double angleDegree);
 
 /**
  * @brief

@@ -9,6 +9,7 @@
 
 Image image;
 Image temp_image;
+int loaded_image = 0;
 
 GtkBuilder *builder;
 gchar *filename;
@@ -139,6 +140,8 @@ void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 
         // Display image
         change_image(&image, "selected_image");
+
+        loaded_image = 1;
 
         // update label
         GtkLabel *label =
@@ -278,9 +281,11 @@ void run_process(GtkButton *button)
             gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo_box));
 
         printf("Processing...\n");
+
+        saveImage(&image, filename);
         // Run processing
         pthread_t t;
-        t = OCR_thread(IMAGE_SAVE_PATH, NULL, TRUE, TRUE, "tmp", TRUE,
+        t = OCR_thread(filename, NULL, TRUE, TRUE, "tmp", TRUE,
                        strcmp(dim, "9x9"));
         thread = &t;
     }
@@ -624,7 +629,7 @@ void show_result(unsigned int **grid, int dimension, Image *res)
         {
             // get input at i,j and set value
             GtkEntry *entry =
-                GTK_ENTRY(gtk_grid_get_child_at(grid_result, i, j));
+                GTK_ENTRY(gtk_grid_get_child_at(grid_result, j, i));
 
             char ch[40] = " ";
             if (grid[i][j] > 9)
@@ -737,23 +742,79 @@ void confirm_result()
         sudoku_image = createSudokuImage(result, copy, IMAGE_PATH, dim);
     }
 
-    freeGrid(result, dim); // Free grid
-    freeGrid(copy, dim); // Free copy
-
     change_image(&sudoku_image, "selected_image");
     edit_progress_bar(1, "Result");
 
-    // TODO: change the way we save image
-    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 1);
+    saveVerbose(1, &sudoku_image, "tmp", "0.0_grid", 1, 0);
 
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
     change_image(&sudoku_image, "result_image");
+  
+    freeGrid(result, dim); // Free grid
+    freeGrid(copy, dim); // Free copy
+
+    freeImage(&sudoku_image, 0);
 }
 
-void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
+#pragma endregion
+
+gboolean on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
-    change_image(&image, "selected_image");
+    // printf("    🔨 Resizing %d %d\n", allocation->width, allocation->height);
+
+    // if (loaded_image)
+    // {
+    //     GtkStack *panel = GTK_STACK(gtk_builder_get_object(builder,
+    //     "right_panel"));
+
+    //     int width =
+    //         clamp(gtk_widget_get_allocated_width(GTK_WIDGET(panel)), 0,
+    //         1000);
+
+    //     int height =
+    //         clamp(gtk_widget_get_allocated_height(GTK_WIDGET(panel)), 0,
+    //         1000);
+
+    //     GdkPixbuf *pixbuf = image_to_pixbuf(&image);
+
+    //     GtkImage *imageWidget =
+    //         GTK_IMAGE(gtk_builder_get_object(builder, "selected_image")); //
+    //         get image
+
+    //     // Change image
+    //     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
+    //     pixbuf, width, height, GDK_INTERP_BILINEAR); // resize image
+
+    //     // set the image
+    //     gtk_image_set_from_pixbuf(imageWidget, resized_image);
+
+    //     GdkPixbuf *sourcePixbuf = data;	/* As read from a file */
+    //     GdkPixbuf *imagePixbuf;	/* pixbuf of the on-screen image */
+
+    //     imagePixbuf = gtk_image_get_pixbuf(GTK_IMAGE(image));
+    //     if (imagePixbuf == NULL) {
+    //     g_message("Can't get on-screen pixbuf");
+    //     return TRUE;
+    //     }
+    //     /* Recreate the displayed image if the image size has changed. */
+    //     if (allocation->width != gdk_pixbuf_get_width(imagePixbuf) ||
+    //         allocation->height != gdk_pixbuf_get_height(imagePixbuf)) {
+
+    //     gtk_image_set_from_pixbuf(
+    //         GTK_IMAGE(image),
+    //         gdk_pixbuf_scale_simple(sourcePixbuf,
+    //                     allocation->width,
+    //                     allocation->height,
+    //                     GDK_INTERP_BILINEAR)
+    //     );
+    //     g_object_unref(imagePixbuf); /* Free the old one */
+    // }
+
+    // return FALSE;
+    // }
+
+    // return TRUE;
 }
 
 #pragma endregion "Result"
@@ -879,8 +940,7 @@ void *init_gui()
     set_recents_files();
 
     // on resize window
-    // g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
-    // TODO: fix this
+    g_signal_connect(window, "size-allocate", G_CALLBACK(on_resize), NULL);
 
     // load UI
     gtk_widget_show_all(window); // show window
@@ -889,6 +949,7 @@ void *init_gui()
 
     // pthread_exit(NULL);
 }
+
 void open_website()
 {
     // Check if the browser is installed
