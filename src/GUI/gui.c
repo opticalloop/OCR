@@ -120,7 +120,7 @@ char *get_filename_ext(const char *filename)
 
 void on_file_set(GtkFileChooserButton *file_chooser, gpointer data)
 {
-    (void)data;
+    (void) data;
 
     // select filename and update image
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_chooser));
@@ -670,7 +670,7 @@ void confirm_result()
         {
             GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
 
-            const gchar *str = gtk_entry_get_text(entry);
+            const gchar * str = gtk_entry_get_text(entry);
             int size = strlen(str);
             // Str length is 1 or 2
             if (size == 0)
@@ -751,7 +751,7 @@ void confirm_result()
     gtk_stack_set_visible_child_name(stack_2, "page_result");
 
     change_image(&sudoku_image, "result_image");
-
+  
     freeGrid(result, dim); // Free grid
     freeGrid(copy, dim); // Free copy
 
@@ -762,9 +762,9 @@ void confirm_result()
 
 void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
-    (void)widget;
-    (void)data;
-    (void)allocation;
+    (void) widget;
+    (void) data;
+    (void) allocation;
     // printf("    🔨 Resizing %d %d\n", allocation->width, allocation->height);
 
     // if (loaded_image)
@@ -826,7 +826,7 @@ void on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 #pragma region "Main"
 void open_file(GtkWidget *widget, gpointer data)
 {
-    (void)widget;
+    (void) widget;
     // open image in explorer
     char *path = data;
     char command[100] = "xdg-open ";
@@ -884,8 +884,8 @@ void set_recents_files()
         gtk_box_pack_start(box, GTK_WIDGET(button), FALSE, FALSE, 0);
 
         // Free
-        g_free((void *)uri);
-        g_free((void *)name);
+        g_free((void *) uri);
+        g_free((void *) name);
 
         items = g_list_next(items);
         i++;
