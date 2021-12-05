@@ -68,7 +68,7 @@ SquareList getAllSquare(LineList *lineList, int width, int height,
  * @param height
  * @return int
  */
-int isSquare(Square *square, unsigned int width, unsigned int height);
+int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR);
 
 /**
  * @brief Get the Line Length object

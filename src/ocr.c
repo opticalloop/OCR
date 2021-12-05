@@ -52,6 +52,7 @@ void *OCR(void *Thread_args)
     Thread_argument arg = *(Thread_argument *)Thread_args;
     Image image = arg.image;
     char *image_path = image.path;
+    printf("%s\n", image_path);
     char *output_path = arg.output_path;
     int verbose = arg.verbose;
     int save = arg.save;

@@ -2,8 +2,6 @@
 
 #define MIN_EQUAL 30
 
-#define SQUARE_FACTOR 300
-
 LineList simplifyLines(LineList *linelist)
 {
     const unsigned int len = linelist->len;
@@ -237,7 +235,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
                                     square.left = fourthLine;
 
                                     // Not a square
-                                    if (!isSquare(&square, width, height))
+                                    if (!isSquare(&square, width, height, 300))
                                     {
                                         continue;
                                     }
@@ -267,7 +265,7 @@ SquareList findSquare(LineList *lineList, int width, int height, Image *image,
     return squareList;
 }
 
-int isSquare(Square *square, unsigned int width, unsigned int height)
+int isSquare(Square *square, unsigned int width, unsigned int height, double SQUARE_FACTOR)
 {
     unsigned int lenLeft = getLineLength(&(square->left));
 

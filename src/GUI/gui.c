@@ -431,7 +431,7 @@ void on_resize_finished(GtkWidget *widget, gpointer data)
     resizing = 0;
     printf("    👍 Finished resize\n");
 
-    Image img = correct_perspective(&image, &resized_square, 1, "temp/");
+    Image img = correctPerspective(&image, &resized_square, 1, "temp/");
     image = img;
 
     GtkWidget *page = data;
