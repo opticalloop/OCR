@@ -85,7 +85,7 @@ void set_selected_image(GdkPixbuf *pixbuf, char *GtkimageID)
     int new_width = image_width * scale_factor;
     int new_height = image_height * scale_factor;
 
-    printf("%f %d %d\n", scale_factor, width, height);
+    // printf("%f %d %d\n", scale_factor, width, height);
     // resize the image
     GdkPixbuf *resized_image = gdk_pixbuf_scale_simple(
         pixbuf, 500, 500, GDK_INTERP_BILINEAR); // resize image
@@ -658,7 +658,7 @@ void confirm_result()
     {
         for (int j = 0; j < dim; j++)
         {
-            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, i, j));
+            GtkEntry *entry = GTK_ENTRY(gtk_grid_get_child_at(grid, j, i));
 
             const gchar *str = gtk_entry_get_text(entry);
             int size = strlen(str);
