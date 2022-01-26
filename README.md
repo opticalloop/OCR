@@ -1,6 +1,8 @@
 # OCR
 ### by opticaloop
 
+> Project made by four students at EPITA for the third semester (S3)
+
 Software designed to solve sudoku grid based on a picture.
 Work with an OCR so the picture need to be a minimum accurate.
 The digit recognization is done thanks to an Neural Network, you can fully train him.
