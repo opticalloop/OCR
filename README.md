@@ -1,11 +1,11 @@
-# OCR
+# OCR 📷
 ### by opticaloop
 
 Software designed to solve sudoku grid based on a picture.
 Work with an OCR so the picture need to be a minimum accurate.
 The digit recognization is done thanks to an Neural Network, you can fully train him.
 
-### Dependencies
+### Dependencies ⚙️
 #### Install SDL 1.2
 ```sh
 Ubuntu/Debian : sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev 
@@ -26,7 +26,7 @@ NixOS         :
 make
 ```
 
-### Usage
+### Usage ❓
 
 #### Graphical interface
 ```sh
@@ -61,7 +61,7 @@ Options nn :
 
 #### The entire code is fully documented in the .h files, all in the include folder
 
-# License
+# License ⚖️
 MIT License
 
 Copyright (c) 2021 opticalloop
